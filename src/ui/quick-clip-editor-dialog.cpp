@@ -56,10 +56,7 @@ QString formatTime(qint64 milliseconds)
 	const qint64 minutes = totalSeconds / 60;
 	const qint64 seconds = totalSeconds % 60;
 	const qint64 tenths = (milliseconds % 1000) / 100;
-	return QStringLiteral("%1:%2.%3")
-		.arg(minutes)
-		.arg(seconds, 2, 10, QLatin1Char('0'))
-		.arg(tenths);
+	return QStringLiteral("%1:%2.%3").arg(minutes).arg(seconds, 2, 10, QLatin1Char('0')).arg(tenths);
 }
 
 class TrimRange final : public QWidget {
@@ -124,12 +121,16 @@ public:
 			if (segmentEnd - segmentStart < 100)
 				continue;
 			const qint64 midpoint = segmentStart + (segmentEnd - segmentStart) / 2;
-			const bool removed = std::any_of(removedRanges_.begin(), removedRanges_.end(),
-				[midpoint](const auto &range) { return midpoint >= range.first && midpoint < range.second; });
+			const bool removed = std::any_of(
+				removedRanges_.begin(), removedRanges_.end(), [midpoint](const auto &range) {
+					return midpoint >= range.first && midpoint < range.second;
+				});
 			if (removed)
 				continue;
-			const bool suggested = std::any_of(suggestedRanges_.begin(), suggestedRanges_.end(),
-				[midpoint](const auto &range) { return midpoint >= range.first && midpoint < range.second; });
+			const bool suggested = std::any_of(
+				suggestedRanges_.begin(), suggestedRanges_.end(), [midpoint](const auto &range) {
+					return midpoint >= range.first && midpoint < range.second;
+				});
 			segments.push_back({segmentStart, segmentEnd, suggested});
 		}
 		return segments;
@@ -174,8 +175,9 @@ public:
 		removedRanges_ = std::move(merged);
 		selectedSourceStarts_.clear();
 		const auto remaining = visibleSegments();
-		const auto next = std::find_if(remaining.begin(), remaining.end(),
-			[deletedEnd](const Segment &segment) { return segment.start >= deletedEnd; });
+		const auto next =
+			std::find_if(remaining.begin(), remaining.end(),
+				     [deletedEnd](const Segment &segment) { return segment.start >= deletedEnd; });
 		position_ = next != remaining.end() ? next->start : remaining.back().start;
 		setProperty("positionMilliseconds", position_);
 		setProperty("removedRangeCount", static_cast<int>(removedRanges_.size()));
@@ -207,22 +209,20 @@ public:
 	std::size_t selectedSegmentCount() const
 	{
 		const auto segments = visibleSegments();
-		return static_cast<std::size_t>(std::count_if(segments.begin(), segments.end(),
-			[this](const Segment &segment) { return isSelected(segment.start); }));
+		return static_cast<std::size_t>(
+			std::count_if(segments.begin(), segments.end(),
+				      [this](const Segment &segment) { return isSelected(segment.start); }));
 	}
 	std::size_t selectedSuggestedCount() const
 	{
 		const auto segments = visibleSegments();
-		return static_cast<std::size_t>(std::count_if(segments.begin(), segments.end(),
-			[this](const Segment &segment) {
+		return static_cast<std::size_t>(
+			std::count_if(segments.begin(), segments.end(), [this](const Segment &segment) {
 				return segment.suggested && isSelected(segment.start);
 			}));
 	}
 	std::size_t suggestedRangeCount() const { return suggestedRanges_.size(); }
-	bool hasEdits() const
-	{
-		return !splitPoints_.empty() || !removedRanges_.empty() || !suggestedRanges_.empty();
-	}
+	bool hasEdits() const { return !splitPoints_.empty() || !removedRanges_.empty() || !suggestedRanges_.empty(); }
 	const std::vector<std::pair<qint64, qint64>> &removedRanges() const { return removedRanges_; }
 	void setRemovedRanges(std::vector<std::pair<qint64, qint64>> ranges)
 	{
@@ -259,20 +259,23 @@ protected:
 			const qreal ratio = static_cast<qreal>(tick) / (tickCount - 1);
 			const qreal x = content.left() + ratio * content.width();
 			painter.drawText(QRectF(x - 26, 8, 52, 18), Qt::AlignCenter,
-				formatTime(static_cast<qint64>(ratio * retainedDuration)));
+					 formatTime(static_cast<qint64>(ratio * retainedDuration)));
 		}
 		qreal segmentX = content.left();
 		for (std::size_t segmentIndex = 0; segmentIndex < segments.size(); ++segmentIndex) {
 			const auto &segment = segments[segmentIndex];
-			const qreal segmentWidth = retainedDuration > 0
-				? content.width() * (segment.end - segment.start) / retainedDuration : 0;
-			const QRectF segmentRect(segmentX, content.top(), std::max(2.0, segmentWidth - 3), content.height());
+			const qreal segmentWidth =
+				retainedDuration > 0
+					? content.width() * (segment.end - segment.start) / retainedDuration
+					: 0;
+			const QRectF segmentRect(segmentX, content.top(), std::max(2.0, segmentWidth - 3),
+						 content.height());
 			painter.save();
 			painter.setClipRect(segmentRect);
 			const int frames = std::max(1, static_cast<int>(segmentRect.width() / 80));
 			for (int frame = 0; frame < frames; ++frame) {
 				const QRectF frameRect(segmentRect.left() + frame * segmentRect.width() / frames,
-					segmentRect.top(), segmentRect.width() / frames + 1, 58);
+						       segmentRect.top(), segmentRect.width() / frames + 1, 58);
 				if (!thumbnail_.isNull())
 					painter.drawPixmap(frameRect.toRect(), thumbnail_, thumbnail_.rect());
 				else
@@ -282,21 +285,29 @@ protected:
 			painter.fillRect(waveformRect, QColor(8, 55, 61, 235));
 			if (!waveform_.empty()) {
 				painter.setPen(QPen(QColor(QStringLiteral("#12B8C4")), 1));
-				const int firstBin = std::clamp(static_cast<int>(segment.start * waveform_.size() / duration_), 0,
-					static_cast<int>(waveform_.size() - 1));
-				const int lastBin = std::clamp(static_cast<int>(segment.end * waveform_.size() / duration_), firstBin + 1,
-					static_cast<int>(waveform_.size()));
+				const int firstBin =
+					std::clamp(static_cast<int>(segment.start * waveform_.size() / duration_), 0,
+						   static_cast<int>(waveform_.size() - 1));
+				const int lastBin =
+					std::clamp(static_cast<int>(segment.end * waveform_.size() / duration_),
+						   firstBin + 1, static_cast<int>(waveform_.size()));
 				for (int bin = firstBin; bin < lastBin; ++bin) {
-					const qreal ratio = static_cast<qreal>(bin - firstBin) / std::max(1, lastBin - firstBin - 1);
+					const qreal ratio = static_cast<qreal>(bin - firstBin) /
+							    std::max(1, lastBin - firstBin - 1);
 					const qreal x = waveformRect.left() + ratio * waveformRect.width();
-					const qreal half = std::clamp(waveform_[static_cast<std::size_t>(bin)], 0.0, 1.0) * waveformRect.height() / 2.0;
-					painter.drawLine(QPointF(x, waveformRect.center().y() - half), QPointF(x, waveformRect.center().y() + half));
+					const qreal half =
+						std::clamp(waveform_[static_cast<std::size_t>(bin)], 0.0, 1.0) *
+						waveformRect.height() / 2.0;
+					painter.drawLine(QPointF(x, waveformRect.center().y() - half),
+							 QPointF(x, waveformRect.center().y() + half));
 				}
 			}
 			painter.restore();
 			const bool selected = isSelected(segment.start);
-			painter.setPen(QPen(selected ? QColor(QStringLiteral("#FFD166")) :
-				(segment.suggested ? QColor(QStringLiteral("#FF9F43")) : QColor(QStringLiteral("#4D6A88"))), selected ? 3 : 1));
+			painter.setPen(QPen(selected ? QColor(QStringLiteral("#FFD166"))
+						     : (segment.suggested ? QColor(QStringLiteral("#FF9F43"))
+									  : QColor(QStringLiteral("#4D6A88"))),
+					    selected ? 3 : 1));
 			painter.setBrush(segment.suggested ? QColor(255, 159, 67, 45) : Qt::NoBrush);
 			painter.drawRect(segmentRect);
 			segmentX += segmentWidth;
@@ -308,27 +319,23 @@ protected:
 		const qreal startX = 16.0;
 		const qreal endX = width() - 16.0;
 		painter.setBrush(QColor(QStringLiteral("#8247F5")));
-		painter.drawRoundedRect(QRectF(startX, track.top(), endX - startX,
-					       track.height()), 4, 4);
+		painter.drawRoundedRect(QRectF(startX, track.top(), endX - startX, track.height()), 4, 4);
 		painter.setPen(QPen(QColor(QStringLiteral("#62D6FF")), 2));
 		const qreal playX = sourceX(position_, segments, content);
 		painter.drawLine(QPointF(playX, 26), QPointF(playX, height() - 5));
 		const QString positionText = formatTime(position_);
 		const QFontMetrics metrics(painter.font());
 		const qreal bubbleWidth = metrics.horizontalAdvance(positionText) + 16;
-		const qreal bubbleX = std::clamp(playX - bubbleWidth / 2.0, 2.0,
-					       width() - bubbleWidth - 2.0);
+		const qreal bubbleX = std::clamp(playX - bubbleWidth / 2.0, 2.0, width() - bubbleWidth - 2.0);
 		painter.setPen(Qt::NoPen);
 		painter.setBrush(QColor(QStringLiteral("#12344A")));
 		painter.drawRoundedRect(QRectF(bubbleX, 1, bubbleWidth, 22), 6, 6);
 		painter.setPen(QColor(QStringLiteral("#9BE8FF")));
-		painter.drawText(QRectF(bubbleX, 1, bubbleWidth, 22), Qt::AlignCenter,
-				 positionText);
+		painter.drawText(QRectF(bubbleX, 1, bubbleWidth, 22), Qt::AlignCenter, positionText);
 		for (const qreal x : {startX, endX}) {
 			painter.setPen(QPen(QColor(QStringLiteral("#DCCBFF")), 2));
 			painter.setBrush(QColor(QStringLiteral("#8B5CF6")));
-			painter.drawRoundedRect(QRectF(x - 7, track.center().y() - 15,
-						  14, 30), 5, 5);
+			painter.drawRoundedRect(QRectF(x - 7, track.center().y() - 15, 14, 30), 5, 5);
 		}
 	}
 
@@ -351,11 +358,7 @@ protected:
 	}
 
 private:
-	qreal valueX(qint64 value) const
-	{
-		return 16.0 + (width() - 32.0) *
-			       (static_cast<qreal>(value) / duration_);
-	}
+	qreal valueX(qint64 value) const { return 16.0 + (width() - 32.0) * (static_cast<qreal>(value) / duration_); }
 
 	qreal sourceX(qint64 source, const std::vector<Segment> &segments, const QRectF &content) const
 	{
@@ -365,8 +368,8 @@ private:
 		qint64 before = 0;
 		for (const auto &segment : segments) {
 			if (source >= segment.start && source <= segment.end)
-				return content.left() + content.width() *
-					(before + source - segment.start) / std::max<qint64>(1, total);
+				return content.left() +
+				       content.width() * (before + source - segment.start) / std::max<qint64>(1, total);
 			before += segment.end - segment.start;
 		}
 		return content.left();
@@ -378,8 +381,8 @@ private:
 		qint64 total = 0;
 		for (const auto &segment : segments)
 			total += segment.end - segment.start;
-		const qint64 offset = static_cast<qint64>(std::clamp((x - 16.0) /
-			std::max(1.0, width() - 32.0), 0.0, 1.0) * total);
+		const qint64 offset =
+			static_cast<qint64>(std::clamp((x - 16.0) / std::max(1.0, width() - 32.0), 0.0, 1.0) * total);
 		qint64 cursor = 0;
 		for (const auto &segment : segments) {
 			const qint64 length = segment.end - segment.start;
@@ -392,8 +395,8 @@ private:
 
 	bool isSelected(qint64 sourceStart) const
 	{
-		return std::find(selectedSourceStarts_.begin(), selectedSourceStarts_.end(),
-			sourceStart) != selectedSourceStarts_.end();
+		return std::find(selectedSourceStarts_.begin(), selectedSourceStarts_.end(), sourceStart) !=
+		       selectedSourceStarts_.end();
 	}
 
 	void updateSelectionProperty()
@@ -407,8 +410,7 @@ private:
 
 	qint64 xValue(qreal x) const
 	{
-		const qreal normalized = std::clamp(
-			(x - 16.0) / std::max(1.0, width() - 32.0), 0.0, 1.0);
+		const qreal normalized = std::clamp((x - 16.0) / std::max(1.0, width() - 32.0), 0.0, 1.0);
 		return static_cast<qint64>(normalized * duration_);
 	}
 
@@ -426,7 +428,7 @@ private:
 				if (position_ >= segment.start && position_ <= segment.end) {
 					if (updateSelection && modifiers.testFlag(Qt::ControlModifier)) {
 						auto selected = std::find(selectedSourceStarts_.begin(),
-							selectedSourceStarts_.end(), segment.start);
+									  selectedSourceStarts_.end(), segment.start);
 						if (selected == selectedSourceStarts_.end())
 							selectedSourceStarts_.push_back(segment.start);
 						else
@@ -524,10 +526,7 @@ public:
 	static constexpr int kPreviewFps = 30;
 	static constexpr int kFrameBytes = kPreviewWidth * kPreviewHeight * 4;
 
-	QString text(const char *key) const
-	{
-		return translator ? translator(key) : QString::fromUtf8(key);
-	}
+	QString text(const char *key) const { return translator ? translator(key) : QString::fromUtf8(key); }
 
 	QString locateFfmpeg() const
 	{
@@ -536,23 +535,18 @@ public:
 			return configured;
 		for (const auto &libraryPath : QCoreApplication::libraryPaths()) {
 			QDir directory(libraryPath);
-			if (directory.dirName().compare(QStringLiteral("qt-plugins"),
-						      Qt::CaseInsensitive) != 0)
+			if (directory.dirName().compare(QStringLiteral("qt-plugins"), Qt::CaseInsensitive) != 0)
 				continue;
 			directory.cdUp();
-			const auto candidate = directory.filePath(
-				QStringLiteral("tools/ffmpeg/ffmpeg.exe"));
+			const auto candidate = directory.filePath(QStringLiteral("tools/ffmpeg/ffmpeg.exe"));
 			if (QFileInfo(candidate).isExecutable())
 				return candidate;
 		}
 		const QStringList roots{
-			qEnvironmentVariable("ProgramData") +
-				QStringLiteral("/obs-studio/plugins/clipxtudio/data"),
-			qEnvironmentVariable("APPDATA") +
-				QStringLiteral("/obs-studio/plugins/clipxtudio/data")};
+			qEnvironmentVariable("ProgramData") + QStringLiteral("/obs-studio/plugins/clipxtudio/data"),
+			qEnvironmentVariable("APPDATA") + QStringLiteral("/obs-studio/plugins/clipxtudio/data")};
 		for (const auto &root : roots) {
-			const auto candidate = QDir(root).filePath(
-				QStringLiteral("tools/ffmpeg/ffmpeg.exe"));
+			const auto candidate = QDir(root).filePath(QStringLiteral("tools/ffmpeg/ffmpeg.exe"));
 			if (QFileInfo(candidate).isExecutable())
 				return candidate;
 		}
@@ -561,27 +555,22 @@ public:
 
 	QStringList decodeArguments(qint64 start, qint64 duration, bool singleFrame) const
 	{
-		QStringList arguments{
-			QStringLiteral("-hide_banner"), QStringLiteral("-loglevel"),
-			QStringLiteral("error")};
+		QStringList arguments{QStringLiteral("-hide_banner"), QStringLiteral("-loglevel"),
+				      QStringLiteral("error")};
 		if (!singleFrame)
 			arguments << QStringLiteral("-re");
-		arguments << QStringLiteral("-ss")
-			  << QString::number(start / 1000.0, 'f', 3)
-			  << QStringLiteral("-i")
+		arguments << QStringLiteral("-ss") << QString::number(start / 1000.0, 'f', 3) << QStringLiteral("-i")
 			  << QString::fromStdString(clip.filePath.u8string());
 		if (!singleFrame)
-			arguments << QStringLiteral("-t")
-				  << QString::number(duration / 1000.0, 'f', 3);
+			arguments << QStringLiteral("-t") << QString::number(duration / 1000.0, 'f', 3);
 		arguments << QStringLiteral("-an") << QStringLiteral("-vf")
 			  << QStringLiteral("scale=960:540:force_original_aspect_ratio=decrease,"
 					    "pad=960:540:(ow-iw)/2:(oh-ih)/2:color=black,"
 					    "fps=30,format=bgra");
 		if (singleFrame)
 			arguments << QStringLiteral("-frames:v") << QStringLiteral("1");
-		arguments << QStringLiteral("-f") << QStringLiteral("rawvideo")
-			  << QStringLiteral("-pix_fmt") << QStringLiteral("bgra")
-			  << QStringLiteral("pipe:1");
+		arguments << QStringLiteral("-f") << QStringLiteral("rawvideo") << QStringLiteral("-pix_fmt")
+			  << QStringLiteral("bgra") << QStringLiteral("pipe:1");
 		return arguments;
 	}
 
@@ -589,21 +578,21 @@ public:
 	{
 		if (bytes.size() < kFrameBytes)
 			return;
-		const QImage frame(reinterpret_cast<const uchar *>(bytes.constData()),
-				   kPreviewWidth, kPreviewHeight, QImage::Format_ARGB32);
+		const QImage frame(reinterpret_cast<const uchar *>(bytes.constData()), kPreviewWidth, kPreviewHeight,
+				   QImage::Format_ARGB32);
 		const auto pixmap = QPixmap::fromImage(frame.copy());
-		video->setPixmap(pixmap.scaled(
-			video->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
+		video->setPixmap(pixmap.scaled(video->size(), Qt::KeepAspectRatio, Qt::SmoothTransformation));
 		if (range != nullptr)
-			range->setThumbnail(pixmap.scaled(160, 90, Qt::KeepAspectRatioByExpanding,
-				Qt::SmoothTransformation));
+			range->setThumbnail(
+				pixmap.scaled(160, 90, Qt::KeepAspectRatioByExpanding, Qt::SmoothTransformation));
 	}
 };
 
-QuickClipEditorDialog::QuickClipEditorDialog(
-	TranslationFunction translator, ClipMetadata clip, ExportManager *exportManager,
-	SettingsManager *settingsManager, QWidget *parent)
-	: QDialog(parent), impl_(new Impl)
+QuickClipEditorDialog::QuickClipEditorDialog(TranslationFunction translator, ClipMetadata clip,
+					     ExportManager *exportManager, SettingsManager *settingsManager,
+					     QWidget *parent)
+	: QDialog(parent),
+	  impl_(new Impl)
 {
 	impl_->translator = std::move(translator);
 	impl_->clip = std::move(clip);
@@ -620,8 +609,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	setMinimumSize(880, 620);
 
 	auto *root = new QVBoxLayout(this);
-	root->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceLg,
-				 tokens::kSpaceLg, tokens::kSpaceLg);
+	root->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceLg, tokens::kSpaceLg, tokens::kSpaceLg);
 	root->setSpacing(tokens::kSpaceMd);
 	auto *heading = new QHBoxLayout();
 	auto *copy = new QVBoxLayout();
@@ -648,8 +636,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	mediaCard->setObjectName(QStringLiteral("quickEditorMediaCard"));
 	mediaCard->setProperty("cardRole", QStringLiteral("editor"));
 	auto *mediaLayout = new QVBoxLayout(mediaCard);
-	mediaLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd,
-					tokens::kSpaceMd, tokens::kSpaceMd);
+	mediaLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	mediaLayout->setSpacing(tokens::kSpaceSm);
 	impl_->video = new QLabel(mediaCard);
 	impl_->video->setObjectName(QStringLiteral("quickEditorVideo"));
@@ -675,21 +662,17 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	rangeInfo->addWidget(impl_->endLabel);
 	mediaLayout->addLayout(rangeInfo);
 	auto *cutActions = new QHBoxLayout();
-	impl_->markCutStart = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorSplit), mediaCard);
+	impl_->markCutStart = new QPushButton(impl_->text(strings::kClipsQuickEditorSplit), mediaCard);
 	impl_->markCutStart->setObjectName(QStringLiteral("quickEditorMarkCutStartButton"));
-	impl_->removeCut = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorRemoveCut), mediaCard);
+	impl_->removeCut = new QPushButton(impl_->text(strings::kClipsQuickEditorRemoveCut), mediaCard);
 	impl_->removeCut->setObjectName(QStringLiteral("quickEditorRemoveCutButton"));
 	impl_->removeCut->setIcon(style()->standardIcon(QStyle::SP_TrashIcon));
 	impl_->removeCut->setIconSize(QSize(17, 17));
 	impl_->removeCut->setEnabled(false);
-	impl_->undoCuts = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorUndoCuts), mediaCard);
+	impl_->undoCuts = new QPushButton(impl_->text(strings::kClipsQuickEditorUndoCuts), mediaCard);
 	impl_->undoCuts->setObjectName(QStringLiteral("quickEditorUndoCutsButton"));
 	impl_->undoCuts->setEnabled(false);
-	impl_->smartTrim = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorSmartTrim), mediaCard);
+	impl_->smartTrim = new QPushButton(impl_->text(strings::kClipsQuickEditorSmartTrim), mediaCard);
 	impl_->smartTrim->setObjectName(QStringLiteral("quickEditorSmartTrimButton"));
 	impl_->smartTrim->setProperty("buttonRole", QStringLiteral("primary"));
 	cutActions->addWidget(impl_->markCutStart);
@@ -698,8 +681,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	cutActions->addStretch();
 	cutActions->addWidget(impl_->smartTrim);
 	mediaLayout->addLayout(cutActions);
-	auto *cutHelp = new QLabel(
-		impl_->text(strings::kClipsQuickEditorCutHelp), mediaCard);
+	auto *cutHelp = new QLabel(impl_->text(strings::kClipsQuickEditorCutHelp), mediaCard);
 	cutHelp->setWordWrap(true);
 	cutHelp->setProperty("textRole", QStringLiteral("muted"));
 	mediaLayout->addWidget(cutHelp);
@@ -711,9 +693,8 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	impl_->play->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	impl_->play->setIconSize(QSize(18, 18));
 	impl_->play->setFixedSize(46, 36);
-	impl_->play->setStyleSheet(QStringLiteral(
-		"QPushButton#quickEditorPlayButton{min-height:0px;max-height:36px;"
-		"min-width:46px;max-width:46px;padding:0px;}"));
+	impl_->play->setStyleSheet(QStringLiteral("QPushButton#quickEditorPlayButton{min-height:0px;max-height:36px;"
+						  "min-width:46px;max-width:46px;padding:0px;}"));
 	impl_->play->setToolTip(impl_->text(strings::kClipsQuickEditorPlay));
 	impl_->play->setAccessibleName(impl_->text(strings::kClipsQuickEditorPlay));
 	transport->addWidget(impl_->play);
@@ -727,30 +708,25 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	side->setObjectName(QStringLiteral("quickEditorSideCard"));
 	side->setProperty("cardRole", QStringLiteral("editor"));
 	auto *sideLayout = new QVBoxLayout(side);
-	sideLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd,
-				       tokens::kSpaceMd, tokens::kSpaceMd);
+	sideLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	sideLayout->setSpacing(tokens::kSpaceSm);
 	auto *captionTitle = new QLabel(impl_->text(strings::kClipsQuickEditorCaption), side);
 	captionTitle->setProperty("textRole", QStringLiteral("sectionTitle"));
 	sideLayout->addWidget(captionTitle);
 	impl_->socialCaption = new QPlainTextEdit(side);
 	impl_->socialCaption->setObjectName(QStringLiteral("quickEditorSocialCaption"));
-	impl_->socialCaption->setPlaceholderText(
-		impl_->text(strings::kClipsQuickEditorNoCaption));
+	impl_->socialCaption->setPlaceholderText(impl_->text(strings::kClipsQuickEditorNoCaption));
 	impl_->socialCaption->setMinimumHeight(120);
 	sideLayout->addWidget(impl_->socialCaption, 1);
 	auto *captionActions = new QHBoxLayout();
-	impl_->generateCaption = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorGenerateCaption), side);
+	impl_->generateCaption = new QPushButton(impl_->text(strings::kClipsQuickEditorGenerateCaption), side);
 	impl_->generateCaption->setObjectName(QStringLiteral("quickEditorGenerateCaptionButton"));
-	auto *copyCaption = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorCopyCaption), side);
+	auto *copyCaption = new QPushButton(impl_->text(strings::kClipsQuickEditorCopyCaption), side);
 	copyCaption->setObjectName(QStringLiteral("quickEditorCopyCaptionButton"));
 	captionActions->addWidget(impl_->generateCaption, 1);
 	captionActions->addWidget(copyCaption);
 	sideLayout->addLayout(captionActions);
-	auto *shortsLabel = new QLabel(
-		impl_->text(strings::kClipsQuickEditorShortsCaption), side);
+	auto *shortsLabel = new QLabel(impl_->text(strings::kClipsQuickEditorShortsCaption), side);
 	shortsLabel->setProperty("textRole", QStringLiteral("muted"));
 	sideLayout->addWidget(shortsLabel);
 	impl_->shortsCaption = new QPlainTextEdit(side);
@@ -784,13 +760,11 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 
 	impl_->directory = new QLineEdit(side);
 	impl_->directory->setObjectName(QStringLiteral("quickEditorDirectory"));
-	const auto fallbackDirectory = impl_->clip.filePath.parent_path() /
-				       "ClipXtudio Exports";
-	const auto exportDirectory =
-		impl_->settingsManager != nullptr &&
-			!impl_->settingsManager->settings().exportDirectory.empty()
-			? impl_->settingsManager->settings().exportDirectory
-			: fallbackDirectory;
+	const auto fallbackDirectory = impl_->clip.filePath.parent_path() / "ClipXtudio Exports";
+	const auto exportDirectory = impl_->settingsManager != nullptr &&
+						     !impl_->settingsManager->settings().exportDirectory.empty()
+					     ? impl_->settingsManager->settings().exportDirectory
+					     : fallbackDirectory;
 	impl_->directory->setText(QString::fromStdString(exportDirectory.u8string()));
 	auto *directoryRow = new QHBoxLayout();
 	directoryRow->addWidget(impl_->directory, 1);
@@ -809,12 +783,10 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	impl_->status->hide();
 	sideLayout->addWidget(impl_->status);
 	auto *exportActions = new QHBoxLayout();
-	impl_->cancelButton = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorCancelExport), side);
+	impl_->cancelButton = new QPushButton(impl_->text(strings::kClipsQuickEditorCancelExport), side);
 	impl_->cancelButton->setObjectName(QStringLiteral("quickEditorCancelExportButton"));
 	impl_->cancelButton->hide();
-	impl_->exportButton = new QPushButton(
-		impl_->text(strings::kClipsQuickEditorExportButton), side);
+	impl_->exportButton = new QPushButton(impl_->text(strings::kClipsQuickEditorExportButton), side);
 	impl_->exportButton->setObjectName(QStringLiteral("quickEditorExportButton"));
 	impl_->exportButton->setProperty("buttonRole", QStringLiteral("primary"));
 	exportActions->addWidget(impl_->cancelButton);
@@ -861,10 +833,9 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		if (impl_->previewProcess->state() != QProcess::NotRunning)
 			impl_->previewProcess->kill();
 		impl_->previewProcess->setProperty("frameBuffer", QByteArray{});
-		impl_->previewProcess->start(
-			impl_->ffmpegExecutable,
-			impl_->decodeArguments(impl_->playbackPosition, 0, true),
-			QIODevice::ReadOnly);
+		impl_->previewProcess->start(impl_->ffmpegExecutable,
+					     impl_->decodeArguments(impl_->playbackPosition, 0, true),
+					     QIODevice::ReadOnly);
 	};
 
 	auto updateRangeLabels = [this](qint64 start, qint64 end) {
@@ -876,8 +847,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		impl_->startLabel->setText(formatTime(start));
 		impl_->endLabel->setText(formatTime(end));
 		impl_->selectionLabel->setText(
-			impl_->text(strings::kClipsQuickEditorSelection)
-				.arg(formatTime(end - start)));
+			impl_->text(strings::kClipsQuickEditorSelection).arg(formatTime(end - start)));
 		if (impl_->playbackPosition < start || impl_->playbackPosition > end)
 			impl_->playbackPosition = start;
 		impl_->previewDebounce->start();
@@ -886,8 +856,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		const auto selected = impl_->range->selectedSegmentCount();
 		impl_->removeCut->setEnabled(selected > 0);
 		if (selected > 1)
-			impl_->removeCut->setText(
-				impl_->text(strings::kClipsQuickEditorRemoveSelected).arg(selected));
+			impl_->removeCut->setText(impl_->text(strings::kClipsQuickEditorRemoveSelected).arg(selected));
 		else
 			impl_->removeCut->setText(impl_->text(strings::kClipsQuickEditorRemoveCut));
 	};
@@ -907,9 +876,9 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			if (end < start)
 				std::swap(start, end);
 		}
-		ranges.erase(std::remove_if(ranges.begin(), ranges.end(), [](const auto &range) {
-			return range.second - range.first < 250;
-		}), ranges.end());
+		ranges.erase(std::remove_if(ranges.begin(), ranges.end(),
+					    [](const auto &range) { return range.second - range.first < 250; }),
+			     ranges.end());
 		std::sort(ranges.begin(), ranges.end());
 		std::vector<std::pair<qint64, qint64>> merged;
 		for (const auto &range : ranges) {
@@ -925,9 +894,9 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		for (const auto &[start, end] : impl_->range->removedRanges())
 			removed += end - start;
 		const qint64 kept = std::max<qint64>(0, impl_->range->end() - impl_->range->start() - removed);
-		impl_->selectionLabel->setText(
-			impl_->text(strings::kClipsQuickEditorSelectionAfterCuts)
-				.arg(formatTime(kept)).arg(impl_->range->removedRanges().size()));
+		impl_->selectionLabel->setText(impl_->text(strings::kClipsQuickEditorSelectionAfterCuts)
+						       .arg(formatTime(kept))
+						       .arg(impl_->range->removedRanges().size()));
 		impl_->undoCuts->setEnabled(impl_->range->hasEdits());
 		updateDeleteAction();
 	};
@@ -936,22 +905,21 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	connect(impl_->markCutStart, &QPushButton::clicked, this, [this, refreshCutSummary] {
 		if (!impl_->range->splitAt(impl_->range->position())) {
 			QMessageBox::information(this, impl_->text(strings::kClipsQuickEditorSplit),
-				impl_->text(strings::kClipsQuickEditorSplitUnavailable));
+						 impl_->text(strings::kClipsQuickEditorSplitUnavailable));
 			return;
 		}
 		refreshCutSummary();
 	});
-	connect(impl_->removeCut, &QPushButton::clicked, this,
-		[this, refreshCutSummary] {
-			if (!impl_->range->deleteSelected()) {
-				QMessageBox::information(this, impl_->text(strings::kClipsQuickEditorRemoveCut),
-					impl_->text(strings::kClipsQuickEditorDeleteUnavailable));
-				return;
-			}
-			impl_->playbackPosition = impl_->range->position();
-			impl_->previewDebounce->start();
-			refreshCutSummary();
-		});
+	connect(impl_->removeCut, &QPushButton::clicked, this, [this, refreshCutSummary] {
+		if (!impl_->range->deleteSelected()) {
+			QMessageBox::information(this, impl_->text(strings::kClipsQuickEditorRemoveCut),
+						 impl_->text(strings::kClipsQuickEditorDeleteUnavailable));
+			return;
+		}
+		impl_->playbackPosition = impl_->range->position();
+		impl_->previewDebounce->start();
+		refreshCutSummary();
+	});
 	connect(impl_->undoCuts, &QPushButton::clicked, this, [this, refreshCutSummary] {
 		impl_->range->clearEdits();
 		refreshCutSummary();
@@ -984,9 +952,9 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		const auto sampleCount = pcm.size() / 2;
 		const auto *bytes = reinterpret_cast<const unsigned char *>(pcm.constData());
 		for (qsizetype sample = 0; sample < sampleCount; ++sample) {
-			const auto raw = static_cast<std::int16_t>(
-				static_cast<std::uint16_t>(bytes[sample * 2]) |
-				(static_cast<std::uint16_t>(bytes[sample * 2 + 1]) << 8));
+			const auto raw =
+				static_cast<std::int16_t>(static_cast<std::uint16_t>(bytes[sample * 2]) |
+							  (static_cast<std::uint16_t>(bytes[sample * 2 + 1]) << 8));
 			const int bin = std::min(bins - 1, static_cast<int>((sample * bins) / sampleCount));
 			waveform[bin] = std::max(waveform[bin], std::abs(static_cast<qreal>(raw)) / 32768.0);
 		}
@@ -997,8 +965,8 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			return;
 		impl_->smartTrim->setEnabled(false);
 		impl_->smartTrim->setText(impl_->text(strings::kClipsQuickEditorSmartTrimAnalyzing));
-		impl_->smartTrimProgress = new QProgressDialog(
-			impl_->text(strings::kClipsQuickEditorSmartTrimProgress), QString(), 0, 0, this);
+		impl_->smartTrimProgress = new QProgressDialog(impl_->text(strings::kClipsQuickEditorSmartTrimProgress),
+							       QString(), 0, 0, this);
 		impl_->smartTrimProgress->setWindowTitle(impl_->text(strings::kClipsQuickEditorSmartTrim));
 		impl_->smartTrimProgress->setWindowModality(Qt::WindowModal);
 		impl_->smartTrimProgress->setCancelButton(nullptr);
@@ -1006,11 +974,12 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		impl_->smartTrimProgress->setMinimumWidth(480);
 		impl_->smartTrimProgress->show();
 		impl_->smartTrimProcess->setProperty("analysisOutput", QByteArray{});
-		impl_->smartTrimProcess->start(impl_->ffmpegExecutable,
-			{QStringLiteral("-hide_banner"), QStringLiteral("-nostdin"),
-			 QStringLiteral("-i"), QString::fromStdString(impl_->clip.filePath.u8string()),
-			 QStringLiteral("-af"), QStringLiteral("silencedetect=noise=-50dB:d=0.65"),
-			 QStringLiteral("-f"), QStringLiteral("null"), QStringLiteral("-")},
+		impl_->smartTrimProcess->start(
+			impl_->ffmpegExecutable,
+			{QStringLiteral("-hide_banner"), QStringLiteral("-nostdin"), QStringLiteral("-i"),
+			 QString::fromStdString(impl_->clip.filePath.u8string()), QStringLiteral("-af"),
+			 QStringLiteral("silencedetect=noise=-50dB:d=0.65"), QStringLiteral("-f"),
+			 QStringLiteral("null"), QStringLiteral("-")},
 			QIODevice::ReadOnly);
 	});
 	connect(impl_->smartTrimProcess, &QProcess::readyReadStandardError, this, [this] {
@@ -1029,11 +998,11 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			impl_->smartTrim->setText(impl_->text(strings::kClipsQuickEditorSmartTrim));
 			if (exitCode != 0) {
 				QMessageBox::warning(this, impl_->text(strings::kClipsQuickEditorSmartTrim),
-					impl_->text(strings::kClipsQuickEditorSmartTrimFailed));
+						     impl_->text(strings::kClipsQuickEditorSmartTrimFailed));
 				return;
 			}
-			const auto output = QString::fromUtf8(
-				impl_->smartTrimProcess->property("analysisOutput").toByteArray());
+			const auto output =
+				QString::fromUtf8(impl_->smartTrimProcess->property("analysisOutput").toByteArray());
 			const QRegularExpression startPattern(QStringLiteral("silence_start:\\s*([0-9.]+)"));
 			const QRegularExpression endPattern(QStringLiteral("silence_end:\\s*([0-9.]+)"));
 			std::vector<qint64> starts;
@@ -1050,8 +1019,8 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			impl_->range->setSuggestedRanges(normalizeCuts(std::move(cuts)));
 			refreshCutSummary();
 			QMessageBox::information(this, impl_->text(strings::kClipsQuickEditorSmartTrim),
-				impl_->text(strings::kClipsQuickEditorSmartTrimDone)
-					.arg(impl_->range->suggestedRangeCount()));
+						 impl_->text(strings::kClipsQuickEditorSmartTrimDone)
+							 .arg(impl_->range->suggestedRangeCount()));
 		});
 	connect(impl_->playbackProcess, &QProcess::readyReadStandardOutput, this, [this] {
 		impl_->frameBuffer.append(impl_->playbackProcess->readAllStandardOutput());
@@ -1061,10 +1030,10 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	});
 	auto startPlaybackSegment = [this](qint64 requestedPosition) {
 		const auto segments = impl_->range->visibleSegments();
-		const auto next = std::find_if(segments.begin(), segments.end(),
-			[requestedPosition](const TrimRange::Segment &segment) {
+		const auto next = std::find_if(
+			segments.begin(), segments.end(), [requestedPosition](const TrimRange::Segment &segment) {
 				return (requestedPosition >= segment.start && requestedPosition < segment.end) ||
-					segment.start >= requestedPosition;
+				       segment.start >= requestedPosition;
 			});
 		if (next == segments.end())
 			return false;
@@ -1079,24 +1048,22 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		impl_->playbackClock.restart();
 		impl_->range->setProperty("playbackSegmentEndMilliseconds", impl_->playbackSegmentEnd);
 		impl_->range->setProperty("playbackSegmentStartCount",
-			impl_->range->property("playbackSegmentStartCount").toInt() + 1);
+					  impl_->range->property("playbackSegmentStartCount").toInt() + 1);
 		impl_->playbackProcess->start(
 			impl_->ffmpegExecutable,
 			impl_->decodeArguments(impl_->playbackPosition,
-				impl_->playbackSegmentEnd - impl_->playbackPosition, false),
+					       impl_->playbackSegmentEnd - impl_->playbackPosition, false),
 			QIODevice::ReadOnly);
 		return true;
 	};
-	connect(impl_->playbackTimer, &QTimer::timeout, this,
-		[this, stopPlayback, startPlaybackSegment] {
+	connect(impl_->playbackTimer, &QTimer::timeout, this, [this, stopPlayback, startPlaybackSegment] {
 		if (impl_->frameBuffer.size() >= Impl::kFrameBytes) {
 			const auto completeFrames = impl_->frameBuffer.size() / Impl::kFrameBytes;
 			const auto latestOffset = (completeFrames - 1) * Impl::kFrameBytes;
 			impl_->showFrame(impl_->frameBuffer.mid(latestOffset, Impl::kFrameBytes));
 			impl_->frameBuffer.remove(0, completeFrames * Impl::kFrameBytes);
 		}
-		impl_->playbackPosition = impl_->playbackBasePosition +
-			impl_->playbackClock.elapsed();
+		impl_->playbackPosition = impl_->playbackBasePosition + impl_->playbackClock.elapsed();
 		if (impl_->playbackPosition >= impl_->playbackSegmentEnd) {
 			const qint64 completedSegmentEnd = impl_->playbackSegmentEnd;
 			if (startPlaybackSegment(completedSegmentEnd + 1)) {
@@ -1110,14 +1077,12 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		}
 		impl_->range->setPosition(impl_->playbackPosition);
 	});
-	connect(impl_->play, &QPushButton::clicked, this,
-		[this, stopPlayback, startPlaybackSegment] {
+	connect(impl_->play, &QPushButton::clicked, this, [this, stopPlayback, startPlaybackSegment] {
 		if (impl_->playing) {
 			stopPlayback();
 			return;
 		}
-		if (impl_->playbackPosition < impl_->range->start() ||
-		    impl_->playbackPosition >= impl_->range->end())
+		if (impl_->playbackPosition < impl_->range->start() || impl_->playbackPosition >= impl_->range->end())
 			impl_->playbackPosition = impl_->range->start();
 		if (!startPlaybackSegment(impl_->playbackPosition))
 			return;
@@ -1133,16 +1098,14 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 	impl_->waveformProcess->start(
 		impl_->ffmpegExecutable,
 		{QStringLiteral("-hide_banner"), QStringLiteral("-loglevel"), QStringLiteral("error"),
-		 QStringLiteral("-i"), QString::fromStdString(impl_->clip.filePath.u8string()),
-		 QStringLiteral("-vn"), QStringLiteral("-ac"), QStringLiteral("1"),
-		 QStringLiteral("-ar"), QStringLiteral("1000"), QStringLiteral("-f"),
-		 QStringLiteral("s16le"), QStringLiteral("pipe:1")},
+		 QStringLiteral("-i"), QString::fromStdString(impl_->clip.filePath.u8string()), QStringLiteral("-vn"),
+		 QStringLiteral("-ac"), QStringLiteral("1"), QStringLiteral("-ar"), QStringLiteral("1000"),
+		 QStringLiteral("-f"), QStringLiteral("s16le"), QStringLiteral("pipe:1")},
 		QIODevice::ReadOnly);
 	impl_->previewDebounce->start(0);
 	connect(browse, &QPushButton::clicked, this, [this] {
 		const auto selected = QFileDialog::getExistingDirectory(
-			this, impl_->text(strings::kClipsQuickEditorChooseFolder),
-			impl_->directory->text());
+			this, impl_->text(strings::kClipsQuickEditorChooseFolder), impl_->directory->text());
 		if (!selected.isEmpty())
 			impl_->directory->setText(selected);
 	});
@@ -1165,10 +1128,12 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		request.clipId = impl_->clip.id + "-trim";
 		request.sourcePath = impl_->clip.filePath;
 		request.outputDirectory = std::filesystem::path(impl_->directory->text().toStdWString());
-		request.outputBaseName = (impl_->clip.title.empty()
-			? impl_->clip.filePath.stem().string() : impl_->clip.title) + "_edited";
+		request.outputBaseName =
+			(impl_->clip.title.empty() ? impl_->clip.filePath.stem().string() : impl_->clip.title) +
+			"_edited";
 		request.orientation = impl_->clip.orientation == ClipOrientation::Vertical
-			? ExportOrientation::Vertical : ExportOrientation::Horizontal;
+					      ? ExportOrientation::Vertical
+					      : ExportOrientation::Horizontal;
 		// A library item marked Vertical must always leave the editor as a real
 		// 9:16 file. Keeping the source frame here preserved OBS' 16:9 replay
 		// canvas and produced a portrait image embedded between black bars.
@@ -1195,7 +1160,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			}
 			if (request.keepSegments.empty()) {
 				QMessageBox::warning(this, impl_->text(strings::kClipsQuickEditorExportFailed),
-					impl_->text(strings::kClipsQuickEditorNoContent));
+						     impl_->text(strings::kClipsQuickEditorNoContent));
 				return;
 			}
 			request.trimDurationMilliseconds = exportedDurationMs;
@@ -1240,8 +1205,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			const QFileInfo outputInfo(outputPath);
 			const QString selectionDuration = formatTime(job.request.trimDurationMilliseconds);
 			impl_->status->setProperty("notificationTone", QStringLiteral("success"));
-			impl_->status->setText(impl_->text(strings::kClipsQuickEditorExportDone)
-				.arg(outputPath));
+			impl_->status->setText(impl_->text(strings::kClipsQuickEditorExportDone).arg(outputPath));
 			impl_->progress->setValue(100);
 
 			QDialog completion(this);
@@ -1254,23 +1218,24 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			completionLayout->setContentsMargins(28, 26, 28, 26);
 			completionLayout->setSpacing(16);
 
-			auto *completionTitle = new QLabel(
-				impl_->text(strings::kClipsQuickEditorExportCompleteTitle), &completion);
+			auto *completionTitle =
+				new QLabel(impl_->text(strings::kClipsQuickEditorExportCompleteTitle), &completion);
 			completionTitle->setObjectName(QStringLiteral("quickEditorExportCompleteTitle"));
 			completionTitle->setProperty("heading", true);
 			completionLayout->addWidget(completionTitle);
 
-			auto *completionMessage = new QLabel(
-				impl_->text(strings::kClipsQuickEditorExportCompleteMessage)
-					.arg(selectionDuration, outputInfo.fileName()), &completion);
+			auto *completionMessage =
+				new QLabel(impl_->text(strings::kClipsQuickEditorExportCompleteMessage)
+						   .arg(selectionDuration, outputInfo.fileName()),
+					   &completion);
 			completionMessage->setObjectName(QStringLiteral("quickEditorExportCompleteMessage"));
 			completionMessage->setTextFormat(Qt::PlainText);
 			completionMessage->setTextInteractionFlags(Qt::TextSelectableByMouse);
 			completionMessage->setWordWrap(true);
 			completionLayout->addWidget(completionMessage);
 
-			auto *locationLabel = new QLabel(
-				impl_->text(strings::kClipsQuickEditorFileLocation), &completion);
+			auto *locationLabel =
+				new QLabel(impl_->text(strings::kClipsQuickEditorFileLocation), &completion);
 			locationLabel->setProperty("fieldLabel", true);
 			completionLayout->addWidget(locationLabel);
 
@@ -1281,8 +1246,7 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			location->setReadOnly(true);
 			location->setCursorPosition(0);
 			location->setMinimumHeight(40);
-			auto *copyPath = new QPushButton(
-				impl_->text(strings::kClipsQuickEditorCopyPath), &completion);
+			auto *copyPath = new QPushButton(impl_->text(strings::kClipsQuickEditorCopyPath), &completion);
 			copyPath->setMinimumHeight(40);
 			locationRow->addWidget(location, 1);
 			locationRow->addWidget(copyPath);
@@ -1292,12 +1256,10 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			auto *footer = new QHBoxLayout();
 			footer->setSpacing(12);
 			footer->addStretch(1);
-			auto *viewFile = new QPushButton(
-				impl_->text(strings::kClipsQuickEditorViewFile), &completion);
-			auto *openFolder = new QPushButton(
-				impl_->text(strings::kClipsQuickEditorOpenFolder), &completion);
-			auto *closeButton = new QPushButton(
-				impl_->text(strings::kClipsQuickEditorClose), &completion);
+			auto *viewFile = new QPushButton(impl_->text(strings::kClipsQuickEditorViewFile), &completion);
+			auto *openFolder =
+				new QPushButton(impl_->text(strings::kClipsQuickEditorOpenFolder), &completion);
+			auto *closeButton = new QPushButton(impl_->text(strings::kClipsQuickEditorClose), &completion);
 			for (auto *button : {viewFile, openFolder, closeButton}) {
 				button->setMinimumHeight(40);
 				button->setMinimumWidth(140);
@@ -1308,13 +1270,13 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 			connect(copyPath, &QPushButton::clicked, &completion, [outputPath] {
 				QApplication::clipboard()->setText(QDir::toNativeSeparators(outputPath));
 			});
-			connect(viewFile, &QPushButton::clicked, &completion, [outputPath] {
-				(void)QDesktopServices::openUrl(QUrl::fromLocalFile(outputPath));
-			});
+			connect(viewFile, &QPushButton::clicked, &completion,
+				[outputPath] { (void)QDesktopServices::openUrl(QUrl::fromLocalFile(outputPath)); });
 			connect(openFolder, &QPushButton::clicked, &completion, [outputPath, outputInfo] {
 #if defined(Q_OS_WIN)
 				if (!QProcess::startDetached(QStringLiteral("explorer.exe"),
-					{QStringLiteral("/select,"), QDir::toNativeSeparators(outputPath)}))
+							     {QStringLiteral("/select,"),
+							      QDir::toNativeSeparators(outputPath)}))
 					(void)QDesktopServices::openUrl(QUrl::fromLocalFile(outputInfo.absolutePath()));
 #else
 				(void)QDesktopServices::openUrl(QUrl::fromLocalFile(outputInfo.absolutePath()));
@@ -1325,9 +1287,9 @@ QuickClipEditorDialog::QuickClipEditorDialog(
 		} else {
 			impl_->status->setProperty("notificationTone", QStringLiteral("error"));
 			impl_->status->setText(job.state == ExportJobState::Cancelled
-				? impl_->text(strings::kClipsQuickEditorExportCancelled)
-				: impl_->text(strings::kClipsQuickEditorExportError)
-					.arg(QString::fromStdString(job.error)));
+						       ? impl_->text(strings::kClipsQuickEditorExportCancelled)
+						       : impl_->text(strings::kClipsQuickEditorExportError)
+								 .arg(QString::fromStdString(job.error)));
 		}
 		impl_->status->style()->unpolish(impl_->status);
 		impl_->status->style()->polish(impl_->status);
@@ -1346,8 +1308,8 @@ QuickClipEditorDialog::~QuickClipEditorDialog()
 			impl_->playbackTimer->stop();
 		if (impl_->previewDebounce != nullptr)
 			impl_->previewDebounce->stop();
-		for (auto *process : {impl_->playbackProcess, impl_->previewProcess,
-				      impl_->waveformProcess, impl_->smartTrimProcess}) {
+		for (auto *process :
+		     {impl_->playbackProcess, impl_->previewProcess, impl_->waveformProcess, impl_->smartTrimProcess}) {
 			if (process == nullptr)
 				continue;
 			process->disconnect(this);
@@ -1366,8 +1328,7 @@ void QuickClipEditorDialog::setCaptionRequest(CaptionRequest callback)
 	impl_->generateCaption->setEnabled(static_cast<bool>(impl_->captionRequest));
 }
 
-void QuickClipEditorDialog::setCaption(const QString &socialCaption,
-				       const QString &youtubeShortsCaption)
+void QuickClipEditorDialog::setCaption(const QString &socialCaption, const QString &youtubeShortsCaption)
 {
 	impl_->socialCaption->setPlainText(socialCaption);
 	impl_->shortsCaption->setPlainText(youtubeShortsCaption);
@@ -1377,9 +1338,8 @@ void QuickClipEditorDialog::setCaption(const QString &socialCaption,
 void QuickClipEditorDialog::setCaptionBusy(bool busy)
 {
 	impl_->generateCaption->setEnabled(!busy && static_cast<bool>(impl_->captionRequest));
-	impl_->generateCaption->setText(busy
-		? impl_->text(strings::kClipsCaptionGenerating)
-		: impl_->text(strings::kClipsQuickEditorGenerateCaption));
+	impl_->generateCaption->setText(busy ? impl_->text(strings::kClipsCaptionGenerating)
+					     : impl_->text(strings::kClipsQuickEditorGenerateCaption));
 	if (!busy) {
 		if (impl_->captionTimeoutTimer != nullptr)
 			impl_->captionTimeoutTimer->stop();
@@ -1405,14 +1365,12 @@ void QuickClipEditorDialog::setCaptionBusy(bool busy)
 	dialog->setWindowFlag(Qt::WindowCloseButtonHint, false);
 	dialog->setMinimumSize(540, 250);
 	auto *layout = new QVBoxLayout(dialog);
-	layout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl,
-				   tokens::kSpaceXl, tokens::kSpaceXl);
+	layout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	layout->setSpacing(tokens::kSpaceMd);
 	auto *title = new QLabel(impl_->text(strings::kClipsCaptionProgressTitle), dialog);
 	title->setProperty("textRole", QStringLiteral("sectionTitle"));
 	layout->addWidget(title);
-	impl_->captionProgressStatus = new QLabel(
-		impl_->text(strings::kClipsCaptionValidatingLicense), dialog);
+	impl_->captionProgressStatus = new QLabel(impl_->text(strings::kClipsCaptionValidatingLicense), dialog);
 	impl_->captionProgressStatus->setObjectName(QStringLiteral("quickEditorCaptionProgressStatus"));
 	impl_->captionProgressStatus->setWordWrap(true);
 	impl_->captionProgressStatus->setMinimumHeight(44);
@@ -1429,8 +1387,7 @@ void QuickClipEditorDialog::setCaptionBusy(bool busy)
 	impl_->captionProgressBar->setTextVisible(false);
 	impl_->captionProgressBar->setMinimumHeight(12);
 	layout->addWidget(impl_->captionProgressBar);
-	impl_->captionProgressEta = new QLabel(
-		impl_->text(strings::kClipsCaptionStillWorking), dialog);
+	impl_->captionProgressEta = new QLabel(impl_->text(strings::kClipsCaptionStillWorking), dialog);
 	impl_->captionProgressEta->setObjectName(QStringLiteral("quickEditorCaptionProgressEta"));
 	impl_->captionProgressEta->setWordWrap(true);
 	impl_->captionProgressEta->setAlignment(Qt::AlignCenter);
@@ -1442,9 +1399,8 @@ void QuickClipEditorDialog::setCaptionBusy(bool busy)
 		impl_->captionTimeoutTimer = new QTimer(this);
 		impl_->captionTimeoutTimer->setObjectName(QStringLiteral("quickEditorCaptionTimeoutTimer"));
 		impl_->captionTimeoutTimer->setSingleShot(true);
-		connect(impl_->captionTimeoutTimer, &QTimer::timeout, this, [this] {
-			setCaptionError(impl_->text(strings::kClipsQuickEditorCaptionTimeout));
-		});
+		connect(impl_->captionTimeoutTimer, &QTimer::timeout, this,
+			[this] { setCaptionError(impl_->text(strings::kClipsQuickEditorCaptionTimeout)); });
 	}
 	impl_->captionTimeoutTimer->start(360'000);
 	dialog->open();
@@ -1462,11 +1418,11 @@ void QuickClipEditorDialog::setCaptionProgress(const CaptionGenerationProgress &
 	if (impl_->captionProgressStatus != nullptr && !progress.status.trimmed().isEmpty())
 		impl_->captionProgressStatus->setText(progress.status);
 	if (impl_->captionProgressEta != nullptr) {
-		impl_->captionProgressEta->setText(progress.estimatedSecondsRemaining > 0
-			? impl_->text(strings::kClipsCaptionEtaSeconds)
-				.arg(progress.estimatedSecondsRemaining)
-			: impl_->text(percentage >= 80 ? strings::kClipsCaptionAlmostThere
-							 : strings::kClipsCaptionStillWorking));
+		impl_->captionProgressEta->setText(
+			progress.estimatedSecondsRemaining > 0
+				? impl_->text(strings::kClipsCaptionEtaSeconds).arg(progress.estimatedSecondsRemaining)
+				: impl_->text(percentage >= 80 ? strings::kClipsCaptionAlmostThere
+							       : strings::kClipsCaptionStillWorking));
 	}
 }
 
@@ -1474,9 +1430,7 @@ void QuickClipEditorDialog::setCaptionError(const QString &message)
 {
 	setCaptionBusy(false);
 	QMessageBox::warning(this, impl_->text(strings::kClipsCaptionFailed),
-		message.trimmed().isEmpty()
-			? impl_->text(strings::kClipsCaptionFailed)
-			: message);
+			     message.trimmed().isEmpty() ? impl_->text(strings::kClipsCaptionFailed) : message);
 }
 
 } // namespace clipcoach::ui

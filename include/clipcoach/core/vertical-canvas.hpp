@@ -64,12 +64,10 @@ struct VerticalCanvasSettings {
 	int zoomPercent{100};
 	int panXPercent{0};
 	int panYPercent{0};
-	VerticalTemplateId selectedTemplate{
-		VerticalTemplateId::GamingVertical};
+	VerticalTemplateId selectedTemplate{VerticalTemplateId::GamingVertical};
 	std::array<VerticalElement, 6> elements;
 
-	[[nodiscard]] const VerticalElement &
-	element(VerticalElementType type) const noexcept
+	[[nodiscard]] const VerticalElement &element(VerticalElementType type) const noexcept
 	{
 		return elements[static_cast<std::size_t>(type)];
 	}
@@ -77,9 +75,7 @@ struct VerticalCanvasSettings {
 
 [[nodiscard]] constexpr bool isNineBySixteen(int width, int height) noexcept
 {
-	return width > 0 && height > 0 &&
-	       static_cast<long long>(width) * 16 ==
-		       static_cast<long long>(height) * 9;
+	return width > 0 && height > 0 && static_cast<long long>(width) * 16 == static_cast<long long>(height) * 9;
 }
 
 } // namespace clipcoach

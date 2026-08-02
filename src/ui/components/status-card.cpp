@@ -9,8 +9,7 @@
 
 namespace clipcoach::ui {
 
-StatusCard::StatusCard(const QString &title, const QString &value, bool active, QWidget *parent)
-	: QFrame(parent)
+StatusCard::StatusCard(const QString &title, const QString &value, bool active, QWidget *parent) : QFrame(parent)
 {
 	setObjectName(QStringLiteral("StatusCard"));
 	setFrameShape(QFrame::NoFrame);
@@ -18,8 +17,7 @@ StatusCard::StatusCard(const QString &title, const QString &value, bool active, 
 	setMinimumHeight(tokens::kSummaryCardMinHeight);
 
 	auto *layout = new QVBoxLayout(this);
-	layout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceSm, tokens::kSpaceMd,
-				   tokens::kSpaceSm);
+	layout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceSm, tokens::kSpaceMd, tokens::kSpaceSm);
 	layout->setSpacing(tokens::kSpaceXs);
 
 	auto *titleLabel = new QLabel(title, this);

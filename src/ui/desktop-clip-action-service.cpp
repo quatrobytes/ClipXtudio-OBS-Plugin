@@ -26,23 +26,20 @@ ClipActionResult openPath(const std::filesystem::path &path)
 
 } // namespace
 
-DesktopClipActionService::DesktopClipActionService(
-	ExportManager *exportManager, SettingsManager *settingsManager,
-	VerticalCanvasManager *verticalManager)
+DesktopClipActionService::DesktopClipActionService(ExportManager *exportManager, SettingsManager *settingsManager,
+						   VerticalCanvasManager *verticalManager)
 	: exportManager_(exportManager),
 	  settingsManager_(settingsManager),
 	  verticalManager_(verticalManager)
 {
 }
 
-ClipActionResult
-DesktopClipActionService::preview(const std::filesystem::path &clipPath)
+ClipActionResult DesktopClipActionService::preview(const std::filesystem::path &clipPath)
 {
 	return openPath(clipPath);
 }
 
-ClipActionResult
-DesktopClipActionService::openFolder(const std::filesystem::path &clipPath)
+ClipActionResult DesktopClipActionService::openFolder(const std::filesystem::path &clipPath)
 {
 	if (clipPath.empty()) {
 		return ClipActionResult::fail("the clip path is empty");
@@ -50,46 +47,37 @@ DesktopClipActionService::openFolder(const std::filesystem::path &clipPath)
 	return openPath(clipPath.parent_path());
 }
 
-ClipActionResult
-DesktopClipActionService::openTextAsset(const std::filesystem::path &assetPath)
+ClipActionResult DesktopClipActionService::openTextAsset(const std::filesystem::path &assetPath)
 {
 	return openPath(assetPath);
 }
 
-ClipActionResult
-DesktopClipActionService::presentCaption(const std::string &caption)
+ClipActionResult DesktopClipActionService::presentCaption(const std::string &caption)
 {
 	if (caption.empty()) {
 		return ClipActionResult::fail("caption is unavailable");
 	}
-	QMessageBox::information(nullptr, QStringLiteral("ClipXtudio"),
-				 QString::fromStdString(caption));
+	QMessageBox::information(nullptr, QStringLiteral("ClipXtudio"), QString::fromStdString(caption));
 	return ClipActionResult::ok();
 }
 
-ClipActionResult
-DesktopClipActionService::requestExport(const ClipMetadata &clip,
-					ExportOrientation orientation)
+ClipActionResult DesktopClipActionService::requestExport(const ClipMetadata &clip, ExportOrientation orientation)
 {
 	if (exportManager_ == nullptr) {
 		return ClipActionResult::fail("export service is unavailable");
 	}
 	std::string error;
-	const auto ids = exportManager_->enqueue(
-		makeRequest(clip, orientation), &error);
+	const auto ids = exportManager_->enqueue(makeRequest(clip, orientation), &error);
 	return !ids.empty() ? ClipActionResult::ok()
-			    : ClipActionResult::fail(
-				      error.empty() ? "could not queue export"
-						    : std::move(error));
+			    : ClipActionResult::fail(error.empty() ? "could not queue export" : std::move(error));
 }
 
-ClipActionResult DesktopClipActionService::requestBatchExport(
-	const std::vector<ClipMetadata> &clips, ExportOrientation orientation)
+ClipActionResult DesktopClipActionService::requestBatchExport(const std::vector<ClipMetadata> &clips,
+							      ExportOrientation orientation)
 {
 	if (exportManager_ == nullptr || clips.empty()) {
-		return ClipActionResult::fail(
-			clips.empty() ? "select at least one clip"
-				      : "export service is unavailable");
+		return ClipActionResult::fail(clips.empty() ? "select at least one clip"
+							    : "export service is unavailable");
 	}
 	std::vector<ExportRequest> requests;
 	requests.reserve(clips.size());
@@ -97,30 +85,24 @@ ClipActionResult DesktopClipActionService::requestBatchExport(
 		requests.push_back(makeRequest(clip, orientation));
 	}
 	std::string error;
-	const auto ids =
-		exportManager_->enqueueBatch(std::move(requests), &error);
+	const auto ids = exportManager_->enqueueBatch(std::move(requests), &error);
 	return !ids.empty() ? ClipActionResult::ok()
-			    : ClipActionResult::fail(
-				      error.empty() ? "could not queue batch export"
-						    : std::move(error));
+			    : ClipActionResult::fail(error.empty() ? "could not queue batch export" : std::move(error));
 }
 
-ExportRequest DesktopClipActionService::makeRequest(
-	const ClipMetadata &clip, ExportOrientation orientation) const
+ExportRequest DesktopClipActionService::makeRequest(const ClipMetadata &clip, ExportOrientation orientation) const
 {
 	ExportRequest request;
 	request.clipId = clip.id;
 	request.sourcePath = clip.filePath;
-	request.outputBaseName =
-		clip.title.empty() ? clip.filePath.stem().string() : clip.title;
+	request.outputBaseName = clip.title.empty() ? clip.filePath.stem().string() : clip.title;
 	request.durationSeconds = std::max(clip.durationSeconds, 1);
 	request.orientation = orientation;
 	if (settingsManager_ != nullptr) {
 		const auto &settings = settingsManager_->settings();
-		request.outputDirectory =
-			settings.exportDirectory.empty()
-				? clip.filePath.parent_path() / "ClipXtudio Exports"
-				: settings.exportDirectory;
+		request.outputDirectory = settings.exportDirectory.empty()
+						  ? clip.filePath.parent_path() / "ClipXtudio Exports"
+						  : settings.exportDirectory;
 		request.verticalWidth = settings.verticalWidth;
 		request.verticalHeight = settings.verticalHeight;
 		switch (settings.exportQuality) {
@@ -138,8 +120,7 @@ ExportRequest DesktopClipActionService::makeRequest(
 			break;
 		}
 	} else {
-		request.outputDirectory =
-			clip.filePath.parent_path() / "ClipXtudio Exports";
+		request.outputDirectory = clip.filePath.parent_path() / "ClipXtudio Exports";
 	}
 	// A future libobs canvas renderer supplies verticalCanvasPath here.
 	request.verticalSource = VerticalExportSource::CenterCrop;

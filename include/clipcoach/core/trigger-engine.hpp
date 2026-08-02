@@ -32,32 +32,24 @@ public:
 
 	explicit TriggerEngine(bool proUnlocked = false);
 
-	[[nodiscard]] bool
-	setConfiguration(SmartTriggerType type,
-			 const TriggerConfiguration &configuration,
-			 std::string *error = nullptr);
-	[[nodiscard]] TriggerConfiguration
-	configuration(SmartTriggerType type) const;
+	[[nodiscard]] bool setConfiguration(SmartTriggerType type, const TriggerConfiguration &configuration,
+					    std::string *error = nullptr);
+	[[nodiscard]] TriggerConfiguration configuration(SmartTriggerType type) const;
 
 	void setProUnlocked(bool unlocked) noexcept;
 	[[nodiscard]] bool proUnlocked() const noexcept;
-	[[nodiscard]] static bool
-	requiresPro(SmartTriggerType type) noexcept;
+	[[nodiscard]] static bool requiresPro(SmartTriggerType type) noexcept;
 
 	[[nodiscard]] TriggerResult process(const TriggerSignal &signal);
-	[[nodiscard]] TriggerResult
-	evaluateMoment(const std::vector<TriggerSignal> &inputSignals);
-	[[nodiscard]] std::vector<TriggerEvent>
-	recentEvents(std::size_t limit = 20) const;
+	[[nodiscard]] TriggerResult evaluateMoment(const std::vector<TriggerSignal> &inputSignals);
+	[[nodiscard]] std::vector<TriggerEvent> recentEvents(std::size_t limit = 20) const;
 	void clearRecentEvents();
 	void setEventCallback(EventCallback callback);
 
 private:
-	[[nodiscard]] bool isEligible(const TriggerSignal &signal,
-				      const TriggerConfiguration &config,
+	[[nodiscard]] bool isEligible(const TriggerSignal &signal, const TriggerConfiguration &config,
 				      TriggerRejection &rejection) const;
-	[[nodiscard]] TriggerResult
-	evaluateLocked(const std::vector<TriggerSignal> &inputSignals);
+	[[nodiscard]] TriggerResult evaluateLocked(const std::vector<TriggerSignal> &inputSignals);
 
 	mutable std::mutex mutex_;
 	std::map<SmartTriggerType, TriggerConfiguration> configurations_;

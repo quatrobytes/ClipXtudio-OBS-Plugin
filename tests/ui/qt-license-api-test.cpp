@@ -13,23 +13,22 @@ namespace {
 
 void serveOnce(QTcpServer &server, QByteArray responseBody, int status)
 {
-	QObject::connect(&server, &QTcpServer::newConnection, &server,
-			 [&server, responseBody = std::move(responseBody), status] {
-				 auto *socket = server.nextPendingConnection();
-				 QObject::connect(socket, &QTcpSocket::readyRead, socket,
-						  [socket, responseBody, status] {
-							  socket->readAll();
-							  const auto reason = status == 200 ? "OK" : "Unprocessable Entity";
-							  const auto response =
-								  QByteArray("HTTP/1.1 ") + QByteArray::number(status) +
-								  ' ' + reason + "\r\nContent-Type: application/json\r\n"
-									       "Connection: close\r\nContent-Length: " +
-								  QByteArray::number(responseBody.size()) +
-								  "\r\n\r\n" + responseBody;
-							  socket->write(response);
-							  socket->disconnectFromHost();
-						  });
-			 });
+	QObject::connect(
+		&server, &QTcpServer::newConnection, &server,
+		[&server, responseBody = std::move(responseBody), status] {
+			auto *socket = server.nextPendingConnection();
+			QObject::connect(socket, &QTcpSocket::readyRead, socket, [socket, responseBody, status] {
+				socket->readAll();
+				const auto reason = status == 200 ? "OK" : "Unprocessable Entity";
+				const auto response =
+					QByteArray("HTTP/1.1 ") + QByteArray::number(status) + ' ' + reason +
+					"\r\nContent-Type: application/json\r\n"
+					"Connection: close\r\nContent-Length: " +
+					QByteArray::number(responseBody.size()) + "\r\n\r\n" + responseBody;
+				socket->write(response);
+				socket->disconnectFromHost();
+			});
+		});
 }
 
 QUrl serverUrl(const QTcpServer &server)

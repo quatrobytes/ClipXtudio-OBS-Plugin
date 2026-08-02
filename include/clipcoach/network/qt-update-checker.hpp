@@ -36,8 +36,7 @@ public:
 	[[nodiscard]] static bool isVersionNewer(const QString &candidate, const QString &current);
 
 private:
-	void checkCandidate(const QString &currentVersion, qsizetype candidateIndex,
-			    Completion completion);
+	void checkCandidate(const QString &currentVersion, qsizetype candidateIndex, Completion completion);
 	[[nodiscard]] UpdateCheckResult parseReply(QNetworkReply &reply, const QString &currentVersion) const;
 
 	QList<QUrl> manifestUrls_;

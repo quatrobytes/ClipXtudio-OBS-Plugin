@@ -10,10 +10,7 @@ struct StorageStatus {
 	std::string error;
 
 	[[nodiscard]] static StorageStatus ok() { return {true, {}}; }
-	[[nodiscard]] static StorageStatus fail(std::string message)
-	{
-		return {false, std::move(message)};
-	}
+	[[nodiscard]] static StorageStatus fail(std::string message) { return {false, std::move(message)}; }
 };
 
 template<typename T> struct RepositoryResult {
@@ -21,14 +18,8 @@ template<typename T> struct RepositoryResult {
 	T value{};
 	std::string error;
 
-	[[nodiscard]] static RepositoryResult ok(T result)
-	{
-		return {true, std::move(result), {}};
-	}
-	[[nodiscard]] static RepositoryResult fail(std::string message)
-	{
-		return {false, {}, std::move(message)};
-	}
+	[[nodiscard]] static RepositoryResult ok(T result) { return {true, std::move(result), {}}; }
+	[[nodiscard]] static RepositoryResult fail(std::string message) { return {false, {}, std::move(message)}; }
 };
 
 } // namespace clipcoach::storage

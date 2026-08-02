@@ -28,10 +28,7 @@ public:
 	virtual ~ReplayManager() = default;
 
 	[[nodiscard]] virtual ReplayState state() const noexcept = 0;
-	[[nodiscard]] virtual int bufferedDurationSeconds() const noexcept
-	{
-		return std::numeric_limits<int>::max();
-	}
+	[[nodiscard]] virtual int bufferedDurationSeconds() const noexcept { return std::numeric_limits<int>::max(); }
 	virtual ReplayOperationResult start() = 0;
 	virtual ReplayOperationResult stop() = 0;
 	virtual ReplayOperationResult save() = 0;

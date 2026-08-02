@@ -94,10 +94,7 @@ public:
 
 	void setValidator(Validator validator) { validator_ = std::move(validator); }
 
-	bool validatePage() override
-	{
-		return !validator_ || validator_();
-	}
+	bool validatePage() override { return !validator_ || validator_(); }
 
 private:
 	Validator validator_;
@@ -117,10 +114,8 @@ QIcon recordingIcon()
 	};
 
 	QIcon icon;
-	icon.addPixmap(makePixmap(QColor(QStringLiteral("#F43F5E"))),
-		       QIcon::Normal);
-	icon.addPixmap(makePixmap(QColor(QStringLiteral("#64748B"))),
-		       QIcon::Disabled);
+	icon.addPixmap(makePixmap(QColor(QStringLiteral("#F43F5E"))), QIcon::Normal);
+	icon.addPixmap(makePixmap(QColor(QStringLiteral("#64748B"))), QIcon::Disabled);
 	return icon;
 }
 
@@ -130,16 +125,13 @@ QIcon remoteStatusIcon(bool online, bool bright = true)
 	pixmap.fill(Qt::transparent);
 	QPainter painter(&pixmap);
 	painter.setRenderHint(QPainter::Antialiasing);
-	painter.setPen(QPen(online ? QColor(bright ? QStringLiteral("#BBF7D0")
-							 : QStringLiteral("#4ADE80"))
+	painter.setPen(QPen(online ? QColor(bright ? QStringLiteral("#BBF7D0") : QStringLiteral("#4ADE80"))
 				   : QColor(QStringLiteral("#FCA5A5")),
-			 1.2));
-	painter.setBrush(online ? QColor(bright ? QStringLiteral("#4ADE80")
-						   : QStringLiteral("#15803D"))
+			    1.2));
+	painter.setBrush(online ? QColor(bright ? QStringLiteral("#4ADE80") : QStringLiteral("#15803D"))
 				: QColor(QStringLiteral("#EF4444")));
 	const qreal inset = online && bright ? 3.0 : 4.0;
-	painter.drawEllipse(QRectF(inset, inset, 18.0 - (inset * 2.0),
-				   18.0 - (inset * 2.0)));
+	painter.drawEllipse(QRectF(inset, inset, 18.0 - (inset * 2.0), 18.0 - (inset * 2.0)));
 	return QIcon(pixmap);
 }
 
@@ -159,7 +151,9 @@ QIcon userAccountIcon()
 class ResponsiveGrid final : public QWidget {
 public:
 	ResponsiveGrid(int wideColumns, int mediumColumns, QWidget *parent = nullptr)
-		: QWidget(parent), wideColumns_(wideColumns), mediumColumns_(mediumColumns)
+		: QWidget(parent),
+		  wideColumns_(wideColumns),
+		  mediumColumns_(mediumColumns)
 	{
 		layout_ = new QGridLayout(this);
 		layout_->setContentsMargins(0, 0, 0, 0);
@@ -185,9 +179,7 @@ protected:
 private:
 	void relayout()
 	{
-		const int columns = width() >= 1120 ? wideColumns_
-				   : width() >= 620 ? mediumColumns_
-						   : 1;
+		const int columns = width() >= 1120 ? wideColumns_ : width() >= 620 ? mediumColumns_ : 1;
 		columns_ = columns;
 		while (auto *item = layout_->takeAt(0))
 			delete item;
@@ -210,18 +202,15 @@ void addPageHeading(QVBoxLayout *layout, const QString &title, const QString &su
 	header->setObjectName(QStringLiteral("capturePageHeader"));
 	header->setProperty("pageRole", QStringLiteral("header"));
 	auto *headerLayout = new QHBoxLayout(header);
-	headerLayout->setContentsMargins(tokens::kCardPaddingHorizontal,
-					 tokens::kCardPaddingVertical,
-					 tokens::kCardPaddingHorizontal,
-					 tokens::kCardPaddingVertical);
+	headerLayout->setContentsMargins(tokens::kCardPaddingHorizontal, tokens::kCardPaddingVertical,
+					 tokens::kCardPaddingHorizontal, tokens::kCardPaddingVertical);
 	headerLayout->setSpacing(tokens::kSectionGap);
 
 	auto *icon = new QLabel(header);
 	icon->setObjectName(QStringLiteral("capturePageIcon"));
 	icon->setProperty("pageRole", QStringLiteral("icon"));
 	icon->setAlignment(Qt::AlignCenter);
-	icon->setPixmap(parent->style()->standardIcon(QStyle::SP_DialogSaveButton)
-				.pixmap(22, 22));
+	icon->setPixmap(parent->style()->standardIcon(QStyle::SP_DialogSaveButton).pixmap(22, 22));
 	icon->setFixedSize(tokens::kPageHeaderIconSize, tokens::kPageHeaderIconSize);
 
 	auto *copy = new QVBoxLayout();
@@ -254,8 +243,7 @@ QScrollArea *wrapPage(QWidget *content, const QString &objectName)
 QVBoxLayout *createPageLayout(QWidget *content)
 {
 	auto *layout = new QVBoxLayout(content);
-	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin,
-				   tokens::kPageMargin, tokens::kPageMargin);
+	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin);
 	layout->setSpacing(tokens::kSectionGap);
 	layout->setAlignment(Qt::AlignTop);
 	return layout;
@@ -285,9 +273,8 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 		   storage::ClipLibraryService *libraryService, QWidget *parent, std::string sessionId,
 		   VerticalCanvasManager *verticalManager, ExportManager *exportManager, TriggerEngine *triggerEngine,
 		   integrations::ChatIntegrationManager *chatManager, licensing::LicenseManager *licenseManager,
-		 FeatureGateService *featureGates, VoiceTriggerController *voiceController,
-		   SceneProvider sceneProvider, VerticalObsBridge verticalObsBridge,
-		   CaptionGenerator captionGenerator)
+		   FeatureGateService *featureGates, VoiceTriggerController *voiceController,
+		   SceneProvider sceneProvider, VerticalObsBridge verticalObsBridge, CaptionGenerator captionGenerator)
 	: QWidget(parent),
 	  translator_(std::move(translator)),
 	  clipManager_(clipManager),
@@ -313,12 +300,11 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 	setStyleSheet(tokens::styleSheet());
 	updateChecker_ = std::make_unique<network::QtUpdateChecker>(
-		QList<QUrl>{
-			QUrl(QStringLiteral(CLIPX_LOCAL_UPDATE_MANIFEST_URL)),
-			QUrl(QStringLiteral(CLIPX_UPDATE_MANIFEST_URL))});
+		QList<QUrl>{QUrl(QStringLiteral(CLIPX_LOCAL_UPDATE_MANIFEST_URL)),
+			    QUrl(QStringLiteral(CLIPX_UPDATE_MANIFEST_URL))});
 	updateDownloader_ = std::make_unique<network::QtUpdateDownloader>();
-	verticalCaptureActionService_ = std::make_unique<DesktopClipActionService>(
-		exportManager_, settingsManager_, verticalManager_);
+	verticalCaptureActionService_ =
+		std::make_unique<DesktopClipActionService>(exportManager_, settingsManager_, verticalManager_);
 
 	auto *rootLayout = new QVBoxLayout(this);
 	rootLayout->setContentsMargins(0, 0, 0, 0);
@@ -336,11 +322,9 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	brandMark->setPixmap(QIcon(QStringLiteral(":/clipx/icon.png")).pixmap(22, 22));
 	brandMark->setFixedSize(22, 22);
 	brandMark->setScaledContents(true);
-	auto *brandLabel = new QLabel(
-		QStringLiteral("%1 - v%2")
-			.arg(text(strings::kBrandName),
-			     QStringLiteral(CLIPCOACH_VERSION)),
-		dockHeader_);
+	auto *brandLabel =
+		new QLabel(QStringLiteral("%1 - v%2").arg(text(strings::kBrandName), QStringLiteral(CLIPCOACH_VERSION)),
+			   dockHeader_);
 	brandLabel->setObjectName(QStringLiteral("BrandLabel"));
 	headerProBadge_ = new ProBadge(text(strings::kPro), dockHeader_);
 	headerProBadge_->setObjectName(QStringLiteral("headerProBadge"));
@@ -365,8 +349,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	headerDemoGuideButton_->setToolTip(text(strings::kHeaderDemoGuide));
 	headerDemoGuideButton_->setEnabled(false);
 	headerCapturePendingDot_ = new QLabel(dockHeader_);
-	headerCapturePendingDot_->setObjectName(
-		QStringLiteral("headerCapturePendingDot"));
+	headerCapturePendingDot_->setObjectName(QStringLiteral("headerCapturePendingDot"));
 	headerCapturePendingDot_->setFixedSize(10, 10);
 	headerCapturePendingDot_->setProperty("pulseOn", false);
 	headerCapturePendingDot_->setToolTip(text(strings::kCaptureSaving));
@@ -378,35 +361,26 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	headerRemoteStatus_->setAlignment(Qt::AlignCenter);
 	headerRemoteStatus_->setToolTip(QStringLiteral("Remote Clipper"));
 	headerRemoteStatus_->hide();
-	headerRemoteAuthenticateButton_ = new QPushButton(
-		text(strings::kHeaderRemoteAuthenticate), dockHeader_);
-	headerRemoteAuthenticateButton_->setObjectName(
-		QStringLiteral("headerRemoteAuthenticateButton"));
-	headerRemoteAuthenticateButton_->setProperty(
-		"buttonRole", QStringLiteral("secondary"));
+	headerRemoteAuthenticateButton_ = new QPushButton(text(strings::kHeaderRemoteAuthenticate), dockHeader_);
+	headerRemoteAuthenticateButton_->setObjectName(QStringLiteral("headerRemoteAuthenticateButton"));
+	headerRemoteAuthenticateButton_->setProperty("buttonRole", QStringLiteral("secondary"));
 	headerRemoteAuthenticateButton_->setProperty("authenticated", false);
 	headerRemoteAuthenticateButton_->setIcon(userAccountIcon());
-	headerRemoteAuthenticateButton_->setToolTip(
-		text(strings::kSettingsRemoteAuthenticate));
-	headerRemoteOpenButton_ = new QPushButton(
-		text(strings::kHeaderRemoteOpen), dockHeader_);
-	headerRemoteOpenButton_->setObjectName(
-		QStringLiteral("headerRemoteOpenButton"));
+	headerRemoteAuthenticateButton_->setToolTip(text(strings::kSettingsRemoteAuthenticate));
+	headerRemoteOpenButton_ = new QPushButton(text(strings::kHeaderRemoteOpen), dockHeader_);
+	headerRemoteOpenButton_->setObjectName(QStringLiteral("headerRemoteOpenButton"));
 	headerRemoteOpenButton_->setProperty("buttonRole", QStringLiteral("secondary"));
 	headerRemoteOpenButton_->setProperty("remoteState", QStringLiteral("offline"));
 	headerRemoteOpenButton_->setIcon(remoteStatusIcon(false));
-	headerRemoteOpenButton_->setToolTip(
-		text(strings::kRemoteToggleTurnOn));
+	headerRemoteOpenButton_->setToolTip(text(strings::kRemoteToggleTurnOn));
 	remoteStatusPulseTimer_ = new QTimer(this);
-	remoteStatusPulseTimer_->setObjectName(
-		QStringLiteral("remoteStatusPulseTimer"));
+	remoteStatusPulseTimer_->setObjectName(QStringLiteral("remoteStatusPulseTimer"));
 	remoteStatusPulseTimer_->setInterval(720);
 	connect(remoteStatusPulseTimer_, &QTimer::timeout, this, [this] {
 		if (!remoteOnline_ || headerRemoteOpenButton_ == nullptr)
 			return;
 		remoteStatusPulseBright_ = !remoteStatusPulseBright_;
-		headerRemoteOpenButton_->setIcon(
-			remoteStatusIcon(true, remoteStatusPulseBright_));
+		headerRemoteOpenButton_->setIcon(remoteStatusIcon(true, remoteStatusPulseBright_));
 	});
 	capturePendingPulseTimer_ = new QTimer(this);
 	capturePendingPulseTimer_->setInterval(420);
@@ -414,12 +388,9 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 		if (headerCapturePendingDot_ == nullptr)
 			return;
 		capturePendingPulseOn_ = !capturePendingPulseOn_;
-		headerCapturePendingDot_->setProperty("pulseOn",
-						   capturePendingPulseOn_);
-		headerCapturePendingDot_->style()->unpolish(
-			headerCapturePendingDot_);
-		headerCapturePendingDot_->style()->polish(
-			headerCapturePendingDot_);
+		headerCapturePendingDot_->setProperty("pulseOn", capturePendingPulseOn_);
+		headerCapturePendingDot_->style()->unpolish(headerCapturePendingDot_);
+		headerCapturePendingDot_->style()->polish(headerCapturePendingDot_);
 	});
 	headerLayout->addWidget(brandMark);
 	headerLayout->addWidget(brandLabel);
@@ -435,10 +406,8 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 		if (demoGuideUrl_.isValid())
 			QDesktopServices::openUrl(demoGuideUrl_);
 	});
-	connect(headerRemoteAuthenticateButton_, &QPushButton::clicked, this,
-		[this] { beginRemoteAuthentication(); });
-	connect(headerRemoteOpenButton_, &QPushButton::clicked, this,
-		[this] { toggleRemoteClipper(); });
+	connect(headerRemoteAuthenticateButton_, &QPushButton::clicked, this, [this] { beginRemoteAuthentication(); });
+	connect(headerRemoteOpenButton_, &QPushButton::clicked, this, [this] { toggleRemoteClipper(); });
 
 	statusContainer_ = new QWidget(this);
 	statusContainer_->setObjectName(QStringLiteral("DockStatusContainer"));
@@ -455,8 +424,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	verticalStatusCard_ = new StatusCard(text(strings::kHeaderVertical),
 					     QStringLiteral("%1×%2").arg(initialWidth).arg(initialHeight), false,
 					     statusContainer_);
-	verticalStatusCard_->setObjectName(
-		QStringLiteral("verticalCanvasStatusCard"));
+	verticalStatusCard_->setObjectName(QStringLiteral("verticalCanvasStatusCard"));
 	statusLayout->addWidget(verticalStatusCard_);
 	planStatusCard_ = new StatusCard(text(strings::kHeaderPlan), text(strings::kPlanFree), false, statusContainer_);
 	planStatusCard_->setObjectName(QStringLiteral("planStatusCard"));
@@ -484,7 +452,8 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	mainTabBar_->addNavigationTab(style()->standardIcon(QStyle::SP_DialogSaveButton), text(strings::kTabCapture));
 	mainTabBar_->addNavigationTab(style()->standardIcon(QStyle::SP_BrowserReload), text(strings::kTabTriggers));
 	mainTabBar_->addNavigationTab(style()->standardIcon(QStyle::SP_FileDialogListView), text(strings::kTabClips));
-	mainTabBar_->addNavigationTab(style()->standardIcon(QStyle::SP_FileDialogDetailedView), text(strings::kTabSettings));
+	mainTabBar_->addNavigationTab(style()->standardIcon(QStyle::SP_FileDialogDetailedView),
+				      text(strings::kTabSettings));
 
 	auto *stack = new QStackedWidget(this);
 	stack->setObjectName(QStringLiteral("mainTabStack"));
@@ -516,8 +485,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	captionBusyOverlay_->setAttribute(Qt::WA_StyledBackground, true);
 	captionBusyOverlay_->setFocusPolicy(Qt::StrongFocus);
 	auto *busyOuter = new QVBoxLayout(captionBusyOverlay_);
-	busyOuter->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl,
-				     tokens::kSpaceXl, tokens::kSpaceXl);
+	busyOuter->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	busyOuter->addStretch(1);
 	auto *busyCard = new QFrame(captionBusyOverlay_);
 	busyCard->setObjectName(QStringLiteral("captionBusyCard"));
@@ -526,8 +494,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	busyCard->setMaximumWidth(560);
 	busyCard->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	auto *busyLayout = new QVBoxLayout(busyCard);
-	busyLayout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl,
-				      tokens::kSpaceXl, tokens::kSpaceXl);
+	busyLayout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	busyLayout->setSpacing(tokens::kSpaceMd);
 	auto *busyTitle = new QLabel(text(strings::kClipsCaptionProgressTitle), busyCard);
 	busyTitle->setObjectName(QStringLiteral("captionBusyTitle"));
@@ -574,8 +541,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	remoteAuthOverlay_->setAttribute(Qt::WA_StyledBackground, true);
 	remoteAuthOverlay_->setFocusPolicy(Qt::StrongFocus);
 	auto *remoteOuter = new QVBoxLayout(remoteAuthOverlay_);
-	remoteOuter->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl,
-				       tokens::kSpaceXl, tokens::kSpaceXl);
+	remoteOuter->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	remoteOuter->addStretch(1);
 	auto *remoteCard = new QFrame(remoteAuthOverlay_);
 	remoteCard->setObjectName(QStringLiteral("remoteAuthCard"));
@@ -583,8 +549,7 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	remoteCard->setMinimumSize(440, 180);
 	remoteCard->setMaximumWidth(560);
 	auto *remoteLayout = new QVBoxLayout(remoteCard);
-	remoteLayout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl,
-					tokens::kSpaceXl, tokens::kSpaceXl);
+	remoteLayout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	remoteLayout->setSpacing(tokens::kSpaceLg);
 	remoteAuthTitle_ = new QLabel(text(strings::kRemoteAuthTitle), remoteCard);
 	remoteAuthTitle_->setObjectName(QStringLiteral("remoteAuthTitle"));
@@ -612,9 +577,8 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 			finishRemoteToggle(false, text(strings::kRemoteToggleFailedTitle),
 					   text(strings::kRemoteToggleFailed), true);
 		else
-			finishRemoteAuthentication(false,
-				text(strings::kRemoteAuthFailedTitle),
-				text(strings::kRemoteAuthFailed));
+			finishRemoteAuthentication(false, text(strings::kRemoteAuthFailedTitle),
+						   text(strings::kRemoteAuthFailed));
 	});
 	captionProgressTimer_ = new QTimer(this);
 	captionProgressTimer_->setObjectName(QStringLiteral("captionProgressTimer"));
@@ -622,13 +586,9 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 	connect(captionProgressTimer_, &QTimer::timeout, this, [this] {
 		captionSpinnerAngle_ = (captionSpinnerAngle_ + 30) % 360;
 		if (captionBusySpinner_ != nullptr) {
-			const auto source = style()
-						    ->standardIcon(QStyle::SP_BrowserReload)
-						    .pixmap(QSize(20, 20));
-			captionBusySpinner_->setPixmap(
-				source.transformed(
-					QTransform().rotate(captionSpinnerAngle_),
-					Qt::SmoothTransformation));
+			const auto source = style()->standardIcon(QStyle::SP_BrowserReload).pixmap(QSize(20, 20));
+			captionBusySpinner_->setPixmap(source.transformed(QTransform().rotate(captionSpinnerAngle_),
+									  Qt::SmoothTransformation));
 		}
 		++captionProgressTimerTicks_;
 		if (captionProgressTimerTicks_ % 4 == 0) {
@@ -654,10 +614,10 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 			if (verticalManager_ != nullptr)
 				verticalManager_->setProUnlocked(active);
 			planStatusCard_->setValue(
-				snapshot.refreshInProgress ? text(strings::kPlanValidating)
-				: snapshot.state == licensing::LicenseState::ProActive  ? text(strings::kPlanProActive)
-				: snapshot.state == licensing::LicenseState::ProGrace ? text(strings::kPlanProGrace)
-										      : text(strings::kPlanFree));
+				snapshot.refreshInProgress                             ? text(strings::kPlanValidating)
+				: snapshot.state == licensing::LicenseState::ProActive ? text(strings::kPlanProActive)
+				: snapshot.state == licensing::LicenseState::ProGrace  ? text(strings::kPlanProGrace)
+										       : text(strings::kPlanFree));
 			planStatusCard_->setActive(active);
 			planStatusCard_->setActionVisible(!active);
 			headerProBadge_->setVisible(active);
@@ -668,10 +628,9 @@ MainDock::MainDock(TranslationFunction translator, ClipManager *clipManager, Set
 				triggersTab_->refreshLicenseState();
 			if (verticalTab_ != nullptr)
 				verticalTab_->refresh();
-			if (!snapshot.refreshInProgress && snapshot.proEnabled() &&
-			    remoteCommandsChangedCallback_)
+			if (!snapshot.refreshInProgress && snapshot.proEnabled() && remoteCommandsChangedCallback_)
 				remoteCommandsChangedCallback_(settingsManager_ == nullptr ||
-					settingsManager_->settings().remoteCommandsEnabled);
+							       settingsManager_->settings().remoteCommandsEnabled);
 		});
 	}
 	if (voiceController_ != nullptr && settingsManager_ != nullptr) {
@@ -705,13 +664,11 @@ void MainDock::loadPublicPluginConfiguration(int endpointIndex)
 		return;
 	QNetworkRequest request(url);
 	request.setRawHeader("Accept", "application/json");
-	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
-			     QNetworkRequest::NoLessSafeRedirectPolicy);
+	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
 	request.setTransferTimeout(5000);
 	auto *reply = publicConfigNetwork_->get(request);
 	connect(reply, &QNetworkReply::finished, this, [this, reply, endpointIndex] {
-		const auto status =
-			reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
+		const auto status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		const auto document = QJsonDocument::fromJson(reply->readAll());
 		const auto data = document.object().value(QStringLiteral("data")).toObject();
 		const auto demoValue = data.value(QStringLiteral("demo_video_url")).toString();
@@ -721,20 +678,16 @@ void MainDock::loadPublicPluginConfiguration(int endpointIndex)
 		const auto isSafe = [](const QUrl &candidate) {
 			if (!candidate.isValid())
 				return false;
-			if (candidate.scheme().compare(QStringLiteral("https"),
-						       Qt::CaseInsensitive) == 0)
+			if (candidate.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0)
 				return true;
 			const auto host = candidate.host().toLower();
-			return candidate.scheme().compare(QStringLiteral("http"),
-							  Qt::CaseInsensitive) == 0 &&
-			       (host == QStringLiteral("127.0.0.1") ||
-				host == QStringLiteral("localhost") ||
+			return candidate.scheme().compare(QStringLiteral("http"), Qt::CaseInsensitive) == 0 &&
+			       (host == QStringLiteral("127.0.0.1") || host == QStringLiteral("localhost") ||
 				host == QStringLiteral("::1"));
 		};
 		const QUrl candidate = isSafe(demoCandidate) ? demoCandidate : supportCandidate;
 		const bool safe = isSafe(candidate);
-		if (reply->error() == QNetworkReply::NoError && status >= 200 &&
-		    status < 300) {
+		if (reply->error() == QNetworkReply::NoError && status >= 200 && status < 300) {
 			demoGuideUrl_ = safe ? candidate : QUrl{};
 			headerDemoGuideButton_->setEnabled(safe);
 		} else {
@@ -766,14 +719,12 @@ void MainDock::setLanguageChangedCallback(LanguageChangedCallback callback)
 	languageChangedCallback_ = std::move(callback);
 }
 
-void MainDock::setHotkeySettingsChangedCallback(
-	HotkeySettingsChangedCallback callback)
+void MainDock::setHotkeySettingsChangedCallback(HotkeySettingsChangedCallback callback)
 {
 	hotkeySettingsChangedCallback_ = std::move(callback);
 }
 
-void MainDock::setReplayDurationChangedCallback(
-	ReplayDurationChangedCallback callback)
+void MainDock::setReplayDurationChangedCallback(ReplayDurationChangedCallback callback)
 {
 	replayDurationChangedCallback_ = std::move(callback);
 }
@@ -785,8 +736,7 @@ void MainDock::setRemoteCommandsChangedCallback(RemoteCommandsChangedCallback ca
 
 void MainDock::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 {
-	const bool reportedOnline =
-		status.connection == remote::RemoteConnectionState::Connected;
+	const bool reportedOnline = status.connection == remote::RemoteConnectionState::Connected;
 	// Polling briefly reports Connecting before every successful heartbeat.
 	// Preserve the established online state during that transition so the
 	// header does not flash red every few seconds.
@@ -800,26 +750,20 @@ void MainDock::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 	else if (status.connection == remote::RemoteConnectionState::Unauthorized)
 		remoteAuthenticated_ = false;
 	if (headerRemoteAuthenticateButton_ != nullptr) {
-		headerRemoteAuthenticateButton_->setText(text(
-			remoteAuthenticated_ ? strings::kHeaderRemoteAuthenticated
-					     : strings::kHeaderRemoteAuthenticate));
-		headerRemoteAuthenticateButton_->setProperty("authenticated",
-							 remoteAuthenticated_);
-		headerRemoteAuthenticateButton_->style()->unpolish(
-			headerRemoteAuthenticateButton_);
-		headerRemoteAuthenticateButton_->style()->polish(
-			headerRemoteAuthenticateButton_);
+		headerRemoteAuthenticateButton_->setText(text(remoteAuthenticated_
+								      ? strings::kHeaderRemoteAuthenticated
+								      : strings::kHeaderRemoteAuthenticate));
+		headerRemoteAuthenticateButton_->setProperty("authenticated", remoteAuthenticated_);
+		headerRemoteAuthenticateButton_->style()->unpolish(headerRemoteAuthenticateButton_);
+		headerRemoteAuthenticateButton_->style()->polish(headerRemoteAuthenticateButton_);
 	}
 	if (headerRemoteOpenButton_ != nullptr) {
-		headerRemoteOpenButton_->setProperty(
-			"remoteState", remoteOnline_ ? QStringLiteral("online")
-						    : QStringLiteral("offline"));
+		headerRemoteOpenButton_->setProperty("remoteState", remoteOnline_ ? QStringLiteral("online")
+										  : QStringLiteral("offline"));
 		remoteStatusPulseBright_ = true;
-		headerRemoteOpenButton_->setIcon(
-			remoteStatusIcon(remoteOnline_, remoteStatusPulseBright_));
-		headerRemoteOpenButton_->setToolTip(text(
-			remoteOnline_ ? strings::kRemoteToggleTurnOff
-				      : strings::kRemoteToggleTurnOn));
+		headerRemoteOpenButton_->setIcon(remoteStatusIcon(remoteOnline_, remoteStatusPulseBright_));
+		headerRemoteOpenButton_->setToolTip(
+			text(remoteOnline_ ? strings::kRemoteToggleTurnOff : strings::kRemoteToggleTurnOn));
 		headerRemoteOpenButton_->style()->unpolish(headerRemoteOpenButton_);
 		headerRemoteOpenButton_->style()->polish(headerRemoteOpenButton_);
 	}
@@ -836,8 +780,8 @@ void MainDock::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 		QString tone = QStringLiteral("warning");
 		if (status.connection == remote::RemoteConnectionState::Connected) {
 			label = status.pendingCommands > 0
-				? text(strings::kHeaderRemotePending).arg(status.pendingCommands)
-				: text(strings::kHeaderRemoteConnected);
+					? text(strings::kHeaderRemotePending).arg(status.pendingCommands)
+					: text(strings::kHeaderRemoteConnected);
 			tone = QStringLiteral("success");
 		} else if (status.connection == remote::RemoteConnectionState::Connecting) {
 			label = text(strings::kHeaderRemoteConnecting);
@@ -861,30 +805,21 @@ void MainDock::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 			remoteToggleSawConnecting_ = true;
 			return;
 		}
-		if (!remoteToggleTargetEnabled_ &&
-		    status.connection == remote::RemoteConnectionState::Paused) {
-			finishRemoteToggle(true,
-				text(strings::kRemoteToggleOfflineTitle),
-				text(strings::kRemoteToggleOffline));
+		if (!remoteToggleTargetEnabled_ && status.connection == remote::RemoteConnectionState::Paused) {
+			finishRemoteToggle(true, text(strings::kRemoteToggleOfflineTitle),
+					   text(strings::kRemoteToggleOffline));
 			return;
 		}
 		if (remoteToggleTargetEnabled_ && remoteToggleSawConnecting_) {
-			if (status.connection ==
-			    remote::RemoteConnectionState::Connected) {
-				finishRemoteToggle(true,
-					text(strings::kRemoteToggleOnlineTitle),
-					text(strings::kRemoteToggleOnline));
-			} else if (status.connection ==
-					   remote::RemoteConnectionState::Unauthorized ||
-				   status.connection ==
-					   remote::RemoteConnectionState::Offline ||
-				   status.connection ==
-					   remote::RemoteConnectionState::Unavailable ||
-				   status.connection ==
-					   remote::RemoteConnectionState::Paused) {
-				finishRemoteToggle(false,
-					text(strings::kRemoteToggleFailedTitle),
-					text(strings::kRemoteToggleFailed), true);
+			if (status.connection == remote::RemoteConnectionState::Connected) {
+				finishRemoteToggle(true, text(strings::kRemoteToggleOnlineTitle),
+						   text(strings::kRemoteToggleOnline));
+			} else if (status.connection == remote::RemoteConnectionState::Unauthorized ||
+				   status.connection == remote::RemoteConnectionState::Offline ||
+				   status.connection == remote::RemoteConnectionState::Unavailable ||
+				   status.connection == remote::RemoteConnectionState::Paused) {
+				finishRemoteToggle(false, text(strings::kRemoteToggleFailedTitle),
+						   text(strings::kRemoteToggleFailed), true);
 			}
 			return;
 		}
@@ -914,12 +849,11 @@ void MainDock::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 		   status.connection == remote::RemoteConnectionState::Paused) {
 		QString failureMessage = text(strings::kRemoteAuthFailed);
 		if (!status.errorCode.empty()) {
-			failureMessage += QStringLiteral("\n\n") +
-				text(strings::kRemoteAuthErrorCode)
-					.arg(QString::fromStdString(status.errorCode));
+			failureMessage +=
+				QStringLiteral("\n\n") +
+				text(strings::kRemoteAuthErrorCode).arg(QString::fromStdString(status.errorCode));
 		}
-		finishRemoteAuthentication(false, text(strings::kRemoteAuthFailedTitle),
-					   failureMessage);
+		finishRemoteAuthentication(false, text(strings::kRemoteAuthFailedTitle), failureMessage);
 	}
 }
 
@@ -944,11 +878,8 @@ void MainDock::toggleRemoteClipper()
 		return;
 	const bool targetEnabled = !remoteOnline_;
 	if (targetEnabled && !remoteAuthenticated_) {
-		auto *dialog = new QMessageBox(
-			QMessageBox::Warning,
-			text(strings::kRemoteToggleAuthRequiredTitle),
-			text(strings::kRemoteToggleAuthRequired), QMessageBox::Ok,
-			this);
+		auto *dialog = new QMessageBox(QMessageBox::Warning, text(strings::kRemoteToggleAuthRequiredTitle),
+					       text(strings::kRemoteToggleAuthRequired), QMessageBox::Ok, this);
 		dialog->setAttribute(Qt::WA_DeleteOnClose, true);
 		tokens::configureRemoteAuthenticationDialog(dialog);
 		dialog->open();
@@ -964,9 +895,8 @@ void MainDock::toggleRemoteClipper()
 	if (remoteAuthTitle_ != nullptr)
 		remoteAuthTitle_->setText(text(strings::kRemoteToggleTitle));
 	if (remoteAuthMessage_ != nullptr)
-		remoteAuthMessage_->setText(text(
-			targetEnabled ? strings::kRemoteToggleConnecting
-				      : strings::kRemoteToggleDisconnecting));
+		remoteAuthMessage_->setText(
+			text(targetEnabled ? strings::kRemoteToggleConnecting : strings::kRemoteToggleDisconnecting));
 	if (remoteAuthOverlay_ != nullptr) {
 		remoteAuthOverlay_->setGeometry(rect());
 		remoteAuthOverlay_->show();
@@ -976,12 +906,10 @@ void MainDock::toggleRemoteClipper()
 	if (remoteAuthTimeout_ != nullptr)
 		remoteAuthTimeout_->start();
 	if (!persistRemoteCommandsEnabled(targetEnabled))
-		finishRemoteToggle(false, text(strings::kRemoteToggleFailedTitle),
-				   text(strings::kRemoteToggleFailed));
+		finishRemoteToggle(false, text(strings::kRemoteToggleFailedTitle), text(strings::kRemoteToggleFailed));
 }
 
-void MainDock::finishRemoteToggle(bool success, const QString &title,
-				  const QString &message, bool rollback)
+void MainDock::finishRemoteToggle(bool success, const QString &title, const QString &message, bool rollback)
 {
 	const bool failedTarget = remoteToggleTargetEnabled_;
 	remoteTogglePending_ = false;
@@ -996,9 +924,8 @@ void MainDock::finishRemoteToggle(bool success, const QString &title,
 		headerRemoteAuthenticateButton_->setEnabled(true);
 	if (rollback)
 		(void)persistRemoteCommandsEnabled(!failedTarget);
-	auto *dialog = new QMessageBox(
-		success ? QMessageBox::Information : QMessageBox::Warning,
-		title, message, QMessageBox::Ok, this);
+	auto *dialog = new QMessageBox(success ? QMessageBox::Information : QMessageBox::Warning, title, message,
+				       QMessageBox::Ok, this);
 	dialog->setObjectName(QStringLiteral("remoteToggleResultDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose, true);
 	tokens::configureRemoteAuthenticationDialog(dialog);
@@ -1011,12 +938,10 @@ void MainDock::openRemoteClipperAccount()
 	url.setPath(QStringLiteral("/account/remote-clipper"));
 	url.setQuery(QString{});
 	url.setFragment(QString{});
-	const bool securePublicUrl =
-		url.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0;
-	const bool localDevelopmentUrl =
-		url.scheme().compare(QStringLiteral("http"), Qt::CaseInsensitive) == 0 &&
-		(url.host().compare(QStringLiteral("localhost"), Qt::CaseInsensitive) == 0 ||
-		 url.host() == QStringLiteral("127.0.0.1"));
+	const bool securePublicUrl = url.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0;
+	const bool localDevelopmentUrl = url.scheme().compare(QStringLiteral("http"), Qt::CaseInsensitive) == 0 &&
+					 (url.host().compare(QStringLiteral("localhost"), Qt::CaseInsensitive) == 0 ||
+					  url.host() == QStringLiteral("127.0.0.1"));
 	if (url.isValid() && (securePublicUrl || localDevelopmentUrl))
 		QDesktopServices::openUrl(url);
 }
@@ -1054,29 +979,31 @@ void MainDock::beginRemoteAuthentication()
 	licenseManager_->refresh([self](const licensing::LicenseSnapshot &snapshot) {
 		if (self.isNull())
 			return;
-		QMetaObject::invokeMethod(self, [self, snapshot] {
-			if (self.isNull() || !self->remoteAuthenticationPending_)
-				return;
-			if (!snapshot.proEnabled() || !snapshot.lastErrorCode.empty()) {
-				self->finishRemoteAuthentication(
-					false, self->text(strings::kRemoteAuthFailedTitle),
-					self->text(strings::kRemoteAuthFailed));
-				return;
-			}
-			if (self->remoteAuthMessage_ != nullptr)
-				self->remoteAuthMessage_->setText(self->text(strings::kRemoteAuthChecking));
-			if (self->remoteCommandsChangedCallback_)
-				self->remoteCommandsChangedCallback_(true);
-			else
-				self->finishRemoteAuthentication(
-					false, self->text(strings::kRemoteAuthFailedTitle),
-					self->text(strings::kRemoteAuthFailed));
-		}, Qt::QueuedConnection);
+		QMetaObject::invokeMethod(
+			self,
+			[self, snapshot] {
+				if (self.isNull() || !self->remoteAuthenticationPending_)
+					return;
+				if (!snapshot.proEnabled() || !snapshot.lastErrorCode.empty()) {
+					self->finishRemoteAuthentication(false,
+									 self->text(strings::kRemoteAuthFailedTitle),
+									 self->text(strings::kRemoteAuthFailed));
+					return;
+				}
+				if (self->remoteAuthMessage_ != nullptr)
+					self->remoteAuthMessage_->setText(self->text(strings::kRemoteAuthChecking));
+				if (self->remoteCommandsChangedCallback_)
+					self->remoteCommandsChangedCallback_(true);
+				else
+					self->finishRemoteAuthentication(false,
+									 self->text(strings::kRemoteAuthFailedTitle),
+									 self->text(strings::kRemoteAuthFailed));
+			},
+			Qt::QueuedConnection);
 	});
 }
 
-void MainDock::finishRemoteAuthentication(bool success, const QString &title,
-					  const QString &message, bool openAccount)
+void MainDock::finishRemoteAuthentication(bool success, const QString &title, const QString &message, bool openAccount)
 {
 	remoteAuthenticationPending_ = false;
 	remoteAuthenticationSawConnecting_ = false;
@@ -1090,14 +1017,13 @@ void MainDock::finishRemoteAuthentication(bool success, const QString &title,
 		headerRemoteAuthenticateButton_->setEnabled(true);
 	if (headerRemoteOpenButton_ != nullptr)
 		headerRemoteOpenButton_->setEnabled(true);
-	auto *dialog = new QMessageBox(success ? QMessageBox::Information : QMessageBox::Warning,
-				       title, message, QMessageBox::Ok, this);
+	auto *dialog = new QMessageBox(success ? QMessageBox::Information : QMessageBox::Warning, title, message,
+				       QMessageBox::Ok, this);
 	dialog->setObjectName(QStringLiteral("remoteAuthenticationResultDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose, true);
 	dialog->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	if (openAccount) {
-		auto *button = dialog->addButton(text(strings::kSettingsRemoteOpenAccount),
-					 QMessageBox::ActionRole);
+		auto *button = dialog->addButton(text(strings::kSettingsRemoteOpenAccount), QMessageBox::ActionRole);
 		connect(button, &QPushButton::clicked, this, [] {
 			QUrl url(QStringLiteral(CLIPX_SERVICE_BASE_URL));
 			url.setPath(QStringLiteral("/account/remote-clipper"));
@@ -1142,8 +1068,7 @@ QWidget *MainDock::createGlobalFooter()
 	connect(updatePulseTimer_, &QTimer::timeout, this, [this] {
 		if (updateAvailableIndicator_ == nullptr)
 			return;
-		const bool pulseOn =
-			!updateAvailableIndicator_->property("pulseOn").toBool();
+		const bool pulseOn = !updateAvailableIndicator_->property("pulseOn").toBool();
 		updateAvailableIndicator_->setProperty("pulseOn", pulseOn);
 		updateAvailableIndicator_->style()->unpolish(updateAvailableIndicator_);
 		updateAvailableIndicator_->style()->polish(updateAvailableIndicator_);
@@ -1154,18 +1079,13 @@ QWidget *MainDock::createGlobalFooter()
 		if (footerUpdateButton_ == nullptr)
 			return;
 		updateSpinnerAngle_ = (updateSpinnerAngle_ + 30) % 360;
-		const auto source = style()
-					    ->standardIcon(QStyle::SP_BrowserReload)
-					    .pixmap(QSize(18, 18));
+		const auto source = style()->standardIcon(QStyle::SP_BrowserReload).pixmap(QSize(18, 18));
 		footerUpdateButton_->setIcon(
-			QIcon(source.transformed(QTransform().rotate(updateSpinnerAngle_),
-						 Qt::SmoothTransformation)));
+			QIcon(source.transformed(QTransform().rotate(updateSpinnerAngle_), Qt::SmoothTransformation)));
 	});
-	for (auto *button : {footerReplayButton_, footerClipButton_,
-			     footerUpdateButton_}) {
+	for (auto *button : {footerReplayButton_, footerClipButton_, footerUpdateButton_}) {
 		button->setFixedHeight(tokens::kFooterControlHeight);
-		button->setSizePolicy(QSizePolicy::Preferred,
-				      QSizePolicy::Fixed);
+		button->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Fixed);
 	}
 	footerCredits_ = new QLabel(text(strings::kSettingsCredits), footer);
 	footerCredits_->setObjectName(QStringLiteral("footerDeveloperCredits"));
@@ -1182,11 +1102,9 @@ QWidget *MainDock::createGlobalFooter()
 	layout->addWidget(updateAvailableIndicator_, 0, Qt::AlignVCenter);
 	layout->addStretch(1);
 	layout->addWidget(footerCredits_, 0, Qt::AlignVCenter);
-	setFooterExpandedText(footerReplayButton_,
-			      text(strings::kActionStartReplay));
+	setFooterExpandedText(footerReplayButton_, text(strings::kActionStartReplay));
 	setFooterExpandedText(footerClipButton_, text(strings::kFooterSaveClip));
-	setFooterExpandedText(footerUpdateButton_,
-			      text(strings::kSettingsCheckUpdates));
+	setFooterExpandedText(footerUpdateButton_, text(strings::kSettingsCheckUpdates));
 	updateFooterResponsivePresentation();
 	connect(footerUpdateButton_, &QPushButton::clicked, this, [this] {
 		if (updateDownloadUrl_.isValid())
@@ -1207,8 +1125,7 @@ void MainDock::resizeEvent(QResizeEvent *event)
 	updateFooterResponsivePresentation();
 }
 
-void MainDock::setCaptionProcessing(
-	bool busy, const CaptionGenerationProgress &progress)
+void MainDock::setCaptionProcessing(bool busy, const CaptionGenerationProgress &progress)
 {
 	if (captionBusyOverlay_ == nullptr)
 		return;
@@ -1226,8 +1143,7 @@ void MainDock::setCaptionProcessing(
 		captionBusyProgress_->setValue(percentage);
 	if (captionBusyPercent_ != nullptr)
 		captionBusyPercent_->setText(QStringLiteral("%1%").arg(percentage));
-	captionEstimatedSecondsRemaining_ =
-		std::max(0, progress.estimatedSecondsRemaining);
+	captionEstimatedSecondsRemaining_ = std::max(0, progress.estimatedSecondsRemaining);
 	updateCaptionEta();
 	captionBusyOverlay_->setGeometry(rect());
 	captionBusyOverlay_->setVisible(busy);
@@ -1246,8 +1162,7 @@ void MainDock::setCaptionProcessing(
 
 void MainDock::updateCaptionActivityMessage()
 {
-	if (!captionProcessingActive_ || captionBusyLabel_ == nullptr ||
-	    captionSecondsWithoutProgress_ < 4)
+	if (!captionProcessingActive_ || captionBusyLabel_ == nullptr || captionSecondsWithoutProgress_ < 4)
 		return;
 	const int cycle = (captionSecondsWithoutProgress_ / 6) % 3;
 	const char *key = strings::kClipsCaptionStillWorking;
@@ -1265,25 +1180,19 @@ void MainDock::updateCaptionEta()
 	if (captionBusyEta_ == nullptr)
 		return;
 	if (captionEstimatedSecondsRemaining_ <= 0) {
-		captionBusyEta_->setText(text(
-			captionLastPercentage_ >= 90
-				? strings::kClipsCaptionFinalizing
-				: strings::kClipsCaptionStillWorking));
+		captionBusyEta_->setText(text(captionLastPercentage_ >= 90 ? strings::kClipsCaptionFinalizing
+									   : strings::kClipsCaptionStillWorking));
 		return;
 	}
 	if (captionEstimatedSecondsRemaining_ >= 90) {
 		const int minutes = (captionEstimatedSecondsRemaining_ + 59) / 60;
-		captionBusyEta_->setText(
-			text(strings::kClipsCaptionEtaMinutes).arg(minutes));
+		captionBusyEta_->setText(text(strings::kClipsCaptionEtaMinutes).arg(minutes));
 		return;
 	}
-	captionBusyEta_->setText(
-		text(strings::kClipsCaptionEtaSeconds)
-			.arg(captionEstimatedSecondsRemaining_));
+	captionBusyEta_->setText(text(strings::kClipsCaptionEtaSeconds).arg(captionEstimatedSecondsRemaining_));
 }
 
-void MainDock::setFooterExpandedText(QPushButton *button,
-				     const QString &expandedText)
+void MainDock::setFooterExpandedText(QPushButton *button, const QString &expandedText)
 {
 	if (button == nullptr)
 		return;
@@ -1294,13 +1203,11 @@ void MainDock::setFooterExpandedText(QPushButton *button,
 
 void MainDock::updateFooterResponsivePresentation()
 {
-	if (globalFooter_ == nullptr || footerReplayButton_ == nullptr ||
-	    footerClipButton_ == nullptr ||
+	if (globalFooter_ == nullptr || footerReplayButton_ == nullptr || footerClipButton_ == nullptr ||
 	    footerUpdateButton_ == nullptr)
 		return;
 
-	const int availableWidth =
-		globalFooter_->width() > 0 ? globalFooter_->width() : width();
+	const int availableWidth = globalFooter_->width() > 0 ? globalFooter_->width() : width();
 	const bool compactActions = availableWidth < kCompactFooterActionsWidth;
 	if (footerCredits_ != nullptr)
 		footerCredits_->setVisible(availableWidth >= kFooterCreditsWidth);
@@ -1308,22 +1215,15 @@ void MainDock::updateFooterResponsivePresentation()
 	const auto expandedText = [](QPushButton *button) {
 		return button->property("expandedFooterText").toString();
 	};
-	footerReplayButton_->setText(
-		compactActions ? QStringLiteral("Replay")
-			       : expandedText(footerReplayButton_));
-	footerClipButton_->setText(compactActions ? QStringLiteral("Clip")
-						 : expandedText(footerClipButton_));
-	footerUpdateButton_->setText(
-		compactActions ? QString{} : expandedText(footerUpdateButton_));
+	footerReplayButton_->setText(compactActions ? QStringLiteral("Replay") : expandedText(footerReplayButton_));
+	footerClipButton_->setText(compactActions ? QStringLiteral("Clip") : expandedText(footerClipButton_));
+	footerUpdateButton_->setText(compactActions ? QString{} : expandedText(footerUpdateButton_));
 
-	footerUpdateButton_->setMinimumWidth(
-		compactActions ? tokens::kFooterControlHeight + tokens::kSpaceXs : 0);
-	footerUpdateButton_->setMaximumWidth(
-		compactActions ? tokens::kFooterControlHeight + tokens::kSpaceXs
-			       : QWIDGETSIZE_MAX);
+	footerUpdateButton_->setMinimumWidth(compactActions ? tokens::kFooterControlHeight + tokens::kSpaceXs : 0);
+	footerUpdateButton_->setMaximumWidth(compactActions ? tokens::kFooterControlHeight + tokens::kSpaceXs
+							    : QWIDGETSIZE_MAX);
 	if (compactActions && footerUpdateButton_->toolTip().isEmpty())
-		footerUpdateButton_->setToolTip(
-			expandedText(footerUpdateButton_));
+		footerUpdateButton_->setToolTip(expandedText(footerUpdateButton_));
 }
 
 QString MainDock::text(const char *key) const
@@ -1365,23 +1265,20 @@ QWidget *MainDock::createCapturePage()
 	auto *actionsCard = makeCard(QStringLiteral("captureQuickActionsCard"));
 	actionsCard->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	auto *actionsRoot = new QVBoxLayout(actionsCard);
-	actionsRoot->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-				       tokens::kSpaceLg);
+	actionsRoot->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceLg);
 	actionsRoot->setSpacing(tokens::kSpaceMd);
-	addSectionTitle(actionsRoot, QStringLiteral("⚡  %1").arg(text(strings::kCaptureActionsTitle)),
-			actionsCard);
+	addSectionTitle(actionsRoot, QStringLiteral("⚡  %1").arg(text(strings::kCaptureActionsTitle)), actionsCard);
 	auto *actionsGrid = new ResponsiveGrid(4, 2, actionsCard);
 
-	auto makeActionPanel = [&](const QString &name, QPushButton *button, const QString &description,
-				   int column, bool featured = false) {
+	auto makeActionPanel = [&](const QString &name, QPushButton *button, const QString &description, int column,
+				   bool featured = false) {
 		auto *panel = makeCard(name);
 		panel->setProperty("captureRole",
 				   featured ? QStringLiteral("actionFeatured") : QStringLiteral("action"));
 		panel->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		panel->setMinimumHeight(76);
 		auto *panelLayout = new QVBoxLayout(panel);
-		panelLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd,
-					       tokens::kSpaceMd);
+		panelLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 		panelLayout->setSpacing(tokens::kSpaceSm);
 		button->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 		button->setToolTip(description);
@@ -1409,22 +1306,18 @@ QWidget *MainDock::createCapturePage()
 	captureGoVerticalButton_ = new SecondaryButton(text(strings::kCaptureGoVertical), actionsCard);
 	captureGoVerticalButton_->setObjectName(QStringLiteral("captureGoVerticalButton"));
 	captureGoVerticalButton_->setIcon(style()->standardIcon(QStyle::SP_DesktopIcon));
-	captureRemoteClipperButton_ = new SecondaryButton(
-		text(strings::kSettingsRemoteOpenAccount), actionsCard);
-	captureRemoteClipperButton_->setObjectName(
-		QStringLiteral("captureRemoteClipperButton"));
-	captureRemoteClipperButton_->setIcon(
-		style()->standardIcon(QStyle::SP_DriveNetIcon));
+	captureRemoteClipperButton_ = new SecondaryButton(text(strings::kSettingsRemoteOpenAccount), actionsCard);
+	captureRemoteClipperButton_->setObjectName(QStringLiteral("captureRemoteClipperButton"));
+	captureRemoteClipperButton_->setIcon(style()->standardIcon(QStyle::SP_DriveNetIcon));
 	makeActionPanel(QStringLiteral("captureStartAction"), startReplayButton_,
 			text(strings::kCaptureStartDescription), 0, true);
-	makeActionPanel(QStringLiteral("captureSaveAction"), markMomentButton_,
-			text(strings::kCaptureSaveDescription), 1);
+	makeActionPanel(QStringLiteral("captureSaveAction"), markMomentButton_, text(strings::kCaptureSaveDescription),
+			1);
 	makeActionPanel(QStringLiteral("captureVerticalAction"), saveVerticalButton_,
 			text(strings::kCaptureVerticalDescription), 2);
 	makeActionPanel(QStringLiteral("captureDesignerAction"), captureGoVerticalButton_,
 			text(strings::kCaptureGoVerticalDescription), 3);
-	makeActionPanel(QStringLiteral("captureRemoteClipperAction"),
-			captureRemoteClipperButton_,
+	makeActionPanel(QStringLiteral("captureRemoteClipperAction"), captureRemoteClipperButton_,
 			text(strings::kSettingsRemoteDescription), 4);
 	actionsRoot->addWidget(actionsGrid);
 
@@ -1432,10 +1325,8 @@ QWidget *MainDock::createCapturePage()
 	verticalLimitedLabel_->setObjectName(QStringLiteral("verticalProRequirementLabel"));
 	verticalLimitedLabel_->setProperty("class", QStringLiteral("supporting"));
 	actionsRoot->addWidget(verticalLimitedLabel_);
-	captureUpgradeBanner_ = new UpgradeBanner(text(strings::kUpgradeTitle),
-						  text(strings::kUpgradeDescription),
-						  text(strings::kUpgradeAction), text(strings::kPro),
-						  actionsCard);
+	captureUpgradeBanner_ = new UpgradeBanner(text(strings::kUpgradeTitle), text(strings::kUpgradeDescription),
+						  text(strings::kUpgradeAction), text(strings::kPro), actionsCard);
 	captureUpgradeBanner_->setObjectName(QStringLiteral("captureUpgradeBanner"));
 	actionsRoot->addWidget(captureUpgradeBanner_);
 
@@ -1444,8 +1335,7 @@ QWidget *MainDock::createCapturePage()
 
 	auto *bufferCard = makeCard(QStringLiteral("captureBufferStatusCard"));
 	auto *bufferLayout = new QVBoxLayout(bufferCard);
-	bufferLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-					 tokens::kSpaceLg);
+	bufferLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceLg);
 	bufferLayout->setSpacing(tokens::kSpaceMd);
 	addSectionTitle(bufferLayout, text(strings::kCaptureBufferState), bufferCard);
 	auto *bufferBody = new QHBoxLayout();
@@ -1456,10 +1346,8 @@ QWidget *MainDock::createCapturePage()
 	auto *bufferCopy = new QVBoxLayout();
 	captureReplayStateLabel_ = new QLabel(text(strings::kStateInactive), bufferCard);
 	captureReplayStateLabel_->setObjectName(QStringLiteral("captureReplayStateLabel"));
-	captureReplayStateDescription_ =
-		makeDescription(text(strings::kCaptureBufferInactiveDescription), bufferCard);
-	captureReplayStateDescription_->setObjectName(
-		QStringLiteral("captureReplayStateDescription"));
+	captureReplayStateDescription_ = makeDescription(text(strings::kCaptureBufferInactiveDescription), bufferCard);
+	captureReplayStateDescription_->setObjectName(QStringLiteral("captureReplayStateDescription"));
 	bufferCopy->addStretch(1);
 	bufferCopy->addWidget(captureReplayStateLabel_);
 	bufferCopy->addWidget(captureReplayStateDescription_);
@@ -1470,47 +1358,35 @@ QWidget *MainDock::createCapturePage()
 
 	auto *controlsCard = makeCard(QStringLiteral("captureControlsCard"));
 	auto *controlsLayout = new QVBoxLayout(controlsCard);
-	controlsLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-					   tokens::kSpaceLg);
+	controlsLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceLg);
 	controlsLayout->setSpacing(tokens::kSpaceMd);
-	addSectionTitle(controlsLayout, text(strings::kCaptureOutputTitle),
-			controlsCard);
+	addSectionTitle(controlsLayout, text(strings::kCaptureOutputTitle), controlsCard);
 	captureOutputModeCombo_ = new QComboBox(controlsCard);
-	captureOutputModeCombo_->setObjectName(
-		QStringLiteral("captureOutputModeCombo"));
-	captureOutputModeCombo_->addItem(
-		text(strings::kSettingsHorizontal),
-		static_cast<int>(CaptureOutputMode::Horizontal));
-	captureOutputModeCombo_->addItem(
-		text(strings::kSettingsVertical),
-		static_cast<int>(CaptureOutputMode::Vertical));
-	captureOutputModeCombo_->addItem(
-		text(strings::kSettingsBoth),
-		static_cast<int>(CaptureOutputMode::Both));
-	captureOutputModeCombo_->setSizePolicy(QSizePolicy::Expanding,
-					      QSizePolicy::Fixed);
+	captureOutputModeCombo_->setObjectName(QStringLiteral("captureOutputModeCombo"));
+	captureOutputModeCombo_->addItem(text(strings::kSettingsHorizontal),
+					 static_cast<int>(CaptureOutputMode::Horizontal));
+	captureOutputModeCombo_->addItem(text(strings::kSettingsVertical),
+					 static_cast<int>(CaptureOutputMode::Vertical));
+	captureOutputModeCombo_->addItem(text(strings::kSettingsBoth), static_cast<int>(CaptureOutputMode::Both));
+	captureOutputModeCombo_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
 	controlsLayout->addWidget(captureOutputModeCombo_);
-	captureOutputModeDescription_ = makeDescription(
-		text(strings::kCaptureOutputDescription), controlsCard);
-	captureOutputModeDescription_->setObjectName(
-		QStringLiteral("captureOutputModeDescription"));
+	captureOutputModeDescription_ = makeDescription(text(strings::kCaptureOutputDescription), controlsCard);
+	captureOutputModeDescription_->setObjectName(QStringLiteral("captureOutputModeDescription"));
 	controlsLayout->addWidget(captureOutputModeDescription_);
 
-	addSectionTitle(controlsLayout, QStringLiteral("◷  %1").arg(text(strings::kCaptureQuick)),
-			controlsCard);
+	addSectionTitle(controlsLayout, QStringLiteral("◷  %1").arg(text(strings::kCaptureQuick)), controlsCard);
 	auto *durationLayout = new QHBoxLayout();
 	durationLayout->setSpacing(tokens::kSpaceSm);
 	const auto configuredDurations = settingsManager_ != nullptr
 						 ? settingsManager_->settings().quickDurationsSeconds
 						 : Settings::defaults().quickDurationsSeconds;
 	for (const auto seconds : configuredDurations) {
-		const QString label =
-			seconds == 15   ? text(strings::kCaptureFifteen)
-			: seconds == 30 ? text(strings::kCaptureThirty)
-			: seconds == 60 ? text(strings::kCaptureSixty)
-			: seconds == 120 ? text(strings::kCaptureTwoMinutes)
-			: seconds == 300 ? text(strings::kCaptureFiveMinutes)
-					 : text(strings::kCaptureDurationSeconds).arg(seconds);
+		const QString label = seconds == 15    ? text(strings::kCaptureFifteen)
+				      : seconds == 30  ? text(strings::kCaptureThirty)
+				      : seconds == 60  ? text(strings::kCaptureSixty)
+				      : seconds == 120 ? text(strings::kCaptureTwoMinutes)
+				      : seconds == 300 ? text(strings::kCaptureFiveMinutes)
+						       : text(strings::kCaptureDurationSeconds).arg(seconds);
 		auto *button = new SecondaryButton(label, controlsCard);
 		button->setObjectName(QStringLiteral("durationButton%1").arg(seconds));
 		button->setCheckable(true);
@@ -1529,13 +1405,11 @@ QWidget *MainDock::createCapturePage()
 	auto *shortcutGrid = new QGridLayout();
 	shortcutGrid->setSpacing(tokens::kSpaceSm);
 	const auto settings = settingsManager_ != nullptr ? settingsManager_->settings() : Settings::defaults();
-	auto makeShortcut = [&](const QString &name, const QString &label, const std::string &sequence,
-				int row, int column) {
+	auto makeShortcut = [&](const QString &name, const QString &label, const std::string &sequence, int row,
+				int column) {
 		auto *button = new SecondaryButton(
-			sequence.empty()
-				? label
-				: QStringLiteral("%1     %2")
-					  .arg(label, QString::fromStdString(sequence)),
+			sequence.empty() ? label
+					 : QStringLiteral("%1     %2").arg(label, QString::fromStdString(sequence)),
 			controlsCard);
 		button->setObjectName(name);
 		button->setProperty("captureRole", QStringLiteral("shortcut"));
@@ -1543,35 +1417,28 @@ QWidget *MainDock::createCapturePage()
 		shortcutGrid->addWidget(button, row, column);
 		return button;
 	};
-	captureShortcutMarkButton_ =
-		makeShortcut(QStringLiteral("captureShortcutMarkMoment"),
-			     text(strings::kActionMarkMoment), settings.markMomentHotkey, 0, 0);
-	captureShortcutSaveButton_ =
-		makeShortcut(QStringLiteral("captureShortcutSaveClip"),
-			     text(strings::kCaptureSaveClip), settings.save30Hotkey, 0, 1);
-	captureShortcutVerticalButton_ =
-		makeShortcut(QStringLiteral("captureShortcutSaveVertical"),
-			     text(strings::kActionSaveVertical), settings.saveVerticalHotkey, 1, 0);
-	stopReplayButton_ =
-		makeShortcut(QStringLiteral("stopReplayBufferButton"),
-			     text(strings::kActionStopReplay), std::string{}, 1, 1);
+	captureShortcutMarkButton_ = makeShortcut(QStringLiteral("captureShortcutMarkMoment"),
+						  text(strings::kActionMarkMoment), settings.markMomentHotkey, 0, 0);
+	captureShortcutSaveButton_ = makeShortcut(QStringLiteral("captureShortcutSaveClip"),
+						  text(strings::kCaptureSaveClip), settings.save30Hotkey, 0, 1);
+	captureShortcutVerticalButton_ = makeShortcut(QStringLiteral("captureShortcutSaveVertical"),
+						      text(strings::kActionSaveVertical), settings.saveVerticalHotkey,
+						      1, 0);
+	stopReplayButton_ = makeShortcut(QStringLiteral("stopReplayBufferButton"), text(strings::kActionStopReplay),
+					 std::string{}, 1, 1);
 	captureShortcutStopButton_ = stopReplayButton_;
 	controlsLayout->addLayout(shortcutGrid);
-	connect(captureOutputModeCombo_,
-		qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[this](int index) {
-			if (verticalManager_ == nullptr || index < 0)
-				return;
-			const auto mode = static_cast<CaptureOutputMode>(
-				captureOutputModeCombo_->itemData(index).toInt());
-			std::string error;
-			if (!verticalManager_->setOutputMode(mode, &error))
-				showCaptureNotification(
-					QString::fromStdString(error), true);
-			refreshCaptureOutputMode();
-			if (verticalTab_ != nullptr)
-				verticalTab_->refresh();
-		});
+	connect(captureOutputModeCombo_, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+		if (verticalManager_ == nullptr || index < 0)
+			return;
+		const auto mode = static_cast<CaptureOutputMode>(captureOutputModeCombo_->itemData(index).toInt());
+		std::string error;
+		if (!verticalManager_->setOutputMode(mode, &error))
+			showCaptureNotification(QString::fromStdString(error), true);
+		refreshCaptureOutputMode();
+		if (verticalTab_ != nullptr)
+			verticalTab_->refresh();
+	});
 	refreshCaptureOutputMode();
 	middleHost->addCard(bufferCard);
 	middleHost->addCard(controlsCard);
@@ -1579,8 +1446,7 @@ QWidget *MainDock::createCapturePage()
 	auto *bottomHost = new ResponsiveGrid(2, 2, content);
 	auto *lastClipCard = makeCard(QStringLiteral("captureLastClipCard"));
 	auto *lastClipLayout = new QVBoxLayout(lastClipCard);
-	lastClipLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-					  tokens::kSpaceLg);
+	lastClipLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceLg);
 	lastClipLayout->setSpacing(tokens::kSpaceMd);
 	addSectionTitle(lastClipLayout, text(strings::kCaptureLastClip), lastClipCard);
 	auto *lastClipBody = new QHBoxLayout();
@@ -1612,8 +1478,7 @@ QWidget *MainDock::createCapturePage()
 
 	auto *flowCard = makeCard(QStringLiteral("captureRecommendedFlowCard"));
 	auto *flowLayout = new QVBoxLayout(flowCard);
-	flowLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-				      tokens::kSpaceLg);
+	flowLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceLg);
 	flowLayout->setSpacing(tokens::kSpaceMd);
 	addSectionTitle(flowLayout, text(strings::kCaptureRecommendedFlow), flowCard);
 	auto *flowGrid = new QGridLayout();
@@ -1627,8 +1492,7 @@ QWidget *MainDock::createCapturePage()
 		auto *step = makeCard(QStringLiteral("captureFlowStep%1").arg(index + 1));
 		step->setProperty("captureRole", QStringLiteral("flowStep"));
 		auto *stepLayout = new QVBoxLayout(step);
-		stepLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd,
-					      tokens::kSpaceMd, tokens::kSpaceMd);
+		stepLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 		auto *number = new QLabel(QString::number(index + 1), step);
 		number->setObjectName(QStringLiteral("CaptureStepNumber"));
 		number->setAlignment(Qt::AlignCenter);
@@ -1657,8 +1521,7 @@ QWidget *MainDock::createCapturePage()
 		if (mainTabBar_ != nullptr)
 			mainTabBar_->setCurrentIndex(0);
 	});
-	connect(captureRemoteClipperButton_, &QPushButton::clicked, this,
-		[this] { openRemoteClipperAccount(); });
+	connect(captureRemoteClipperButton_, &QPushButton::clicked, this, [this] { openRemoteClipperAccount(); });
 	connect(viewLibrary, &QPushButton::clicked, this, [this] {
 		if (mainTabBar_ != nullptr)
 			mainTabBar_->setCurrentIndex(3);
@@ -1669,22 +1532,18 @@ QWidget *MainDock::createCapturePage()
 QWidget *MainDock::createVerticalPage()
 {
 	verticalTab_ = new VerticalTab(translator_, verticalManager_, verticalObsBridge_);
-	if (auto *previewOnlyButton = verticalTab_->findChild<QPushButton *>(
-		    QStringLiteral("verticalPreviewOnlyButton"));
+	if (auto *previewOnlyButton =
+		    verticalTab_->findChild<QPushButton *>(QStringLiteral("verticalPreviewOnlyButton"));
 	    previewOnlyButton != nullptr) {
 		connect(previewOnlyButton, &QPushButton::toggled, this,
 			[this](bool enabled) { setVerticalPreviewOnly(enabled); });
 	}
-	verticalTab_->setCanvasChangedCallback(
-		[this](const VerticalCanvasSettings &settings) {
-			if (verticalStatusCard_ != nullptr) {
-				verticalStatusCard_->setValue(
-					QStringLiteral("%1×%2")
-						.arg(settings.width)
-						.arg(settings.height));
-			}
-			refreshCaptureOutputMode();
-		});
+	verticalTab_->setCanvasChangedCallback([this](const VerticalCanvasSettings &settings) {
+		if (verticalStatusCard_ != nullptr) {
+			verticalStatusCard_->setValue(QStringLiteral("%1×%2").arg(settings.width).arg(settings.height));
+		}
+		refreshCaptureOutputMode();
+	});
 	verticalTab_->setCaptureActions(
 		[this] {
 			if (clipManager_ != nullptr)
@@ -1702,25 +1561,22 @@ void MainDock::refreshVerticalObsScenes()
 
 void MainDock::showInitialSetupIfNeeded(bool force)
 {
-	if (settingsManager_ == nullptr ||
-	    findChild<QWizard *>(QStringLiteral("clipXtudioInitialSetup")) != nullptr)
+	if (settingsManager_ == nullptr || findChild<QWizard *>(QStringLiteral("clipXtudioInitialSetup")) != nullptr)
 		return;
 	const auto &stored = settingsManager_->settings();
-	if (!force && stored.initialSetupCompleted &&
-	    stored.initialSetupCompletedVersion == CLIPCOACH_VERSION)
+	if (!force && stored.initialSetupCompleted && stored.initialSetupCompletedVersion == CLIPCOACH_VERSION)
 		return;
 
 	constexpr auto managedScene = "ClipXtudio Vertical";
 	auto scenes = verticalObsBridge_.scenes ? verticalObsBridge_.scenes()
-					       : (sceneProvider_ ? sceneProvider_() : std::vector<std::string>{});
-	if (std::find(scenes.begin(), scenes.end(), managedScene) == scenes.end() &&
-	    verticalManager_ != nullptr && verticalObsBridge_.createVerticalScene &&
-	    verticalObsBridge_.activeScene) {
+						: (sceneProvider_ ? sceneProvider_() : std::vector<std::string>{});
+	if (std::find(scenes.begin(), scenes.end(), managedScene) == scenes.end() && verticalManager_ != nullptr &&
+	    verticalObsBridge_.createVerticalScene && verticalObsBridge_.activeScene) {
 		const auto activeScene = verticalObsBridge_.activeScene();
 		if (!activeScene.empty()) {
 			std::string ignored;
-			(void)verticalObsBridge_.createVerticalScene(
-				activeScene, {}, verticalManager_->settings(), &ignored);
+			(void)verticalObsBridge_.createVerticalScene(activeScene, {}, verticalManager_->settings(),
+								     &ignored);
 			scenes = verticalObsBridge_.scenes ? verticalObsBridge_.scenes() : scenes;
 		}
 	}
@@ -1750,7 +1606,7 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	wizard->setAutoFillBackground(true);
 
 	auto addCopy = [](QVBoxLayout *layout, const QString &copy, QWidget *parent,
-			    const QString &role = QStringLiteral("muted")) {
+			  const QString &role = QStringLiteral("muted")) {
 		auto *label = new QLabel(copy, parent);
 		label->setWordWrap(true);
 		label->setProperty("textRole", role);
@@ -1765,8 +1621,7 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	welcomePage->setSubTitle(text(strings::kInitialSetupWelcomeBody));
 	auto *welcomeLayout = new QVBoxLayout(welcomePage);
 	welcomeLayout->setSpacing(tokens::kSpaceMd);
-	addCopy(welcomeLayout, text(strings::kInitialSetupWelcomeFree), welcomePage,
-		QStringLiteral("info"));
+	addCopy(welcomeLayout, text(strings::kInitialSetupWelcomeFree), welcomePage, QStringLiteral("info"));
 	auto *openDock = new QCheckBox(text(strings::kInitialSetupOpenDock), welcomePage);
 	openDock->setObjectName(QStringLiteral("initialSetupOpenDock"));
 	openDock->setChecked(stored.openDockAtStartup);
@@ -1788,13 +1643,10 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	captureLayout->setSpacing(tokens::kSpaceMd);
 	auto *outputMode = new QComboBox(capturePage);
 	outputMode->setObjectName(QStringLiteral("initialSetupOutputMode"));
-	outputMode->addItem(text(strings::kSettingsVertical),
-			    static_cast<int>(CaptureOutputMode::Vertical));
-	outputMode->addItem(text(strings::kSettingsHorizontal),
-			    static_cast<int>(CaptureOutputMode::Horizontal));
+	outputMode->addItem(text(strings::kSettingsVertical), static_cast<int>(CaptureOutputMode::Vertical));
+	outputMode->addItem(text(strings::kSettingsHorizontal), static_cast<int>(CaptureOutputMode::Horizontal));
 	if (licenseManager_ != nullptr && licenseManager_->snapshot().proEnabled()) {
-		outputMode->addItem(text(strings::kSettingsBoth),
-				    static_cast<int>(CaptureOutputMode::Both));
+		outputMode->addItem(text(strings::kSettingsBoth), static_cast<int>(CaptureOutputMode::Both));
 	}
 	const auto outputIndex = outputMode->findData(static_cast<int>(stored.outputMode));
 	outputMode->setCurrentIndex(outputIndex < 0 ? 0 : outputIndex);
@@ -1802,23 +1654,23 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	duration->setObjectName(QStringLiteral("initialSetupDuration"));
 	for (const int seconds : {15, 30, 60, 120})
 		duration->addItem(seconds < 60 ? QStringLiteral("%1 s").arg(seconds)
-					       : QStringLiteral("%1 min").arg(seconds / 60), seconds);
+					       : QStringLiteral("%1 min").arg(seconds / 60),
+				  seconds);
 	const auto durationIndex = duration->findData(stored.defaultDurationSeconds);
 	duration->setCurrentIndex(durationIndex < 0 ? 1 : durationIndex);
 	auto *folderRow = new QWidget(capturePage);
 	auto *folderLayout = new QHBoxLayout(folderRow);
 	folderLayout->setContentsMargins(0, 0, 0, 0);
 	folderLayout->setSpacing(tokens::kSpaceSm);
-	auto *clipFolder = new QLineEdit(
-		QString::fromStdString(stored.clipDirectory.u8string()), folderRow);
+	auto *clipFolder = new QLineEdit(QString::fromStdString(stored.clipDirectory.u8string()), folderRow);
 	clipFolder->setObjectName(QStringLiteral("initialSetupClipFolder"));
 	auto *browse = new QPushButton(text(strings::kInitialSetupBrowse), folderRow);
 	browse->setObjectName(QStringLiteral("initialSetupBrowseFolder"));
 	folderLayout->addWidget(clipFolder, 1);
 	folderLayout->addWidget(browse);
 	connect(browse, &QPushButton::clicked, wizard, [wizard, clipFolder, this] {
-		const auto selected = QFileDialog::getExistingDirectory(
-			wizard, text(strings::kInitialSetupClipFolder), clipFolder->text());
+		const auto selected = QFileDialog::getExistingDirectory(wizard, text(strings::kInitialSetupClipFolder),
+									clipFolder->text());
 		if (!selected.isEmpty())
 			clipFolder->setText(selected);
 	});
@@ -1843,8 +1695,7 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	if (voiceController_ != nullptr)
 		for (const auto &source : voiceController_->availableAudioSources())
 			microphoneCombo->addItem(QString::fromStdString(source), QString::fromStdString(source));
-	const auto microphoneIndex = microphoneCombo->findData(
-		QString::fromStdString(stored.voiceAudioSourceName));
+	const auto microphoneIndex = microphoneCombo->findData(QString::fromStdString(stored.voiceAudioSourceName));
 	if (microphoneIndex >= 0)
 		microphoneCombo->setCurrentIndex(microphoneIndex);
 	auto *voiceLanguage = new QComboBox(voicePage);
@@ -1852,11 +1703,9 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	voiceLanguage->addItem(text(strings::kSettingsAiAuto), QStringLiteral("auto"));
 	voiceLanguage->addItem(text(strings::kSettingsAiSpanish), QStringLiteral("es"));
 	voiceLanguage->addItem(text(strings::kSettingsAiEnglish), QStringLiteral("en"));
-	const auto voiceLanguageIndex = voiceLanguage->findData(
-		QString::fromStdString(stored.voiceTriggerLanguage));
+	const auto voiceLanguageIndex = voiceLanguage->findData(QString::fromStdString(stored.voiceTriggerLanguage));
 	voiceLanguage->setCurrentIndex(voiceLanguageIndex < 0 ? 0 : voiceLanguageIndex);
-	auto *voicePhrases = new QPlainTextEdit(
-		QString::fromStdString(stored.voiceTriggerPhrasesCsv), voicePage);
+	auto *voicePhrases = new QPlainTextEdit(QString::fromStdString(stored.voiceTriggerPhrasesCsv), voicePage);
 	voicePhrases->setObjectName(QStringLiteral("initialSetupVoicePhrases"));
 	voicePhrases->setMaximumHeight(100);
 	voiceLayout->addRow(QString{}, voiceEnabled);
@@ -1877,23 +1726,22 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 	for (const auto &scene : scenes)
 		if (!scene.empty())
 			sceneCombo->addItem(QString::fromStdString(scene), QString::fromStdString(scene));
-	const auto desiredScene = QString::fromStdString(
-		stored.verticalSceneName.empty() ? managedScene : stored.verticalSceneName);
+	const auto desiredScene =
+		QString::fromStdString(stored.verticalSceneName.empty() ? managedScene : stored.verticalSceneName);
 	const auto sceneIndex = sceneCombo->findData(desiredScene);
 	if (sceneIndex >= 0)
 		sceneCombo->setCurrentIndex(sceneIndex);
 	auto *verticalResolution = new QComboBox(verticalPage);
 	verticalResolution->setObjectName(QStringLiteral("initialSetupVerticalResolution"));
 	verticalResolution->addItem(QStringLiteral("720p · 720 × 1280"),
-		static_cast<int>(VerticalResolution::Portrait720));
+				    static_cast<int>(VerticalResolution::Portrait720));
 	verticalResolution->addItem(QStringLiteral("1080p · 1080 × 1920"),
-		static_cast<int>(VerticalResolution::Portrait1080));
+				    static_cast<int>(VerticalResolution::Portrait1080));
 	verticalResolution->addItem(QStringLiteral("2K · 1440 × 2560"),
-		static_cast<int>(VerticalResolution::Portrait1440));
+				    static_cast<int>(VerticalResolution::Portrait1440));
 	verticalResolution->addItem(QStringLiteral("4K · 2160 × 3840"),
-		static_cast<int>(VerticalResolution::Portrait2160));
-	const auto resolutionIndex = verticalResolution->findData(
-		static_cast<int>(stored.verticalResolution));
+				    static_cast<int>(VerticalResolution::Portrait2160));
+	const auto resolutionIndex = verticalResolution->findData(static_cast<int>(stored.verticalResolution));
 	verticalResolution->setCurrentIndex(resolutionIndex < 0 ? 1 : resolutionIndex);
 	verticalLayout->addRow(text(strings::kInitialSetupVerticalScene), sceneCombo);
 	verticalLayout->addRow(text(strings::kInitialSetupVerticalResolution), verticalResolution);
@@ -1948,93 +1796,87 @@ void MainDock::showInitialSetupIfNeeded(bool force)
 		url.setFragment(QStringLiteral("pricing"));
 		QDesktopServices::openUrl(url);
 	});
-	connect(activate, &QPushButton::clicked, wizard,
-		[this, wizard, licenseKey, activate, licenseStatus, licenseRow] {
-			if (licenseManager_ == nullptr)
-				return;
-			const auto key = licenseKey->text().trimmed();
-			static const QRegularExpression pattern(
-				QStringLiteral("^CCS1-(?:[A-Fa-f0-9]{5}-){3}[A-Fa-f0-9]{5}$"));
-			if (!pattern.match(key).hasMatch()) {
-				licenseStatus->setText(text(strings::kSettingsLicenseKeyInvalid));
-				licenseStatus->setProperty("notificationTone", QStringLiteral("error"));
+	connect(activate, &QPushButton::clicked, wizard, [this, wizard, licenseKey, activate, licenseStatus, licenseRow] {
+		if (licenseManager_ == nullptr)
+			return;
+		const auto key = licenseKey->text().trimmed();
+		static const QRegularExpression pattern(QStringLiteral("^CCS1-(?:[A-Fa-f0-9]{5}-){3}[A-Fa-f0-9]{5}$"));
+		if (!pattern.match(key).hasMatch()) {
+			licenseStatus->setText(text(strings::kSettingsLicenseKeyInvalid));
+			licenseStatus->setProperty("notificationTone", QStringLiteral("error"));
+			licenseStatus->show();
+			return;
+		}
+		activate->setEnabled(false);
+		activate->setText(text(strings::kInitialSetupActivating));
+		licenseStatus->hide();
+		QPointer<QWizard> guardedWizard(wizard);
+		licenseManager_->activate(
+			key.toUpper().toStdString(), [guardedWizard, licenseStatus, activate, licenseRow,
+						      this](const licensing::LicenseSnapshot &snapshot) {
+				if (guardedWizard.isNull())
+					return;
+				activate->setText(text(strings::kInitialSetupActivate));
+				activate->setEnabled(true);
+				const bool active = snapshot.proEnabled() && snapshot.lastErrorCode.empty();
+				licenseStatus->setText(active ? text(strings::kInitialSetupActivated)
+							      : QString::fromStdString(snapshot.lastErrorMessage));
+				licenseStatus->setProperty("notificationTone", active ? QStringLiteral("success")
+										      : QStringLiteral("error"));
 				licenseStatus->show();
-				return;
-			}
-			activate->setEnabled(false);
-			activate->setText(text(strings::kInitialSetupActivating));
-			licenseStatus->hide();
-			QPointer<QWizard> guardedWizard(wizard);
-			licenseManager_->activate(key.toUpper().toStdString(),
-				[guardedWizard, licenseStatus, activate, licenseRow, this]
-				(const licensing::LicenseSnapshot &snapshot) {
-					if (guardedWizard.isNull())
-						return;
-					activate->setText(text(strings::kInitialSetupActivate));
-					activate->setEnabled(true);
-					const bool active = snapshot.proEnabled() && snapshot.lastErrorCode.empty();
-					licenseStatus->setText(active
-						? text(strings::kInitialSetupActivated)
-						: QString::fromStdString(snapshot.lastErrorMessage));
-					licenseStatus->setProperty("notificationTone",
-						active ? QStringLiteral("success") : QStringLiteral("error"));
-					licenseStatus->show();
-					licenseRow->setVisible(!active);
-				});
-			licenseKey->clear();
-		});
+				licenseRow->setVisible(!active);
+			});
+		licenseKey->clear();
+	});
 	wizard->addPage(readyPage);
 	for (const auto role : {QWizard::NextButton, QWizard::FinishButton})
 		wizard->button(role)->setProperty("controlRole", QStringLiteral("primary"));
 	for (const auto role : {QWizard::BackButton, QWizard::CancelButton})
 		wizard->button(role)->setProperty("controlRole", QStringLiteral("secondary"));
 
-	readyPage->setValidator(
-		[this, wizard, openDock, notifications, outputMode, duration, clipFolder,
-		 voiceEnabled, microphoneCombo, voiceLanguage, voicePhrases, sceneCombo,
-		 verticalResolution] {
-			auto settings = settingsManager_->settings();
-			settings.initialSetupCompleted = true;
-			settings.initialSetupCompletedVersion = CLIPCOACH_VERSION;
-			settings.openDockAtStartup = openDock->isChecked();
-			settings.notificationsEnabled = notifications->isChecked();
-			settings.autoStartReplayBuffer = false;
-			settings.outputMode = static_cast<CaptureOutputMode>(outputMode->currentData().toInt());
-			settings.defaultDurationSeconds = duration->currentData().toInt();
-			if (!clipFolder->text().trimmed().isEmpty())
-				settings.clipDirectory = std::filesystem::u8path(
-					clipFolder->text().trimmed().toUtf8().constData());
-			settings.triggerVoiceEnabled = voiceEnabled->isChecked();
-			if (settings.triggerVoiceEnabled)
-				settings.triggerAction = TriggerAction::SaveClip;
-			settings.voiceAudioSourceName = microphoneCombo->currentData().toString().toStdString();
-			settings.voiceTriggerLanguage = voiceLanguage->currentData().toString().toStdString();
-			settings.voiceTriggerPhrasesCsv = voicePhrases->toPlainText().trimmed().toStdString();
-			settings.verticalSceneName = sceneCombo->currentData().toString().toStdString();
-			settings.verticalSourceName.clear();
-			settings.verticalResolution = static_cast<VerticalResolution>(
-				verticalResolution->currentData().toInt());
-			const auto dimensions = verticalResolutionDimensions(settings.verticalResolution);
-			settings.verticalWidth = dimensions.width;
-			settings.verticalHeight = dimensions.height;
-			std::string error;
-			if (!settingsManager_->save(settings, &error)) {
-				QMessageBox::warning(wizard, text(strings::kInitialSetupTitle),
-					QString::fromStdString(error));
-				return false;
-			}
-			if (voiceController_ != nullptr)
-				voiceController_->applySettings(settingsManager_->settings());
-			if (hotkeySettingsChangedCallback_)
-				hotkeySettingsChangedCallback_(settingsManager_->settings());
-			if (verticalTab_ != nullptr)
-				verticalTab_->refreshObsSceneOptions();
-			if (triggersTab_ != nullptr)
-				triggersTab_->refreshConfiguration();
-			refreshCaptureOutputMode();
-			updateFeatureGateUi();
-			return true;
-		});
+	readyPage->setValidator([this, wizard, openDock, notifications, outputMode, duration, clipFolder, voiceEnabled,
+				 microphoneCombo, voiceLanguage, voicePhrases, sceneCombo, verticalResolution] {
+		auto settings = settingsManager_->settings();
+		settings.initialSetupCompleted = true;
+		settings.initialSetupCompletedVersion = CLIPCOACH_VERSION;
+		settings.openDockAtStartup = openDock->isChecked();
+		settings.notificationsEnabled = notifications->isChecked();
+		settings.autoStartReplayBuffer = false;
+		settings.outputMode = static_cast<CaptureOutputMode>(outputMode->currentData().toInt());
+		settings.defaultDurationSeconds = duration->currentData().toInt();
+		if (!clipFolder->text().trimmed().isEmpty())
+			settings.clipDirectory =
+				std::filesystem::u8path(clipFolder->text().trimmed().toUtf8().constData());
+		settings.triggerVoiceEnabled = voiceEnabled->isChecked();
+		if (settings.triggerVoiceEnabled)
+			settings.triggerAction = TriggerAction::SaveClip;
+		settings.voiceAudioSourceName = microphoneCombo->currentData().toString().toStdString();
+		settings.voiceTriggerLanguage = voiceLanguage->currentData().toString().toStdString();
+		settings.voiceTriggerPhrasesCsv = voicePhrases->toPlainText().trimmed().toStdString();
+		settings.verticalSceneName = sceneCombo->currentData().toString().toStdString();
+		settings.verticalSourceName.clear();
+		settings.verticalResolution =
+			static_cast<VerticalResolution>(verticalResolution->currentData().toInt());
+		const auto dimensions = verticalResolutionDimensions(settings.verticalResolution);
+		settings.verticalWidth = dimensions.width;
+		settings.verticalHeight = dimensions.height;
+		std::string error;
+		if (!settingsManager_->save(settings, &error)) {
+			QMessageBox::warning(wizard, text(strings::kInitialSetupTitle), QString::fromStdString(error));
+			return false;
+		}
+		if (voiceController_ != nullptr)
+			voiceController_->applySettings(settingsManager_->settings());
+		if (hotkeySettingsChangedCallback_)
+			hotkeySettingsChangedCallback_(settingsManager_->settings());
+		if (verticalTab_ != nullptr)
+			verticalTab_->refreshObsSceneOptions();
+		if (triggersTab_ != nullptr)
+			triggersTab_->refreshConfiguration();
+		refreshCaptureOutputMode();
+		updateFeatureGateUi();
+		return true;
+	});
 	wizard->open();
 }
 
@@ -2051,8 +1893,8 @@ void MainDock::setVerticalPreviewOnly(bool enabled)
 
 QWidget *MainDock::createTriggersPage()
 {
-	triggersTab_ = new TriggersTab(translator_, triggerEngine_, settingsManager_,
-				       nullptr, voiceController_, sceneProvider_);
+	triggersTab_ = new TriggersTab(translator_, triggerEngine_, settingsManager_, nullptr, voiceController_,
+				       sceneProvider_);
 	triggersTab_->setTimingChangedCallback([this](int seconds) {
 		if (replayDurationChangedCallback_)
 			replayDurationChangedCallback_(seconds);
@@ -2063,19 +1905,15 @@ QWidget *MainDock::createTriggersPage()
 QWidget *MainDock::createClipsPage()
 {
 	clipsTab_ = new ClipsTab(translator_, libraryService_, QString::fromStdString(sessionId_), nullptr, nullptr,
-				 exportManager_, settingsManager_, verticalManager_, featureGates_,
-				 captionGenerator_);
+				 exportManager_, settingsManager_, verticalManager_, featureGates_, captionGenerator_);
 	clipsTab_->setCaptionBusyCallback(
-		[this](bool busy, const CaptionGenerationProgress &progress) {
-			setCaptionProcessing(busy, progress);
-		});
+		[this](bool busy, const CaptionGenerationProgress &progress) { setCaptionProcessing(busy, progress); });
 	return clipsTab_;
 }
 
 QWidget *MainDock::createSettingsPage()
 {
-	settingsTab_ = new SettingsTab(translator_, settingsManager_, nullptr,
-				       chatManager_, licenseManager_,
+	settingsTab_ = new SettingsTab(translator_, settingsManager_, nullptr, chatManager_, licenseManager_,
 				       verticalObsBridge_);
 	settingsTab_->setAppliedCallback([this](const Settings &before, const Settings &after) {
 		if (before.remoteCommandsEnabled != after.remoteCommandsEnabled && remoteCommandsChangedCallback_)
@@ -2099,27 +1937,21 @@ QWidget *MainDock::createSettingsPage()
 				verticalTab_->refresh();
 			}
 		}
-		if ((before.markMomentHotkey != after.markMomentHotkey ||
-		     before.save15Hotkey != after.save15Hotkey ||
-		     before.save30Hotkey != after.save30Hotkey ||
-		     before.save60Hotkey != after.save60Hotkey ||
+		if ((before.markMomentHotkey != after.markMomentHotkey || before.save15Hotkey != after.save15Hotkey ||
+		     before.save30Hotkey != after.save30Hotkey || before.save60Hotkey != after.save60Hotkey ||
 		     before.saveVerticalHotkey != after.saveVerticalHotkey ||
-		     before.openVerticalDesignerHotkey !=
-			     after.openVerticalDesignerHotkey) &&
+		     before.openVerticalDesignerHotkey != after.openVerticalDesignerHotkey) &&
 		    hotkeySettingsChangedCallback_) {
 			hotkeySettingsChangedCallback_(after);
 		}
 	});
-	settingsTab_->setRemoteAuthenticationRequestedCallback(
-		[this] { beginRemoteAuthentication(); });
-	settingsTab_->setRemoteClipperOpenRequestedCallback(
-		[this] { openRemoteClipperAccount(); });
+	settingsTab_->setRemoteAuthenticationRequestedCallback([this] { beginRemoteAuthentication(); });
+	settingsTab_->setRemoteClipperOpenRequestedCallback([this] { openRemoteClipperAccount(); });
 	settingsTab_->setProfileImportedCallback([this] {
 		if (languageChangedCallback_)
 			languageChangedCallback_();
 	});
-	settingsTab_->setSetupRequestedCallback(
-		[this] { showInitialSetupIfNeeded(true); });
+	settingsTab_->setSetupRequestedCallback([this] { showInitialSetupIfNeeded(true); });
 	return settingsTab_;
 }
 
@@ -2151,12 +1983,9 @@ void MainDock::bindCaptureFlow()
 	connect(stopReplayButton_, &QPushButton::clicked, this, [this] { (void)clipManager_->stopReplayBuffer(); });
 	connect(markMomentButton_, &QPushButton::clicked, this, [this] { captureSelectedClip(); });
 	connect(saveVerticalButton_, &QPushButton::clicked, this, [this] { captureVerticalClip(); });
-	connect(captureShortcutMarkButton_, &QPushButton::clicked, this,
-		[this] { captureSelectedClip(); });
-	connect(captureShortcutSaveButton_, &QPushButton::clicked, this,
-		[this] { captureSelectedClip(); });
-	connect(captureShortcutVerticalButton_, &QPushButton::clicked, this,
-		[this] { captureVerticalClip(); });
+	connect(captureShortcutMarkButton_, &QPushButton::clicked, this, [this] { captureSelectedClip(); });
+	connect(captureShortcutSaveButton_, &QPushButton::clicked, this, [this] { captureSelectedClip(); });
+	connect(captureShortcutVerticalButton_, &QPushButton::clicked, this, [this] { captureVerticalClip(); });
 	connect(captureShortcutStopButton_, &QPushButton::clicked, this,
 		[this] { (void)clipManager_->stopReplayBuffer(); });
 	connect(footerReplayButton_, &QPushButton::clicked, this, [this] { toggleReplayBuffer(); });
@@ -2174,8 +2003,7 @@ void MainDock::bindCaptureFlow()
 	});
 
 	updateReplayState(clipManager_->replayState());
-	if (settingsManager_ != nullptr &&
-	    settingsManager_->settings().autoStartReplayBuffer &&
+	if (settingsManager_ != nullptr && settingsManager_->settings().autoStartReplayBuffer &&
 	    clipManager_->replayState() == ReplayState::Inactive) {
 		(void)clipManager_->startReplayBuffer();
 	}
@@ -2211,27 +2039,24 @@ void MainDock::updateReplayState(ReplayState state)
 	replayStatusCard_->setTone(tone);
 	if (headerStatus_ != nullptr) {
 		const bool replayActive = state == ReplayState::Active;
-		headerStatus_->setText(text(replayActive ? strings::kHeaderBufferActive
-							 : strings::kHeaderBufferInactive));
+		headerStatus_->setText(
+			text(replayActive ? strings::kHeaderBufferActive : strings::kHeaderBufferInactive));
 		headerStatus_->setToolTip(stateText);
-		headerStatus_->setProperty(
-			"notificationTone",
-			replayActive ? QStringLiteral("success") : QStringLiteral("error"));
+		headerStatus_->setProperty("notificationTone",
+					   replayActive ? QStringLiteral("success") : QStringLiteral("error"));
 		headerStatus_->style()->unpolish(headerStatus_);
 		headerStatus_->style()->polish(headerStatus_);
 	}
 	if (captureReplayStateLabel_ != nullptr) {
 		captureReplayStateLabel_->setText(stateText);
-		captureReplayStateLabel_->setProperty(
-			"replayActive", state == ReplayState::Active);
+		captureReplayStateLabel_->setProperty("replayActive", state == ReplayState::Active);
 		captureReplayStateLabel_->style()->unpolish(captureReplayStateLabel_);
 		captureReplayStateLabel_->style()->polish(captureReplayStateLabel_);
 	}
 	if (captureReplayStateDescription_ != nullptr) {
-		captureReplayStateDescription_->setText(
-			state == ReplayState::Active
-				? text(strings::kCaptureBufferActiveDescription)
-				: text(strings::kCaptureBufferInactiveDescription));
+		captureReplayStateDescription_->setText(state == ReplayState::Active
+								? text(strings::kCaptureBufferActiveDescription)
+								: text(strings::kCaptureBufferInactiveDescription));
 	}
 
 	const bool active = state == ReplayState::Active;
@@ -2248,10 +2073,10 @@ void MainDock::updateReplayState(ReplayState state)
 	startReplayButton_->setEnabled(clipManager_ != nullptr && !active && !transition);
 	stopReplayButton_->setEnabled(clipManager_ != nullptr && (active || state == ReplayState::Error));
 	markMomentButton_->setEnabled(clipManager_ != nullptr && active && !clipManager_->capturePending());
-	const bool verticalAllowed =
-		featureGates_ != nullptr && featureGates_->isAllowed(Feature::LimitedVerticalExport);
-	saveVerticalButton_->setEnabled(clipManager_ != nullptr && active &&
-					!clipManager_->capturePending() && verticalAllowed);
+	const bool verticalAllowed = featureGates_ != nullptr &&
+				     featureGates_->isAllowed(Feature::LimitedVerticalExport);
+	saveVerticalButton_->setEnabled(clipManager_ != nullptr && active && !clipManager_->capturePending() &&
+					verticalAllowed);
 	if (captureShortcutMarkButton_ != nullptr)
 		captureShortcutMarkButton_->setEnabled(clipManager_ != nullptr && active &&
 						       !clipManager_->capturePending());
@@ -2259,21 +2084,16 @@ void MainDock::updateReplayState(ReplayState state)
 		captureShortcutSaveButton_->setEnabled(clipManager_ != nullptr && active &&
 						       !clipManager_->capturePending());
 	if (captureShortcutVerticalButton_ != nullptr)
-		captureShortcutVerticalButton_->setEnabled(
-			clipManager_ != nullptr && active && !clipManager_->capturePending() &&
-			verticalAllowed);
+		captureShortcutVerticalButton_->setEnabled(clipManager_ != nullptr && active &&
+							   !clipManager_->capturePending() && verticalAllowed);
 	if (captureShortcutStopButton_ != nullptr)
 		captureShortcutStopButton_->setEnabled(clipManager_ != nullptr &&
 						       (active || state == ReplayState::Error));
 	footerReplayButton_->setEnabled(clipManager_ != nullptr && !transition);
-	footerReplayButton_->setIcon(style()->standardIcon(
-		active ? QStyle::SP_MediaStop : QStyle::SP_MediaPlay));
-	setFooterExpandedText(
-		footerReplayButton_,
-		active ? text(strings::kActionStopReplay)
-		       : text(strings::kActionStartReplay));
-	footerClipButton_->setEnabled(clipManager_ != nullptr && active &&
-				      !clipManager_->capturePending());
+	footerReplayButton_->setIcon(style()->standardIcon(active ? QStyle::SP_MediaStop : QStyle::SP_MediaPlay));
+	setFooterExpandedText(footerReplayButton_,
+			      active ? text(strings::kActionStopReplay) : text(strings::kActionStartReplay));
+	footerClipButton_->setEnabled(clipManager_ != nullptr && active && !clipManager_->capturePending());
 }
 
 void MainDock::handleClipSaved(const ClipMetadata &clip)
@@ -2288,14 +2108,12 @@ void MainDock::handleClipSaved(const ClipMetadata &clip)
 	if (lastClipMetadataLabel_ != nullptr)
 		lastClipMetadataLabel_->setText(metadata);
 	if (lastClipThumbnailLabel_ != nullptr) {
-		const QString thumbnailPath =
-			QString::fromStdString(clip.thumbnailPath.string());
+		const QString thumbnailPath = QString::fromStdString(clip.thumbnailPath.string());
 		QPixmap thumbnail(thumbnailPath);
 		if (!thumbnail.isNull()) {
-			lastClipThumbnailLabel_->setPixmap(
-				thumbnail.scaled(lastClipThumbnailLabel_->size(),
-						 Qt::KeepAspectRatioByExpanding,
-						 Qt::SmoothTransformation));
+			lastClipThumbnailLabel_->setPixmap(thumbnail.scaled(lastClipThumbnailLabel_->size(),
+									    Qt::KeepAspectRatioByExpanding,
+									    Qt::SmoothTransformation));
 			lastClipThumbnailLabel_->setText(QString{});
 		} else {
 			lastClipThumbnailLabel_->setText(text(strings::kCaptureNoPreview));
@@ -2307,43 +2125,33 @@ void MainDock::handleClipSaved(const ClipMetadata &clip)
 		const auto output = *pendingCaptureExport_;
 		pendingCaptureExport_.reset();
 		const auto result = verticalCaptureActionService_ != nullptr
-					    ? verticalCaptureActionService_->requestExport(
-						      clip, output)
-					    : ClipActionResult::fail(
-						      "vertical export service is unavailable");
+					    ? verticalCaptureActionService_->requestExport(clip, output)
+					    : ClipActionResult::fail("vertical export service is unavailable");
 		if (result.success) {
-			completion = text(output == ExportOrientation::Both
-						  ? strings::kCaptureBothQueued
-						  : strings::kCaptureVerticalQueued)
+			completion = text(output == ExportOrientation::Both ? strings::kCaptureBothQueued
+									    : strings::kCaptureVerticalQueued)
 					     .arg(clipName);
 		} else {
 			completionSucceeded = false;
 			showCaptureNotification(
-				text(strings::kCaptureVerticalFailed)
-					.arg(QString::fromStdString(result.error)),
-				true, true);
-			showFooterStatus(text(strings::kCaptureVerticalFailed)
-						 .arg(QString::fromStdString(result.error)),
-					 true);
+				text(strings::kCaptureVerticalFailed).arg(QString::fromStdString(result.error)), true,
+				true);
+			showFooterStatus(
+				text(strings::kCaptureVerticalFailed).arg(QString::fromStdString(result.error)), true);
 		}
 	}
 	if (completionSucceeded) {
 		QString notification = completion;
 		if (settingsManager_ != nullptr) {
 			const auto &settings = settingsManager_->settings();
-			if (settings.notificationDetail ==
-			    NotificationDetail::Compact) {
-				notification =
-					text(strings::kNotificationClipSavedCompact);
-			} else if (settings.notificationDetail ==
-				   NotificationDetail::Detailed) {
+			if (settings.notificationDetail == NotificationDetail::Compact) {
+				notification = text(strings::kNotificationClipSavedCompact);
+			} else if (settings.notificationDetail == NotificationDetail::Detailed) {
 				notification =
 					text(strings::kNotificationClipSavedDetailed)
 						.arg(clipName)
 						.arg(clip.durationSeconds)
-						.arg(QString::fromStdString(
-							clip.filePath.parent_path()
-								.string()));
+						.arg(QString::fromStdString(clip.filePath.parent_path().string()));
 			}
 			// Save feedback stays inside the OBS dock. Native Windows tray
 			// notifications and QApplication::beep are intentionally avoided
@@ -2407,15 +2215,14 @@ void MainDock::updateFeatureGateUi()
 		captureUpgradeBanner_->setVisible(!unlimited);
 	if (durationProBadge_ != nullptr)
 		durationProBadge_->setVisible(!unlimited);
-	const bool verticalAllowed =
-		featureGates_ != nullptr && featureGates_->isAllowed(Feature::LimitedVerticalExport);
+	const bool verticalAllowed = featureGates_ != nullptr &&
+				     featureGates_->isAllowed(Feature::LimitedVerticalExport);
 	if (saveVerticalButton_ != nullptr) {
 		const bool replayReady = clipManager_ != nullptr &&
 					 clipManager_->replayState() == ReplayState::Active &&
 					 !clipManager_->capturePending();
 		saveVerticalButton_->setEnabled(verticalAllowed && replayReady);
-		saveVerticalButton_->setToolTip(
-			verticalAllowed ? QString{} : text(strings::kCaptureVerticalLimited));
+		saveVerticalButton_->setToolTip(verticalAllowed ? QString{} : text(strings::kCaptureVerticalLimited));
 	}
 	if (verticalLimitedLabel_ != nullptr)
 		verticalLimitedLabel_->setVisible(!verticalAllowed);
@@ -2433,15 +2240,12 @@ void MainDock::selectDuration(int seconds)
 
 void MainDock::refreshCaptureOutputMode()
 {
-	const auto mode = verticalManager_ != nullptr
-				  ? verticalManager_->settings().outputMode
-				  : settingsManager_ != nullptr
-					    ? settingsManager_->settings().outputMode
-					    : CaptureOutputMode::Horizontal;
+	const auto mode = verticalManager_ != nullptr   ? verticalManager_->settings().outputMode
+			  : settingsManager_ != nullptr ? settingsManager_->settings().outputMode
+							: CaptureOutputMode::Horizontal;
 	if (captureOutputModeCombo_ != nullptr) {
 		const QSignalBlocker blocker(captureOutputModeCombo_);
-		const auto index = captureOutputModeCombo_->findData(
-			static_cast<int>(mode));
+		const auto index = captureOutputModeCombo_->findData(static_cast<int>(mode));
 		captureOutputModeCombo_->setCurrentIndex(index >= 0 ? index : 0);
 		captureOutputModeCombo_->setEnabled(verticalManager_ != nullptr);
 	}
@@ -2455,9 +2259,8 @@ void MainDock::refreshCaptureOutputMode()
 		saveLabel = strings::kCaptureSaveBoth;
 	}
 	if (captureOutputModeDescription_ != nullptr)
-		captureOutputModeDescription_->setText(
-			text(strings::kCaptureOutputDescription) +
-			QStringLiteral("\n") + text(description));
+		captureOutputModeDescription_->setText(text(strings::kCaptureOutputDescription) + QStringLiteral("\n") +
+						       text(description));
 	if (markMomentButton_ != nullptr)
 		markMomentButton_->setText(text(saveLabel));
 	if (captureShortcutSaveButton_ != nullptr)
@@ -2466,8 +2269,7 @@ void MainDock::refreshCaptureOutputMode()
 		footerClipButton_->setToolTip(text(description));
 }
 
-void MainDock::showCaptureNotification(const QString &message, bool error,
-				       bool autoDismiss)
+void MainDock::showCaptureNotification(const QString &message, bool error, bool autoDismiss)
 {
 	if (captureNotification_ == nullptr)
 		return;
@@ -2478,8 +2280,7 @@ void MainDock::showCaptureNotification(const QString &message, bool error,
 		captureNotification_->hide();
 		return;
 	}
-	captureNotification_->setText(
-		autoDismiss ? message + QStringLiteral("  ✓") : message);
+	captureNotification_->setText(autoDismiss ? message + QStringLiteral("  ✓") : message);
 	captureNotification_->setToolTip(message);
 	captureNotification_->setProperty("notificationTone",
 					  error ? QStringLiteral("error") : QStringLiteral("success"));
@@ -2487,14 +2288,12 @@ void MainDock::showCaptureNotification(const QString &message, bool error,
 	captureNotification_->style()->polish(captureNotification_);
 	captureNotification_->show();
 	if (autoDismiss) {
-		QTimer::singleShot(kTransientNotificationMs, this,
-				   [this, generation] {
-					   if (generation ==
-					       captureNotificationGeneration_) {
-						   captureNotificationPending_ = false;
-						   captureNotification_->hide();
-					   }
-				   });
+		QTimer::singleShot(kTransientNotificationMs, this, [this, generation] {
+			if (generation == captureNotificationGeneration_) {
+				captureNotificationPending_ = false;
+				captureNotification_->hide();
+			}
+		});
 	}
 }
 
@@ -2512,16 +2311,12 @@ void MainDock::captureSelectedClip()
 {
 	if (clipManager_ == nullptr)
 		return;
-	const auto mode = verticalManager_ != nullptr
-				  ? verticalManager_->settings().outputMode
-				  : CaptureOutputMode::Horizontal;
-	const auto output = mode == CaptureOutputMode::Vertical
-				    ? ExportOrientation::Vertical
-			    : mode == CaptureOutputMode::Both
-				    ? ExportOrientation::Both
-				    : ExportOrientation::Horizontal;
-	const auto result = requestTriggeredCapture(
-		selectedDurationSeconds_, TriggerType::Manual, "manual", 0, output);
+	const auto mode = verticalManager_ != nullptr ? verticalManager_->settings().outputMode
+						      : CaptureOutputMode::Horizontal;
+	const auto output = mode == CaptureOutputMode::Vertical ? ExportOrientation::Vertical
+			    : mode == CaptureOutputMode::Both   ? ExportOrientation::Both
+								: ExportOrientation::Horizontal;
+	const auto result = requestTriggeredCapture(selectedDurationSeconds_, TriggerType::Manual, "manual", 0, output);
 	if (!result.accepted)
 		return;
 	if (triggerEngine_ != nullptr) {
@@ -2540,17 +2335,15 @@ void MainDock::captureVerticalClip()
 {
 	if (clipManager_ == nullptr)
 		return;
-	const auto gate = featureGates_ != nullptr
-				  ? featureGates_->check(Feature::LimitedVerticalExport)
-				  : FeatureGateDecision{false, "PRO_REQUIRED",
-							"Vertical Canvas requires ClipXtudio Pro"};
+	const auto gate = featureGates_ != nullptr ? featureGates_->check(Feature::LimitedVerticalExport)
+						   : FeatureGateDecision{false, "PRO_REQUIRED",
+									 "Vertical Canvas requires ClipXtudio Pro"};
 	if (!gate.allowed) {
 		handleCaptureError(CaptureError::ProRequired);
 		return;
 	}
-	const auto result = requestTriggeredCapture(
-		selectedDurationSeconds_, TriggerType::Manual, "manual", 0,
-		ExportOrientation::Vertical);
+	const auto result = requestTriggeredCapture(selectedDurationSeconds_, TriggerType::Manual, "manual", 0,
+						    ExportOrientation::Vertical);
 	if (!result.accepted)
 		return;
 	markMomentButton_->setEnabled(false);
@@ -2558,36 +2351,31 @@ void MainDock::captureVerticalClip()
 	footerClipButton_->setEnabled(false);
 }
 
-CaptureResult MainDock::requestTriggeredCapture(
-	int durationSeconds, TriggerType triggerType, std::string triggerLabel,
-	int score, ExportOrientation output)
+CaptureResult MainDock::requestTriggeredCapture(int durationSeconds, TriggerType triggerType, std::string triggerLabel,
+						int score, ExportOrientation output)
 {
 	if (clipManager_ == nullptr)
-		return {false, CaptureError::SaveRejected,
-			"capture service is unavailable"};
+		return {false, CaptureError::SaveRejected, "capture service is unavailable"};
 	if (output != ExportOrientation::Horizontal) {
-		const auto requiredFeature = output == ExportOrientation::Both
-					     ? Feature::HorizontalAndVertical
-					     : Feature::LimitedVerticalExport;
-		const auto gate = featureGates_ != nullptr
-					  ? featureGates_->check(requiredFeature)
-					  : FeatureGateDecision{
-						    false, "PRO_REQUIRED",
-						    "Vertical Canvas requires ClipXtudio Pro"};
+		const auto requiredFeature = output == ExportOrientation::Both ? Feature::HorizontalAndVertical
+									       : Feature::LimitedVerticalExport;
+		const auto gate =
+			featureGates_ != nullptr
+				? featureGates_->check(requiredFeature)
+				: FeatureGateDecision{false, "PRO_REQUIRED", "Vertical Canvas requires ClipXtudio Pro"};
 		if (!gate.allowed) {
 			handleCaptureError(CaptureError::ProRequired);
 			return {false, CaptureError::ProRequired, gate.message};
 		}
 	}
-	auto result = triggerType == TriggerType::Manual
-			      ? clipManager_->captureManual(durationSeconds)
-			      : clipManager_->captureTriggered(
-					durationSeconds, triggerType,
-					std::move(triggerLabel), score);
+	auto result =
+		triggerType == TriggerType::Manual
+			? clipManager_->captureManual(durationSeconds)
+			: clipManager_->captureTriggered(durationSeconds, triggerType, std::move(triggerLabel), score);
 	if (result.accepted) {
 		pendingCaptureExport_ = output == ExportOrientation::Horizontal
-					? std::nullopt
-					: std::optional<ExportOrientation>{output};
+						? std::nullopt
+						: std::optional<ExportOrientation>{output};
 		showCapturePending();
 	}
 	return result;
@@ -2595,8 +2383,7 @@ CaptureResult MainDock::requestTriggeredCapture(
 
 void MainDock::showCapturePending()
 {
-	if (clipManager_ == nullptr ||
-	    clipManager_->replayState() != ReplayState::Active) {
+	if (clipManager_ == nullptr || clipManager_->replayState() != ReplayState::Active) {
 		captureNotificationPending_ = false;
 		setCapturePendingIndicator(false);
 		if (captureNotification_ != nullptr)
@@ -2615,8 +2402,7 @@ void MainDock::showCapturePending()
 
 void MainDock::setCapturePendingIndicator(bool pending)
 {
-	if (headerCapturePendingDot_ == nullptr ||
-	    capturePendingPulseTimer_ == nullptr)
+	if (headerCapturePendingDot_ == nullptr || capturePendingPulseTimer_ == nullptr)
 		return;
 	headerCapturePendingDot_->setVisible(pending);
 	if (pending) {
@@ -2628,45 +2414,33 @@ void MainDock::setCapturePendingIndicator(bool pending)
 		capturePendingPulseOn_ = false;
 		headerCapturePendingDot_->setProperty("pulseOn", false);
 	}
-	headerCapturePendingDot_->style()->unpolish(
-		headerCapturePendingDot_);
+	headerCapturePendingDot_->style()->unpolish(headerCapturePendingDot_);
 	headerCapturePendingDot_->style()->polish(headerCapturePendingDot_);
 }
 
-void MainDock::showFooterStatus(const QString &message, bool error,
-				bool autoReset)
+void MainDock::showFooterStatus(const QString &message, bool error, bool autoReset)
 {
 	if (headerStatus_ == nullptr)
 		return;
 	const auto generation = ++headerStatusGeneration_;
-	headerStatus_->setText(autoReset ? message + QStringLiteral("  ✓")
-					 : message);
+	headerStatus_->setText(autoReset ? message + QStringLiteral("  ✓") : message);
 	headerStatus_->setToolTip(message);
 	// The header badge is reserved for the concise Replay Buffer state. Other
 	// transient operations remain available as its tooltip and in their page
 	// notification/dialog, so long messages cannot stretch the header.
-	updateReplayState(clipManager_ != nullptr ? clipManager_->replayState()
-						 : ReplayState::Inactive);
+	updateReplayState(clipManager_ != nullptr ? clipManager_->replayState() : ReplayState::Inactive);
 	if (autoReset) {
-		QTimer::singleShot(kTransientNotificationMs, this,
-				   [this, generation] {
-					   if (generation != headerStatusGeneration_)
-						   return;
-					   headerStatus_->setText(
-						   text(strings::kFooterReady));
-					   headerStatus_->setToolTip({});
-					   headerStatus_->setProperty(
-						   "notificationTone",
-						   QStringLiteral("success"));
-					   headerStatus_->style()->unpolish(
-						   headerStatus_);
-					   headerStatus_->style()->polish(
-						   headerStatus_);
-					   updateReplayState(
-						   clipManager_ != nullptr
-							   ? clipManager_->replayState()
-							   : ReplayState::Inactive);
-				   });
+		QTimer::singleShot(kTransientNotificationMs, this, [this, generation] {
+			if (generation != headerStatusGeneration_)
+				return;
+			headerStatus_->setText(text(strings::kFooterReady));
+			headerStatus_->setToolTip({});
+			headerStatus_->setProperty("notificationTone", QStringLiteral("success"));
+			headerStatus_->style()->unpolish(headerStatus_);
+			headerStatus_->style()->polish(headerStatus_);
+			updateReplayState(clipManager_ != nullptr ? clipManager_->replayState()
+								  : ReplayState::Inactive);
+		});
 	}
 	Q_UNUSED(error);
 }
@@ -2692,10 +2466,8 @@ void MainDock::setUpdateChecking(bool checking)
 	if (footerUpdateButton_ == nullptr)
 		return;
 	footerUpdateButton_->setEnabled(!checking);
-	setFooterExpandedText(
-		footerUpdateButton_,
-		text(checking ? strings::kSettingsCheckingUpdates
-			     : strings::kSettingsCheckUpdates));
+	setFooterExpandedText(footerUpdateButton_,
+			      text(checking ? strings::kSettingsCheckingUpdates : strings::kSettingsCheckUpdates));
 	if (checking) {
 		updateSpinnerAngle_ = 0;
 		if (updateSpinnerTimer_ != nullptr)
@@ -2703,8 +2475,7 @@ void MainDock::setUpdateChecking(bool checking)
 	} else {
 		if (updateSpinnerTimer_ != nullptr)
 			updateSpinnerTimer_->stop();
-		footerUpdateButton_->setIcon(
-			style()->standardIcon(QStyle::SP_BrowserReload));
+		footerUpdateButton_->setIcon(style()->standardIcon(QStyle::SP_BrowserReload));
 	}
 }
 
@@ -2720,36 +2491,36 @@ void MainDock::checkForUpdates(bool userInitiated)
 	setUpdateChecking(true);
 	setUpdateIndicatorVisible(false);
 	QPointer<MainDock> self(this);
-	updateChecker_->check(QStringLiteral(CLIPCOACH_VERSION), [self, userInitiated](network::UpdateCheckResult result) {
-		if (self.isNull())
-			return;
-		self->setUpdateChecking(false);
-		self->updateDownloadUrl_ = {};
-		self->updateSha256_.clear();
-		self->updateVersion_.clear();
-		self->updateSizeBytes_ = 0;
-		if (!result.success) {
-			self->footerUpdateButton_->setToolTip(result.errorCode);
-			self->showFooterStatus(self->text(strings::kFooterReady));
-			if (userInitiated)
-				self->showUpdateErrorDialog(result.errorCode);
-		} else if (result.updateAvailable) {
-			self->showFooterStatus(self->text(strings::kFooterReady));
-			self->updateDownloadUrl_ = result.downloadUrl;
-			self->updateSha256_ = result.sha256;
-			self->updateVersion_ = result.latestVersion;
-			self->updateSizeBytes_ = result.sizeBytes;
-			self->setFooterExpandedText(
-				self->footerUpdateButton_,
-				self->text(strings::kSettingsDownloadUpdate));
-			self->setUpdateIndicatorVisible(true);
-			self->showUpdateAvailableDialog();
-		} else if (userInitiated) {
-			self->footerUpdateButton_->setToolTip({});
-			self->showFooterStatus(self->text(strings::kFooterReady));
-			self->showUpToDateDialog();
-		}
-	});
+	updateChecker_->check(QStringLiteral(CLIPCOACH_VERSION),
+			      [self, userInitiated](network::UpdateCheckResult result) {
+				      if (self.isNull())
+					      return;
+				      self->setUpdateChecking(false);
+				      self->updateDownloadUrl_ = {};
+				      self->updateSha256_.clear();
+				      self->updateVersion_.clear();
+				      self->updateSizeBytes_ = 0;
+				      if (!result.success) {
+					      self->footerUpdateButton_->setToolTip(result.errorCode);
+					      self->showFooterStatus(self->text(strings::kFooterReady));
+					      if (userInitiated)
+						      self->showUpdateErrorDialog(result.errorCode);
+				      } else if (result.updateAvailable) {
+					      self->showFooterStatus(self->text(strings::kFooterReady));
+					      self->updateDownloadUrl_ = result.downloadUrl;
+					      self->updateSha256_ = result.sha256;
+					      self->updateVersion_ = result.latestVersion;
+					      self->updateSizeBytes_ = result.sizeBytes;
+					      self->setFooterExpandedText(self->footerUpdateButton_,
+									  self->text(strings::kSettingsDownloadUpdate));
+					      self->setUpdateIndicatorVisible(true);
+					      self->showUpdateAvailableDialog();
+				      } else if (userInitiated) {
+					      self->footerUpdateButton_->setToolTip({});
+					      self->showFooterStatus(self->text(strings::kFooterReady));
+					      self->showUpToDateDialog();
+				      }
+			      });
 }
 
 void MainDock::showUpToDateDialog()
@@ -2760,20 +2531,17 @@ void MainDock::showUpToDateDialog()
 		return;
 	}
 
-	auto *dialog = new QMessageBox(
-		QMessageBox::Information, text(strings::kSettingsUpToDateTitle),
-		text(strings::kSettingsUpdateCurrentVersion)
-				.arg(QStringLiteral(CLIPCOACH_VERSION)) +
-			QStringLiteral("\n\n") +
-			text(strings::kSettingsUpToDateBody),
-		QMessageBox::Ok, this);
+	auto *dialog =
+		new QMessageBox(QMessageBox::Information, text(strings::kSettingsUpToDateTitle),
+				text(strings::kSettingsUpdateCurrentVersion).arg(QStringLiteral(CLIPCOACH_VERSION)) +
+					QStringLiteral("\n\n") + text(strings::kSettingsUpToDateBody),
+				QMessageBox::Ok, this);
 	dialog->setObjectName(QStringLiteral("updateStatusDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	tokens::configureCompactUpdateDialog(dialog, 360);
 	updateStatusDialog_ = dialog;
-	connect(dialog, &QObject::destroyed, this,
-		[this] { updateStatusDialog_ = nullptr; });
+	connect(dialog, &QObject::destroyed, this, [this] { updateStatusDialog_ = nullptr; });
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->open();
 }
@@ -2791,32 +2559,21 @@ void MainDock::showUpdateAvailableDialog()
 	}
 
 	const auto versionSummary =
-		text(strings::kSettingsUpdateCurrentVersion)
-			.arg(QStringLiteral(CLIPCOACH_VERSION)) +
-		QStringLiteral("\n") +
-		text(strings::kSettingsUpdateAvailableVersion).arg(updateVersion_) +
-		QStringLiteral("\n\n") +
-		text(strings::kSettingsUpdateAvailableBody);
-	auto *dialog = new QMessageBox(
-		QMessageBox::Question,
-		text(strings::kSettingsUpdateAvailableTitle), versionSummary,
-		QMessageBox::NoButton, this);
+		text(strings::kSettingsUpdateCurrentVersion).arg(QStringLiteral(CLIPCOACH_VERSION)) +
+		QStringLiteral("\n") + text(strings::kSettingsUpdateAvailableVersion).arg(updateVersion_) +
+		QStringLiteral("\n\n") + text(strings::kSettingsUpdateAvailableBody);
+	auto *dialog = new QMessageBox(QMessageBox::Question, text(strings::kSettingsUpdateAvailableTitle),
+				       versionSummary, QMessageBox::NoButton, this);
 	dialog->setObjectName(QStringLiteral("updateAvailableDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	tokens::configureCompactUpdateDialog(dialog, 440);
-	auto *installButton = dialog->addButton(
-		text(strings::kSettingsUpdateInstallNow),
-		QMessageBox::AcceptRole);
-	installButton->setObjectName(
-		QStringLiteral("installAvailableUpdateButton"));
-	dialog->addButton(text(strings::kSettingsUpdateLater),
-			  QMessageBox::RejectRole);
-	connect(installButton, &QPushButton::clicked, this,
-		[this] { beginUpdateDownload(false); });
+	auto *installButton = dialog->addButton(text(strings::kSettingsUpdateInstallNow), QMessageBox::AcceptRole);
+	installButton->setObjectName(QStringLiteral("installAvailableUpdateButton"));
+	dialog->addButton(text(strings::kSettingsUpdateLater), QMessageBox::RejectRole);
+	connect(installButton, &QPushButton::clicked, this, [this] { beginUpdateDownload(false); });
 	updateStatusDialog_ = dialog;
-	connect(dialog, &QObject::destroyed, this,
-		[this] { updateStatusDialog_ = nullptr; });
+	connect(dialog, &QObject::destroyed, this, [this] { updateStatusDialog_ = nullptr; });
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->open();
 }
@@ -2829,31 +2586,26 @@ void MainDock::showUpdateErrorDialog(const QString &details)
 		return;
 	}
 
-	auto body = text(strings::kSettingsUpdateCurrentVersion)
-			    .arg(QStringLiteral(CLIPCOACH_VERSION)) +
-		    QStringLiteral("\n\n") +
-		    text(strings::kSettingsUpdateErrorBody);
+	auto body = text(strings::kSettingsUpdateCurrentVersion).arg(QStringLiteral(CLIPCOACH_VERSION)) +
+		    QStringLiteral("\n\n") + text(strings::kSettingsUpdateErrorBody);
 	if (!details.isEmpty())
 		body += QStringLiteral("\n\n%1").arg(details);
-	auto *dialog = new QMessageBox(
-		QMessageBox::Warning, text(strings::kSettingsUpdateErrorTitle),
-		body, QMessageBox::Ok, this);
+	auto *dialog = new QMessageBox(QMessageBox::Warning, text(strings::kSettingsUpdateErrorTitle), body,
+				       QMessageBox::Ok, this);
 	dialog->setObjectName(QStringLiteral("updateErrorDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
 	dialog->setTextInteractionFlags(Qt::TextSelectableByMouse);
 	tokens::configureCompactUpdateDialog(dialog, 460);
 	updateStatusDialog_ = dialog;
-	connect(dialog, &QObject::destroyed, this,
-		[this] { updateStatusDialog_ = nullptr; });
+	connect(dialog, &QObject::destroyed, this, [this] { updateStatusDialog_ = nullptr; });
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->open();
 }
 
 void MainDock::beginUpdateDownload(bool requireConfirmation)
 {
-	if (updateDownloader_ == nullptr || !updateDownloadUrl_.isValid() ||
-	    updateVersion_.isEmpty() || updateSha256_.isEmpty() ||
-	    updateSizeBytes_ <= 0)
+	if (updateDownloader_ == nullptr || !updateDownloadUrl_.isValid() || updateVersion_.isEmpty() ||
+	    updateSha256_.isEmpty() || updateSizeBytes_ <= 0)
 		return;
 
 	if (requireConfirmation) {
@@ -2862,19 +2614,15 @@ void MainDock::beginUpdateDownload(bool requireConfirmation)
 	}
 
 	const auto updateDirectory =
-		QStandardPaths::writableLocation(QStandardPaths::TempLocation) +
-		QStringLiteral("/ClipXtudio/updates");
+		QStandardPaths::writableLocation(QStandardPaths::TempLocation) + QStringLiteral("/ClipXtudio/updates");
 	if (!QDir().mkpath(updateDirectory)) {
 		showFooterStatus(text(strings::kFooterReady));
 		showUpdateErrorDialog(
-			text(strings::kSettingsUpdateInstallError)
-				.arg(QStringLiteral("UPDATE_DIRECTORY_FAILED")));
+			text(strings::kSettingsUpdateInstallError).arg(QStringLiteral("UPDATE_DIRECTORY_FAILED")));
 		return;
 	}
 	const auto destination =
-		QDir(updateDirectory)
-			.filePath(QStringLiteral("ClipXtudio-Setup-%1.exe")
-					  .arg(updateVersion_));
+		QDir(updateDirectory).filePath(QStringLiteral("ClipXtudio-Setup-%1.exe").arg(updateVersion_));
 	network::UpdateCheckResult update;
 	update.success = true;
 	update.updateAvailable = true;
@@ -2891,51 +2639,39 @@ void MainDock::beginUpdateDownload(bool requireConfirmation)
 		[self](qint64 received, qint64 total) {
 			if (self.isNull() || total <= 0)
 				return;
-			const auto percent =
-				std::clamp(static_cast<int>((received * 100) / total),
-					   0, 100);
-			self->setFooterExpandedText(
-				self->footerUpdateButton_,
-				self->text(strings::kSettingsDownloadingUpdate)
-					.arg(percent));
+			const auto percent = std::clamp(static_cast<int>((received * 100) / total), 0, 100);
+			self->setFooterExpandedText(self->footerUpdateButton_,
+						    self->text(strings::kSettingsDownloadingUpdate).arg(percent));
 		},
 		[self](network::UpdateDownloadResult result) {
 			if (self.isNull())
 				return;
 			if (!result.success) {
 				self->footerUpdateButton_->setEnabled(true);
-				self->setFooterExpandedText(
-					self->footerUpdateButton_,
-					self->text(strings::kSettingsDownloadUpdate));
+				self->setFooterExpandedText(self->footerUpdateButton_,
+							    self->text(strings::kSettingsDownloadUpdate));
 				self->setUpdateIndicatorVisible(true);
-				self->showFooterStatus(
-					self->text(strings::kFooterReady));
+				self->showFooterStatus(self->text(strings::kFooterReady));
 				self->showUpdateErrorDialog(
-					self->text(strings::kSettingsUpdateInstallError)
-						.arg(result.errorCode));
+					self->text(strings::kSettingsUpdateInstallError).arg(result.errorCode));
 				return;
 			}
 
 			std::string error;
 			if (!self->verticalObsBridge_.installUpdate ||
-			    !self->verticalObsBridge_.installUpdate(
-				    result.filePath.toStdString(), &error)) {
+			    !self->verticalObsBridge_.installUpdate(result.filePath.toStdString(), &error)) {
 				self->footerUpdateButton_->setEnabled(true);
-				self->setFooterExpandedText(
-					self->footerUpdateButton_,
-					self->text(strings::kSettingsDownloadUpdate));
+				self->setFooterExpandedText(self->footerUpdateButton_,
+							    self->text(strings::kSettingsDownloadUpdate));
 				self->setUpdateIndicatorVisible(true);
-				self->showFooterStatus(
-					self->text(strings::kFooterReady));
+				self->showFooterStatus(self->text(strings::kFooterReady));
 				self->showUpdateErrorDialog(
 					self->text(strings::kSettingsUpdateInstallError)
-						.arg(QString::fromStdString(error.empty()
-							? "UPDATE_INSTALLER_UNAVAILABLE"
-							: error)));
+						.arg(QString::fromStdString(
+							error.empty() ? "UPDATE_INSTALLER_UNAVAILABLE" : error)));
 				return;
 			}
-			self->showFooterStatus(
-				self->text(strings::kSettingsInstallingUpdate));
+			self->showFooterStatus(self->text(strings::kSettingsInstallingUpdate));
 		});
 }
 

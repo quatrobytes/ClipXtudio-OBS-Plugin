@@ -28,9 +28,9 @@ int main()
 	for (const auto *key : clipcoach::ui::strings::kRequiredTranslationKeys) {
 		const auto declaration = std::string(key) + '=';
 		clipcoach::test::expect(english.find(declaration) != std::string::npos,
-				       std::string("missing English localization key: ") + key);
+					std::string("missing English localization key: ") + key);
 		clipcoach::test::expect(spanish.find(declaration) != std::string::npos,
-				       std::string("missing Spanish localization key: ") + key);
+					std::string("missing Spanish localization key: ") + key);
 	}
 
 	return clipcoach::test::pass("localization-keys-test");

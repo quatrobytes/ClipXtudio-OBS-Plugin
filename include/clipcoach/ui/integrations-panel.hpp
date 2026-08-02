@@ -12,7 +12,7 @@ class QUrl;
 namespace clipcoach::integrations {
 class ChatIntegrationManager;
 enum class ChatPlatform;
-}
+} // namespace clipcoach::integrations
 
 namespace clipcoach::ui {
 
@@ -21,10 +21,8 @@ public:
 	using TranslationFunction = std::function<QString(const char *)>;
 	using AuthorizationOpener = std::function<bool(const QUrl &)>;
 
-	IntegrationsPanel(
-		TranslationFunction translator,
-		integrations::ChatIntegrationManager *manager,
-		AuthorizationOpener opener = {}, QWidget *parent = nullptr);
+	IntegrationsPanel(TranslationFunction translator, integrations::ChatIntegrationManager *manager,
+			  AuthorizationOpener opener = {}, QWidget *parent = nullptr);
 
 	void refresh();
 
@@ -36,8 +34,7 @@ private:
 	};
 
 	[[nodiscard]] QString text(const char *key) const;
-	void addPlatform(integrations::ChatPlatform platform,
-			 const QString &name, const QString &statusObjectName);
+	void addPlatform(integrations::ChatPlatform platform, const QString &name, const QString &statusObjectName);
 	void beginConnect(integrations::ChatPlatform platform);
 	void disconnect(integrations::ChatPlatform platform);
 

@@ -159,15 +159,13 @@ public:
 	bool compact{false};
 };
 
-ClipCard::ClipCard(const QString &title, const QString &metadata, int score, QWidget *parent)
-	: QFrame(parent)
+ClipCard::ClipCard(const QString &title, const QString &metadata, int score, QWidget *parent) : QFrame(parent)
 {
 	setObjectName(QStringLiteral("ClipCard"));
 	setFrameShape(QFrame::NoFrame);
 
 	auto *layout = new QHBoxLayout(this);
-	layout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd,
-				   tokens::kSpaceMd);
+	layout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	layout->setSpacing(tokens::kSpaceMd);
 
 	auto *thumbnail = new QFrame(this);
@@ -190,8 +188,7 @@ ClipCard::ClipCard(const QString &title, const QString &metadata, int score, QWi
 	}
 }
 
-ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
-	: QFrame(parent), impl_(new Impl)
+ClipCard::ClipCard(ClipCardViewData data, QWidget *parent) : QFrame(parent), impl_(new Impl)
 {
 	setObjectName(QStringLiteral("ClipCard"));
 	setProperty("libraryRole", QStringLiteral("persistedClip"));
@@ -200,8 +197,7 @@ ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
 	setMinimumHeight(82);
 
 	impl_->layout = new QGridLayout(this);
-	impl_->layout->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm,
-					 tokens::kSpaceSm, tokens::kSpaceSm);
+	impl_->layout->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm);
 	impl_->layout->setHorizontalSpacing(tokens::kSpaceSm);
 	impl_->layout->setVerticalSpacing(tokens::kSpaceXs);
 	impl_->selected = new QCheckBox(this);
@@ -219,17 +215,14 @@ ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
 	thumbnailImage->setAlignment(Qt::AlignCenter);
 	const QPixmap image(data.thumbnailPath);
 	if (!image.isNull()) {
-		const auto scaled = image.scaled(
-			impl_->thumbnail->size(), Qt::KeepAspectRatioByExpanding,
-			Qt::SmoothTransformation);
+		const auto scaled = image.scaled(impl_->thumbnail->size(), Qt::KeepAspectRatioByExpanding,
+						 Qt::SmoothTransformation);
 		const auto x = std::max(0, (scaled.width() - impl_->thumbnail->width()) / 2);
 		const auto y = std::max(0, (scaled.height() - impl_->thumbnail->height()) / 2);
-		thumbnailImage->setPixmap(
-			scaled.copy(x, y, impl_->thumbnail->width(), impl_->thumbnail->height()));
+		thumbnailImage->setPixmap(scaled.copy(x, y, impl_->thumbnail->width(), impl_->thumbnail->height()));
 	} else {
 		thumbnailImage->setText(QStringLiteral("\u25B6"));
-		thumbnailImage->setProperty("thumbnailState",
-					    QStringLiteral("placeholder"));
+		thumbnailImage->setProperty("thumbnailState", QStringLiteral("placeholder"));
 	}
 	auto *duration = new QLabel(data.duration, impl_->thumbnail);
 	duration->setObjectName(QStringLiteral("clipDurationBadge"));
@@ -280,12 +273,9 @@ ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
 	impl_->favorite->setIcon(favoriteIcon(data.favorite));
 	impl_->favorite->setIconSize(QSize(18, 18));
 	connect(impl_->favorite, &QPushButton::toggled, this,
-		[this](bool checked) {
-			impl_->favorite->setIcon(favoriteIcon(checked));
-		});
+		[this](bool checked) { impl_->favorite->setIcon(favoriteIcon(checked)); });
 
-	auto makeAction = [this](const QString &name, const QString &tooltip,
-				 ClipActionIcon icon) {
+	auto makeAction = [this](const QString &name, const QString &tooltip, ClipActionIcon icon) {
 		auto *button = new QPushButton(this);
 		button->setObjectName(name);
 		button->setProperty("controlRole", QStringLiteral("compact"));
@@ -297,20 +287,16 @@ ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
 		button->setIconSize(QSize(18, 18));
 		return button;
 	};
-	impl_->preview = makeAction(QStringLiteral("clipPreviewButton"),
-				    data.previewLabel, ClipActionIcon::Preview);
-	impl_->edit = makeAction(QStringLiteral("clipQuickEditorButton"),
-			       data.editLabel, ClipActionIcon::Edit);
-	impl_->exportVertical = makeAction(QStringLiteral("clipExportVerticalButton"),
-					   data.exportLabel, ClipActionIcon::Vertical);
-	impl_->caption = makeAction(QStringLiteral("clipCaptionButton"),
-				    data.captionLabel, ClipActionIcon::Caption);
-	impl_->subtitles = makeAction(QStringLiteral("clipSubtitlesButton"),
-				      data.subtitlesLabel, ClipActionIcon::Subtitles);
-	impl_->folder = makeAction(QStringLiteral("clipOpenFolderButton"),
-				   data.openFolderLabel, ClipActionIcon::Folder);
-	impl_->deleteClip = makeAction(QStringLiteral("clipDeleteButton"),
-				       data.deleteLabel, ClipActionIcon::Delete);
+	impl_->preview = makeAction(QStringLiteral("clipPreviewButton"), data.previewLabel, ClipActionIcon::Preview);
+	impl_->edit = makeAction(QStringLiteral("clipQuickEditorButton"), data.editLabel, ClipActionIcon::Edit);
+	impl_->exportVertical =
+		makeAction(QStringLiteral("clipExportVerticalButton"), data.exportLabel, ClipActionIcon::Vertical);
+	impl_->caption = makeAction(QStringLiteral("clipCaptionButton"), data.captionLabel, ClipActionIcon::Caption);
+	impl_->subtitles =
+		makeAction(QStringLiteral("clipSubtitlesButton"), data.subtitlesLabel, ClipActionIcon::Subtitles);
+	impl_->folder =
+		makeAction(QStringLiteral("clipOpenFolderButton"), data.openFolderLabel, ClipActionIcon::Folder);
+	impl_->deleteClip = makeAction(QStringLiteral("clipDeleteButton"), data.deleteLabel, ClipActionIcon::Delete);
 	impl_->deleteClip->setProperty("destructiveAction", true);
 	impl_->caption->setEnabled(data.captionAvailable);
 	impl_->subtitles->setEnabled(data.subtitlesAvailable);
@@ -348,17 +334,12 @@ ClipCard::ClipCard(ClipCardViewData data, QWidget *parent)
 	if (data.processing) {
 		impl_->pendingPulseTimer = new QTimer(impl_->scoreStatus);
 		impl_->pendingPulseTimer->setInterval(420);
-		connect(impl_->pendingPulseTimer, &QTimer::timeout, this,
-			[this] {
-				const bool on = !impl_->pendingDot
-							->property("pulseOn")
-							.toBool();
-				impl_->pendingDot->setProperty("pulseOn", on);
-				impl_->pendingDot->style()->unpolish(
-					impl_->pendingDot);
-				impl_->pendingDot->style()->polish(
-					impl_->pendingDot);
-			});
+		connect(impl_->pendingPulseTimer, &QTimer::timeout, this, [this] {
+			const bool on = !impl_->pendingDot->property("pulseOn").toBool();
+			impl_->pendingDot->setProperty("pulseOn", on);
+			impl_->pendingDot->style()->unpolish(impl_->pendingDot);
+			impl_->pendingDot->style()->polish(impl_->pendingDot);
+		});
 		impl_->pendingPulseTimer->start();
 	}
 	updateResponsiveLayout();
@@ -423,8 +404,7 @@ void ClipCard::setDeleteCallback(std::function<void()> callback)
 
 void ClipCard::setSelectionCallback(std::function<void(bool)> callback)
 {
-	connect(impl_->selected, &QCheckBox::toggled, this,
-		std::move(callback));
+	connect(impl_->selected, &QCheckBox::toggled, this, std::move(callback));
 }
 
 void ClipCard::resizeEvent(QResizeEvent *event)
@@ -442,9 +422,8 @@ void ClipCard::updateResponsiveLayout()
 		return;
 	impl_->compact = compact;
 
-	for (auto *widget : {static_cast<QWidget *>(impl_->selected), impl_->thumbnail,
-			     impl_->details, impl_->scoreStatus,
-			     impl_->actions})
+	for (auto *widget : {static_cast<QWidget *>(impl_->selected), impl_->thumbnail, impl_->details,
+			     impl_->scoreStatus, impl_->actions})
 		impl_->layout->removeWidget(widget);
 
 	impl_->layout->addWidget(impl_->selected, 0, 0, 1, 1, Qt::AlignVCenter);

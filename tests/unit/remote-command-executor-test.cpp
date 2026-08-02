@@ -17,12 +17,14 @@ int main()
 	using clipcoach::test::expect;
 	std::vector<RemoteCapturePlan> captures;
 	std::vector<RemoteCommandResult> results;
-	RemoteCommandExecutor executor(
-		[&](const RemoteCapturePlan &plan, RemoteCommandExecutor::Completion done) {
-			captures.push_back(plan);
-			done({plan.commandUuid, true, "clip-id", "clip.mp4", plan.durationSeconds,
-			      plan.vertical ? "vertical" : plan.both ? "both" : "horizontal", "Clip saved"});
-		});
+	RemoteCommandExecutor executor([&](const RemoteCapturePlan &plan, RemoteCommandExecutor::Completion done) {
+		captures.push_back(plan);
+		done({plan.commandUuid, true, "clip-id", "clip.mp4", plan.durationSeconds,
+		      plan.vertical ? "vertical"
+		      : plan.both   ? "both"
+				    : "horizontal",
+		      "Clip saved"});
+	});
 
 	RemoteCommand vertical{kUuid, RemoteCommandType::SaveVertical, 60, 10, {}, "editor@example.com"};
 	executor.submit(vertical, [&](auto result) { results.push_back(std::move(result)); });
@@ -34,10 +36,11 @@ int main()
 	expect(results.size() == 1 && results.front().success, "successful remote capture must complete");
 
 	const std::array<int, 5> delays{0, 5, 10, 20, 37};
-	const std::array<const char *, 5> delayUuids{
-		"523e4567-e89b-12d3-a456-426614174000", "623e4567-e89b-12d3-a456-426614174000",
-		"723e4567-e89b-12d3-a456-426614174000", "823e4567-e89b-12d3-a456-426614174000",
-		"923e4567-e89b-12d3-a456-426614174000"};
+	const std::array<const char *, 5> delayUuids{"523e4567-e89b-12d3-a456-426614174000",
+						     "623e4567-e89b-12d3-a456-426614174000",
+						     "723e4567-e89b-12d3-a456-426614174000",
+						     "823e4567-e89b-12d3-a456-426614174000",
+						     "923e4567-e89b-12d3-a456-426614174000"};
 	for (std::size_t index = 0; index < delays.size(); ++index) {
 		RemoteCommand delayed{delayUuids[index], RemoteCommandType::SaveCustom, 40, delays[index]};
 		executor.submit(delayed, [&](auto result) { results.push_back(std::move(result)); });

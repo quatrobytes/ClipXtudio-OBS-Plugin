@@ -44,23 +44,17 @@ struct ChatPulseEvent {
 
 class ChatPulseDetector final {
 public:
-	explicit ChatPulseDetector(
-		ChatPulseConfiguration configuration = {});
+	explicit ChatPulseDetector(ChatPulseConfiguration configuration = {});
 
-	[[nodiscard]] bool
-	configure(const ChatPulseConfiguration &configuration,
-		  std::string *error = nullptr);
-	[[nodiscard]] std::optional<ChatPulseEvent>
-	ingest(ChatPlatform platform, const ChatMessage &message);
+	[[nodiscard]] bool configure(const ChatPulseConfiguration &configuration, std::string *error = nullptr);
+	[[nodiscard]] std::optional<ChatPulseEvent> ingest(ChatPlatform platform, const ChatMessage &message);
 	void reset();
 
 private:
 	ChatPulseConfiguration configuration_;
 	std::map<ChatPlatform, std::deque<ChatMessage>> windows_;
 	std::map<ChatPlatform, std::set<std::string>> messageIds_;
-	std::map<ChatPlatform,
-		 std::optional<std::chrono::system_clock::time_point>>
-		lastPulseAt_;
+	std::map<ChatPlatform, std::optional<std::chrono::system_clock::time_point>> lastPulseAt_;
 };
 
 struct ChatPulseResult {
@@ -74,11 +68,8 @@ class ChatPulseService final {
 public:
 	ChatPulseService(TriggerEngine &triggerEngine, bool proUnlocked);
 
-	[[nodiscard]] bool
-	configure(const ChatPulseConfiguration &configuration,
-		  std::string *error = nullptr);
-	[[nodiscard]] ChatPulseResult
-	process(ChatPlatform platform, const ChatMessage &message);
+	[[nodiscard]] bool configure(const ChatPulseConfiguration &configuration, std::string *error = nullptr);
+	[[nodiscard]] ChatPulseResult process(ChatPlatform platform, const ChatMessage &message);
 	void setProUnlocked(bool unlocked) noexcept;
 	void reset();
 
@@ -98,8 +89,7 @@ struct ChatSyncResult {
 
 class ChatIntegrationController final {
 public:
-	ChatIntegrationController(ChatIntegrationManager &manager,
-				  ChatPulseService &pulseService);
+	ChatIntegrationController(ChatIntegrationManager &manager, ChatPulseService &pulseService);
 
 	[[nodiscard]] ChatSyncResult sync(ChatPlatform platform);
 

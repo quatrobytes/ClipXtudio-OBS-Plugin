@@ -94,10 +94,8 @@ inline constexpr const char *kCaptureNoLastClip = "Capture.NoLastClip";
 inline constexpr const char *kCaptureSessionCount = "Capture.SessionCount";
 inline constexpr const char *kCaptureSaved = "Capture.Saved";
 inline constexpr const char *kNotificationTitle = "Notification.Title";
-inline constexpr const char *kNotificationClipSavedCompact =
-	"Notification.ClipSavedCompact";
-inline constexpr const char *kNotificationClipSavedDetailed =
-	"Notification.ClipSavedDetailed";
+inline constexpr const char *kNotificationClipSavedCompact = "Notification.ClipSavedCompact";
+inline constexpr const char *kNotificationClipSavedDetailed = "Notification.ClipSavedDetailed";
 inline constexpr const char *kCaptureSaving = "Capture.Saving";
 inline constexpr const char *kCaptureManualMetadata = "Capture.ManualMetadata";
 inline constexpr const char *kCaptureVerticalLimited = "Capture.VerticalLimited";
@@ -106,12 +104,9 @@ inline constexpr const char *kCaptureVerticalFailed = "Capture.VerticalFailed";
 inline constexpr const char *kCaptureBothQueued = "Capture.BothQueued";
 inline constexpr const char *kCaptureOutputTitle = "Capture.Output.Title";
 inline constexpr const char *kCaptureOutputDescription = "Capture.Output.Description";
-inline constexpr const char *kCaptureOutputHorizontalDescription =
-	"Capture.Output.HorizontalDescription";
-inline constexpr const char *kCaptureOutputVerticalDescription =
-	"Capture.Output.VerticalDescription";
-inline constexpr const char *kCaptureOutputBothDescription =
-	"Capture.Output.BothDescription";
+inline constexpr const char *kCaptureOutputHorizontalDescription = "Capture.Output.HorizontalDescription";
+inline constexpr const char *kCaptureOutputVerticalDescription = "Capture.Output.VerticalDescription";
+inline constexpr const char *kCaptureOutputBothDescription = "Capture.Output.BothDescription";
 inline constexpr const char *kCaptureSaveHorizontal = "Capture.Output.SaveHorizontal";
 inline constexpr const char *kCaptureSaveVertical = "Capture.Output.SaveVertical";
 inline constexpr const char *kCaptureSaveBoth = "Capture.Output.SaveBoth";
@@ -621,8 +616,7 @@ inline constexpr const char *kSettingsActivatedDevice = "Settings.Pro.ActivatedD
 inline constexpr const char *kSettingsLicenseKeyPlaceholder = "Settings.Pro.LicenseKeyPlaceholder";
 inline constexpr const char *kSettingsLicenseKeyRequired = "Settings.Pro.LicenseKeyRequired";
 inline constexpr const char *kSettingsLicenseKeyInvalid = "Settings.Pro.LicenseKeyInvalid";
-inline constexpr const char *kSettingsLicenseActivationUnavailable =
-	"Settings.Pro.LicenseActivationUnavailable";
+inline constexpr const char *kSettingsLicenseActivationUnavailable = "Settings.Pro.LicenseActivationUnavailable";
 inline constexpr const char *kSettingsActivating = "Settings.Pro.Activating";
 inline constexpr const char *kSettingsDeviceUnavailable = "Settings.Pro.DeviceUnavailable";
 inline constexpr const char *kSettingsThisDevice = "Settings.Pro.ThisDevice";

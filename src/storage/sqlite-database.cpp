@@ -109,8 +109,7 @@ WHERE trigger_label = 'manual'
 StorageStatus sqliteFailure(sqlite3 *database, const std::string &operation)
 {
 	return StorageStatus::fail(operation + ": " +
-				   (database != nullptr ? sqlite3_errmsg(database)
-							: "database is not open"));
+				   (database != nullptr ? sqlite3_errmsg(database) : "database is not open"));
 }
 
 } // namespace
@@ -133,15 +132,14 @@ StorageStatus SqliteDatabase::open()
 	if (!parent.empty()) {
 		std::filesystem::create_directories(parent, fileError);
 		if (fileError) {
-			return StorageStatus::fail("could not create database directory: " +
-						   fileError.message());
+			return StorageStatus::fail("could not create database directory: " + fileError.message());
 		}
 	}
 
 	const auto utf8Path = path_.u8string();
-	const auto result = sqlite3_open_v2(
-		utf8Path.c_str(), &database_,
-		SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX, nullptr);
+	const auto result = sqlite3_open_v2(utf8Path.c_str(), &database_,
+					    SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
+					    nullptr);
 	if (result != SQLITE_OK) {
 		const auto error = sqliteFailure(database_, "could not open SQLite database");
 		close();
@@ -187,8 +185,7 @@ bool SqliteDatabase::hasTable(const std::string &tableName) const
 		return false;
 	}
 	sqlite3_stmt *statement = nullptr;
-	const char *sql =
-		"SELECT 1 FROM sqlite_master WHERE type='table' AND name=?1 LIMIT 1";
+	const char *sql = "SELECT 1 FROM sqlite_master WHERE type='table' AND name=?1 LIMIT 1";
 	if (sqlite3_prepare_v2(database_, sql, -1, &statement, nullptr) != SQLITE_OK) {
 		return false;
 	}
@@ -198,8 +195,7 @@ bool SqliteDatabase::hasTable(const std::string &tableName) const
 	return found;
 }
 
-bool SqliteDatabase::hasColumn(const std::string &tableName,
-			       const std::string &columnName) const
+bool SqliteDatabase::hasColumn(const std::string &tableName, const std::string &columnName) const
 {
 	if (database_ == nullptr) {
 		return false;
@@ -214,8 +210,7 @@ bool SqliteDatabase::hasColumn(const std::string &tableName,
 	bool found = false;
 	while (sqlite3_step(statement) == SQLITE_ROW) {
 		const auto *name = sqlite3_column_text(statement, 0);
-		if (name != nullptr &&
-		    columnName == reinterpret_cast<const char *>(name)) {
+		if (name != nullptr && columnName == reinterpret_cast<const char *>(name)) {
 			found = true;
 			break;
 		}
@@ -332,8 +327,7 @@ StorageStatus SqliteDatabase::execute(const char *sql)
 	if (result == SQLITE_OK) {
 		return StorageStatus::ok();
 	}
-	const std::string message =
-		rawError != nullptr ? rawError : sqlite3_errmsg(database_);
+	const std::string message = rawError != nullptr ? rawError : sqlite3_errmsg(database_);
 	sqlite3_free(rawError);
 	return StorageStatus::fail(message);
 }
@@ -341,8 +335,7 @@ StorageStatus SqliteDatabase::execute(const char *sql)
 int SqliteDatabase::readUserVersion() const noexcept
 {
 	sqlite3_stmt *statement = nullptr;
-	if (sqlite3_prepare_v2(database_, "PRAGMA user_version;", -1, &statement, nullptr) !=
-	    SQLITE_OK) {
+	if (sqlite3_prepare_v2(database_, "PRAGMA user_version;", -1, &statement, nullptr) != SQLITE_OK) {
 		return -1;
 	}
 	const auto result = sqlite3_step(statement);

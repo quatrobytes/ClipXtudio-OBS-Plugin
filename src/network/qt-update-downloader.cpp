@@ -34,11 +34,7 @@ bool allowedDownloadUrl(const QUrl &url)
 }
 
 struct DownloadState {
-	explicit DownloadState(const QString &path)
-		: file(path),
-		  hash(QCryptographicHash::Sha256)
-	{
-	}
+	explicit DownloadState(const QString &path) : file(path), hash(QCryptographicHash::Sha256) {}
 
 	QSaveFile file;
 	QCryptographicHash hash;
@@ -49,8 +45,7 @@ struct DownloadState {
 
 } // namespace
 
-QtUpdateDownloader::QtUpdateDownloader(QNetworkAccessManager *manager)
-	: manager_(manager)
+QtUpdateDownloader::QtUpdateDownloader(QNetworkAccessManager *manager) : manager_(manager)
 {
 	if (manager_ == nullptr) {
 		ownedManager_ = std::make_unique<QNetworkAccessManager>();
@@ -60,8 +55,8 @@ QtUpdateDownloader::QtUpdateDownloader(QNetworkAccessManager *manager)
 
 QtUpdateDownloader::~QtUpdateDownloader() = default;
 
-void QtUpdateDownloader::download(const UpdateCheckResult &update, const QString &destinationPath,
-				  Progress progress, Completion completion)
+void QtUpdateDownloader::download(const UpdateCheckResult &update, const QString &destinationPath, Progress progress,
+				  Completion completion)
 {
 	static const QRegularExpression checksumPattern(QStringLiteral("^[a-fA-F0-9]{64}$"));
 	if (!update.updateAvailable || !allowedDownloadUrl(update.downloadUrl) ||
@@ -83,10 +78,8 @@ void QtUpdateDownloader::download(const UpdateCheckResult &update, const QString
 	request.setRawHeader("Accept", "application/octet-stream");
 	request.setRawHeader("User-Agent", "ClipXtudio-Updater");
 	request.setTransferTimeout(120000);
-	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute,
-			     QNetworkRequest::NoLessSafeRedirectPolicy);
-	const auto secure =
-		update.downloadUrl.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0;
+	request.setAttribute(QNetworkRequest::RedirectPolicyAttribute, QNetworkRequest::NoLessSafeRedirectPolicy);
+	const auto secure = update.downloadUrl.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0;
 	if (secure) {
 		auto ssl = request.sslConfiguration();
 		ssl.setProtocol(QSsl::TlsV1_2OrLater);
@@ -119,35 +112,33 @@ void QtUpdateDownloader::download(const UpdateCheckResult &update, const QString
 			progress(state->received, expected);
 	};
 	QObject::connect(reply, &QNetworkReply::readyRead, reply, [consume] { (*consume)(); });
-	QObject::connect(
-		reply, &QNetworkReply::finished, reply,
-		[reply, state, consume, expected = update.sizeBytes,
-		 expectedHash = update.sha256.toLower(), destinationPath,
-		 completion = std::move(completion)]() mutable {
-			(*consume)();
-			QString errorCode;
-			if (state->sizeExceeded || state->received != expected)
-				errorCode = QStringLiteral("UPDATE_SIZE_MISMATCH");
-			else if (state->writeFailed)
-				errorCode = QStringLiteral("UPDATE_FILE_WRITE_FAILED");
-			else if (reply->error() != QNetworkReply::NoError)
-				errorCode = QStringLiteral("UPDATE_DOWNLOAD_NETWORK_ERROR");
-			else if (!allowedDownloadUrl(reply->url()))
-				errorCode = QStringLiteral("UPDATE_REDIRECT_REJECTED");
-			else if (QString::fromLatin1(state->hash.result().toHex()) != expectedHash)
-				errorCode = QStringLiteral("UPDATE_CHECKSUM_MISMATCH");
-			else if (!state->file.commit())
-				errorCode = QStringLiteral("UPDATE_FILE_COMMIT_FAILED");
+	QObject::connect(reply, &QNetworkReply::finished, reply,
+			 [reply, state, consume, expected = update.sizeBytes, expectedHash = update.sha256.toLower(),
+			  destinationPath, completion = std::move(completion)]() mutable {
+				 (*consume)();
+				 QString errorCode;
+				 if (state->sizeExceeded || state->received != expected)
+					 errorCode = QStringLiteral("UPDATE_SIZE_MISMATCH");
+				 else if (state->writeFailed)
+					 errorCode = QStringLiteral("UPDATE_FILE_WRITE_FAILED");
+				 else if (reply->error() != QNetworkReply::NoError)
+					 errorCode = QStringLiteral("UPDATE_DOWNLOAD_NETWORK_ERROR");
+				 else if (!allowedDownloadUrl(reply->url()))
+					 errorCode = QStringLiteral("UPDATE_REDIRECT_REJECTED");
+				 else if (QString::fromLatin1(state->hash.result().toHex()) != expectedHash)
+					 errorCode = QStringLiteral("UPDATE_CHECKSUM_MISMATCH");
+				 else if (!state->file.commit())
+					 errorCode = QStringLiteral("UPDATE_FILE_COMMIT_FAILED");
 
-			if (!errorCode.isEmpty()) {
-				state->file.cancelWriting();
-				if (completion)
-					completion({false, {}, errorCode});
-			} else if (completion) {
-				completion({true, QFileInfo(destinationPath).absoluteFilePath(), {}});
-			}
-			reply->deleteLater();
-		});
+				 if (!errorCode.isEmpty()) {
+					 state->file.cancelWriting();
+					 if (completion)
+						 completion({false, {}, errorCode});
+				 } else if (completion) {
+					 completion({true, QFileInfo(destinationPath).absoluteFilePath(), {}});
+				 }
+				 reply->deleteLater();
+			 });
 }
 
 } // namespace clipcoach::network

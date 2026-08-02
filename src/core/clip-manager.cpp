@@ -141,14 +141,11 @@ CaptureResult ClipManager::captureManual(int durationSeconds)
 	signal.type = SmartTriggerType::Manual;
 	signal.manualMarker = true;
 	signal.durationSeconds = durationSeconds;
-	return beginCapture(durationSeconds, TriggerType::Manual, "manual",
-			    ScoreEngine{}.calculate(signal));
+	return beginCapture(durationSeconds, TriggerType::Manual, "manual", ScoreEngine{}.calculate(signal));
 }
 
-CaptureResult ClipManager::captureTriggered(int durationSeconds,
-					    TriggerType triggerType,
-					    std::string triggerLabel, int score,
-					    std::string requestedBy)
+CaptureResult ClipManager::captureTriggered(int durationSeconds, TriggerType triggerType, std::string triggerLabel,
+					    int score, std::string requestedBy)
 {
 	if (triggerLabel.empty()) {
 		switch (triggerType) {
@@ -172,22 +169,21 @@ CaptureResult ClipManager::captureTriggered(int durationSeconds,
 			break;
 		}
 	}
-	return beginCapture(durationSeconds, triggerType, std::move(triggerLabel),
-			    std::clamp(score, 0, 100), std::move(requestedBy));
+	return beginCapture(durationSeconds, triggerType, std::move(triggerLabel), std::clamp(score, 0, 100),
+			    std::move(requestedBy));
 }
 
 CaptureResult ClipManager::markMoment(std::string label, int secondsBeforeNow)
 {
-	if (label.empty()) label = "manual";
+	if (label.empty())
+		label = "manual";
 	secondsBeforeNow = std::clamp(secondsBeforeNow, 0, 120);
 	markedMoments_.push_back({clock_() - std::chrono::seconds(secondsBeforeNow), std::move(label)});
 	return {true, CaptureError::None, "moment marked"};
 }
 
-CaptureResult ClipManager::beginCapture(int durationSeconds,
-					TriggerType triggerType,
-					std::string triggerLabel, int score,
-					std::string requestedBy)
+CaptureResult ClipManager::beginCapture(int durationSeconds, TriggerType triggerType, std::string triggerLabel,
+					int score, std::string requestedBy)
 {
 	if (!isValidDuration(durationSeconds)) {
 		const std::string message = "clip duration must be between 5 and 300 seconds";
@@ -208,10 +204,8 @@ CaptureResult ClipManager::beginCapture(int durationSeconds,
 	}
 	const auto bufferedSeconds = replayManager_.bufferedDurationSeconds();
 	if (bufferedSeconds < durationSeconds - 2) {
-		const std::string message =
-			"Replay Buffer contains only " +
-			std::to_string(bufferedSeconds) + " of " +
-			std::to_string(durationSeconds) + " requested seconds";
+		const std::string message = "Replay Buffer contains only " + std::to_string(bufferedSeconds) + " of " +
+					    std::to_string(durationSeconds) + " requested seconds";
 		reportError(CaptureError::ReplayBufferWarmingUp, message);
 		return rejected(CaptureError::ReplayBufferWarmingUp, message);
 	}
@@ -221,8 +215,8 @@ CaptureResult ClipManager::beginCapture(int durationSeconds,
 		return rejected(CaptureError::CaptureAlreadyPending, message);
 	}
 
-	pendingCapture_ = PendingCapture{durationSeconds, triggerType,
-					 std::move(triggerLabel), std::move(requestedBy), score, clock_()};
+	pendingCapture_ = PendingCapture{durationSeconds,        triggerType, std::move(triggerLabel),
+					 std::move(requestedBy), score,       clock_()};
 	const auto result = replayManager_.save();
 	if (!result.accepted) {
 		pendingCapture_.reset();
@@ -292,8 +286,14 @@ ClipManager::ObserverId ClipManager::addErrorObserver(ErrorCallback callback)
 	return id;
 }
 
-void ClipManager::removeClipSavedObserver(ObserverId id) { clipSavedObservers_.erase(id); }
-void ClipManager::removeErrorObserver(ObserverId id) { errorObservers_.erase(id); }
+void ClipManager::removeClipSavedObserver(ObserverId id)
+{
+	clipSavedObservers_.erase(id);
+}
+void ClipManager::removeErrorObserver(ObserverId id)
+{
+	errorObservers_.erase(id);
+}
 
 void ClipManager::handleReplaySaved(const std::filesystem::path &sourcePath)
 {
@@ -312,8 +312,7 @@ void ClipManager::handleReplaySaved(const std::filesystem::path &sourcePath)
 	}
 
 	const auto readableName =
-		createReadableFileName(pending.capturedAt, pending.triggerLabel,
-				       sourcePath.extension().string());
+		createReadableFileName(pending.capturedAt, pending.triggerLabel, sourcePath.extension().string());
 	const auto destination = availableDestination(sourcePath, readableName);
 	if (destination.empty()) {
 		reportError(CaptureError::FileRenameFailed, "could not allocate a unique clip file name");
@@ -360,7 +359,8 @@ void ClipManager::handleReplaySaved(const std::filesystem::path &sourcePath)
 	const auto savedObservers = clipSavedObservers_;
 	for (const auto &[id, observer] : savedObservers) {
 		(void)id;
-		if (observer) observer(sessionClips_.back());
+		if (observer)
+			observer(sessionClips_.back());
 	}
 	if (renameFailed) {
 		reportError(CaptureError::FileRenameFailed, "the replay was saved but could not be renamed");
@@ -375,7 +375,8 @@ void ClipManager::reportError(CaptureError error, std::string message)
 	const auto errorObservers = errorObservers_;
 	for (const auto &[id, observer] : errorObservers) {
 		(void)id;
-		if (observer) observer(error, message);
+		if (observer)
+			observer(error, message);
 	}
 }
 

@@ -56,9 +56,8 @@ bool validResponse(const AiAssistantResponse &response)
 	// Backends released before 0.5.59 may still return up to 30 hashtags.
 	// Accept that wire format and normalize it before persistence and UI use.
 	if (response.suggestedTitles.size() > 10 || response.hashtags.size() > 30 || response.caption.size() > 10'000 ||
-	    response.summary.size() > 20'000 || response.qualityReason.size() > 2'000 ||
-	    response.qualityScore < -1 || response.qualityScore > 100 ||
-	    response.hookStrength < -1 || response.hookStrength > 100)
+	    response.summary.size() > 20'000 || response.qualityReason.size() > 2'000 || response.qualityScore < -1 ||
+	    response.qualityScore > 100 || response.hookStrength < -1 || response.hookStrength > 100)
 		return false;
 	for (const auto &title : response.suggestedTitles)
 		if (title.empty() || title.size() > 240)
@@ -229,11 +228,9 @@ void AiAssistantService::handleClipResponse(ClipMetadata clip, AiAssistantConfig
 			persisted.hookStrength = response.hookStrength;
 			persisted.qualityReason = response.qualityReason;
 			if (response.qualityScore >= 0 && response.hookStrength >= 0) {
-				persisted.score = std::clamp(
-					static_cast<int>(std::lround(
-						response.qualityScore * 0.6 +
-						response.hookStrength * 0.4)),
-					0, 100);
+				persisted.score = std::clamp(static_cast<int>(std::lround(response.qualityScore * 0.6 +
+											  response.hookStrength * 0.4)),
+							     0, 100);
 			} else if (response.qualityScore >= 0) {
 				persisted.score = response.qualityScore;
 			}

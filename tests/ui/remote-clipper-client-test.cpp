@@ -18,14 +18,16 @@ void serve(QTcpServer &server, int &requests, bool &authorizationSeen)
 		QObject::connect(socket, &QTcpSocket::readyRead, socket, [&, socket] {
 			const auto request = socket->readAll();
 			++requests;
-			authorizationSeen = authorizationSeen || request.toLower().contains("authorization: bearer signed-token");
+			authorizationSeen = authorizationSeen ||
+					    request.toLower().contains("authorization: bearer signed-token");
 			QByteArray body;
 			if (request.startsWith("POST /api/plugin/remote/heartbeat")) {
 				body = R"({"remote_enabled":true,"poll_interval_seconds":3,"session_id":"77","message":"Remote Clipper active"})";
 			} else if (request.startsWith("GET /api/plugin/remote/commands") &&
 				   request.contains("denied-device")) {
 				body = R"({"error":{"code":"TOKEN_ABILITY_MISSING","message":"The license token cannot perform this action."}})";
-				const QByteArray response = "HTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: " +
+				const QByteArray response =
+					"HTTP/1.1 403 Forbidden\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: " +
 					QByteArray::number(body.size()) + "\r\n\r\n" + body;
 				socket->write(response);
 				socket->disconnectFromHost();
@@ -35,7 +37,8 @@ void serve(QTcpServer &server, int &requests, bool &authorizationSeen)
 			} else {
 				body = R"({"status":"completed"})";
 			}
-			const QByteArray response = "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: " +
+			const QByteArray response =
+				"HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nConnection: close\r\nContent-Length: " +
 				QByteArray::number(body.size()) + "\r\n\r\n" + body;
 			socket->write(response);
 			socket->disconnectFromHost();
@@ -49,13 +52,15 @@ int main(int argc, char **argv)
 {
 	QCoreApplication application(argc, argv);
 	QTcpServer server;
-	if (!server.listen(QHostAddress::LocalHost)) return 10;
+	if (!server.listen(QHostAddress::LocalHost))
+		return 10;
 	int requests = 0;
 	bool authorizationSeen = false;
 	serve(server, requests, authorizationSeen);
 	clipcoach::network::RemoteClipperClient client(
 		QUrl(QStringLiteral("http://127.0.0.1:%1").arg(server.serverPort())));
-	if (!client.configured()) return 11;
+	if (!client.configured())
+		return 11;
 	int stage = 0;
 
 	clipcoach::remote::RemoteHeartbeatRequest heartbeat;
@@ -84,16 +89,27 @@ int main(int argc, char **argv)
 			result.durationSeconds = 60;
 			result.orientation = "vertical";
 			client.markProcessing(result.commandUuid, "signed-token", [&, result](auto processing) mutable {
-				if (!processing.succeeded()) { stage = -3; application.quit(); return; }
+				if (!processing.succeeded()) {
+					stage = -3;
+					application.quit();
+					return;
+				}
 				QTimer::singleShot(0, [&client, &application, &stage, result]() {
 					client.reportResult(result, "signed-token", [&](auto report) {
-						if (!report.succeeded()) { stage = -4; application.quit(); return; }
+						if (!report.succeeded()) {
+							stage = -4;
+							application.quit();
+							return;
+						}
 						stage = 3;
 						client.commands("denied-device", "signed-token", [&](auto denied) {
 							stage = !denied.succeeded() && denied.error.unauthorized &&
-									denied.error.code == "TOKEN_ABILITY_MISSING" &&
-									denied.error.message == "The license token cannot perform this action."
-								? 4 : -5;
+										denied.error.code ==
+											"TOKEN_ABILITY_MISSING" &&
+										denied.error.message ==
+											"The license token cannot perform this action."
+									? 4
+									: -5;
 							application.quit();
 						});
 					});

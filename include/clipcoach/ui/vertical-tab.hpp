@@ -22,12 +22,10 @@ class VerticalPreviewWidget;
 class VerticalTab final : public QWidget {
 public:
 	using TranslationFunction = std::function<QString(const char *)>;
-	using CanvasChangedCallback =
-		std::function<void(const VerticalCanvasSettings &)>;
+	using CanvasChangedCallback = std::function<void(const VerticalCanvasSettings &)>;
 	using ActionCallback = std::function<void()>;
 
-	VerticalTab(TranslationFunction translator,
-		    VerticalCanvasManager *manager, VerticalObsBridge obsBridge = {},
+	VerticalTab(TranslationFunction translator, VerticalCanvasManager *manager, VerticalObsBridge obsBridge = {},
 		    QWidget *parent = nullptr);
 
 	void refresh();

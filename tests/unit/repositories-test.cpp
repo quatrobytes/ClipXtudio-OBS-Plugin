@@ -53,8 +53,7 @@ int main()
 		expect(withAi.success && withAi.value && withAi.value->title == "AI title" &&
 			       withAi.value->caption == "Generated caption" &&
 			       withAi.value->suggestedTitles.size() == 2 && withAi.value->hashtags.size() == 2 &&
-			       withAi.value->subtitlePath.filename() == "generated.srt" &&
-			       withAi.value->score == 86,
+			       withAi.value->subtitlePath.filename() == "generated.srt" && withAi.value->score == 86,
 		       "AI metadata must round-trip through SQLite");
 
 		const auto favorites = clips.listFavorites();
@@ -68,8 +67,7 @@ int main()
 		       "thumbnail update must succeed");
 		const auto withThumbnail = clips.findById(horizontal.id);
 		expect(withThumbnail.success && withThumbnail.value &&
-			       withThumbnail.value->thumbnailPath.filename() ==
-				       "generated-thumbnail.jpg",
+			       withThumbnail.value->thumbnailPath.filename() == "generated-thumbnail.jpg",
 		       "generated thumbnail path must persist");
 
 		const auto verticals = clips.listByOrientation(ClipOrientation::Vertical);
@@ -87,10 +85,8 @@ int main()
 
 		expect(clips.remove(vertical.id).success, "clip deletion must remove stored metadata");
 		const auto deleted = clips.findById(vertical.id);
-		expect(deleted.success && !deleted.value.has_value(),
-		       "deleted clip must no longer be queryable");
-		expect(!clips.remove(vertical.id).success,
-		       "deleting a missing clip must return a controlled failure");
+		expect(deleted.success && !deleted.value.has_value(), "deleted clip must no longer be queryable");
+		expect(!clips.remove(vertical.id).success, "deleting a missing clip must return a controlled failure");
 	}
 
 	{
@@ -98,8 +94,7 @@ int main()
 		expect(reopened.open().success, "persisted database must reopen");
 		clipcoach::storage::ClipRepository clips(reopened);
 		const auto restored = clips.listBySession("session-test-001");
-		expect(restored.success && restored.value.size() == 1 &&
-			       restored.value.front().id == "clip-horizontal",
+		expect(restored.success && restored.value.size() == 1 && restored.value.front().id == "clip-horizontal",
 		       "clip deletion must remain persisted after database reopen");
 	}
 

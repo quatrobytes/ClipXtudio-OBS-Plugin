@@ -49,7 +49,7 @@ class LicenseManager;
 namespace network {
 class QtUpdateChecker;
 class QtUpdateDownloader;
-}
+} // namespace network
 namespace storage {
 class ClipLibraryService;
 template<typename T> struct RepositoryResult;
@@ -71,8 +71,7 @@ public:
 	using TranslationFunction = std::function<QString(const char *)>;
 	using SceneProvider = std::function<std::vector<std::string>()>;
 	using LanguageChangedCallback = std::function<void()>;
-	using HotkeySettingsChangedCallback =
-		std::function<void(const Settings &)>;
+	using HotkeySettingsChangedCallback = std::function<void(const Settings &)>;
 	using ReplayDurationChangedCallback = std::function<void(int)>;
 	using RemoteCommandsChangedCallback = std::function<void(bool)>;
 
@@ -86,15 +85,12 @@ public:
 		 VerticalCanvasManager *verticalManager, ExportManager *exportManager = nullptr,
 		 TriggerEngine *triggerEngine = nullptr, integrations::ChatIntegrationManager *chatManager = nullptr,
 		 licensing::LicenseManager *licenseManager = nullptr, FeatureGateService *featureGates = nullptr,
-		 VoiceTriggerController *voiceController = nullptr,
-		 SceneProvider sceneProvider = {}, VerticalObsBridge verticalObsBridge = {},
-		 CaptionGenerator captionGenerator = {});
+		 VoiceTriggerController *voiceController = nullptr, SceneProvider sceneProvider = {},
+		 VerticalObsBridge verticalObsBridge = {}, CaptionGenerator captionGenerator = {});
 	~MainDock() override;
 	void setLanguageChangedCallback(LanguageChangedCallback callback);
-	void setHotkeySettingsChangedCallback(
-		HotkeySettingsChangedCallback callback);
-	void setReplayDurationChangedCallback(
-		ReplayDurationChangedCallback callback);
+	void setHotkeySettingsChangedCallback(HotkeySettingsChangedCallback callback);
+	void setReplayDurationChangedCallback(ReplayDurationChangedCallback callback);
 	void setRemoteCommandsChangedCallback(RemoteCommandsChangedCallback callback);
 	void setRemoteClipperStatus(const remote::RemoteClipperStatus &status);
 	void refreshClipLibrary();
@@ -106,9 +102,9 @@ public:
 	MainDock(const MainDock &) = delete;
 	MainDock &operator=(const MainDock &) = delete;
 
-	[[nodiscard]] CaptureResult requestTriggeredCapture(
-		int durationSeconds, TriggerType triggerType,
-		std::string triggerLabel, int score, ExportOrientation output);
+	[[nodiscard]] CaptureResult requestTriggeredCapture(int durationSeconds, TriggerType triggerType,
+							    std::string triggerLabel, int score,
+							    ExportOrientation output);
 
 protected:
 	void resizeEvent(QResizeEvent *event) override;
@@ -132,33 +128,28 @@ private:
 	void showUpdateErrorDialog(const QString &details = {});
 	void setUpdateIndicatorVisible(bool visible);
 	void setUpdateChecking(bool checking);
-	void setFooterExpandedText(QPushButton *button,
-				   const QString &expandedText);
+	void setFooterExpandedText(QPushButton *button, const QString &expandedText);
 	void updateFooterResponsivePresentation();
 	void setVerticalPreviewOnly(bool enabled);
-	void showFooterStatus(const QString &message, bool error = false,
-			      bool autoReset = false);
+	void showFooterStatus(const QString &message, bool error = false, bool autoReset = false);
 	void updateReplayState(ReplayState state);
 	void handleClipSaved(const ClipMetadata &clip);
 	void handleCaptureError(CaptureError error);
 	void selectDuration(int seconds);
-	void showCaptureNotification(const QString &message, bool error,
-				     bool autoDismiss = false);
+	void showCaptureNotification(const QString &message, bool error, bool autoDismiss = false);
 	void updateFeatureGateUi();
 	void loadPublicPluginConfiguration(int endpointIndex = 0);
-	void setCaptionProcessing(bool busy,
-				 const CaptionGenerationProgress &progress = {});
+	void setCaptionProcessing(bool busy, const CaptionGenerationProgress &progress = {});
 	void updateCaptionEta();
 	void updateCaptionActivityMessage();
 	void setCapturePendingIndicator(bool pending);
 	void beginRemoteAuthentication();
 	void toggleRemoteClipper();
 	bool persistRemoteCommandsEnabled(bool enabled);
-	void finishRemoteToggle(bool success, const QString &title,
-				const QString &message, bool rollback = false);
+	void finishRemoteToggle(bool success, const QString &title, const QString &message, bool rollback = false);
 	void openRemoteClipperAccount();
-	void finishRemoteAuthentication(bool success, const QString &title,
-					const QString &message, bool openAccount = false);
+	void finishRemoteAuthentication(bool success, const QString &title, const QString &message,
+					bool openAccount = false);
 
 	TranslationFunction translator_;
 	LanguageChangedCallback languageChangedCallback_;

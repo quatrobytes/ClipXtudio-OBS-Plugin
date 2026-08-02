@@ -101,8 +101,7 @@ licensing::TokenVerificationResult Rs256TokenVerifier::verify(std::string_view s
 	claims.activationId = payload.value(QStringLiteral("sub")).toString().toStdString();
 	claims.licenseId = payload.value(QStringLiteral("license_id")).toString().toStdString();
 	claims.tokenId = payload.value(QStringLiteral("jti")).toString().toStdString();
-	claims.tokenVersion = static_cast<std::uint32_t>(
-		payload.value(QStringLiteral("token_version")).toInt());
+	claims.tokenVersion = static_cast<std::uint32_t>(payload.value(QStringLiteral("token_version")).toInt());
 	claims.plan = payload.value(QStringLiteral("plan")).toString().toStdString();
 	claims.subscriptionStatus = payload.value(QStringLiteral("subscription_status")).toString().toStdString();
 	claims.perpetual = payload.value(QStringLiteral("license_kind")).toString() == QStringLiteral("founder");
@@ -118,8 +117,7 @@ licensing::TokenVerificationResult Rs256TokenVerifier::verify(std::string_view s
 	}
 	if (claims.activationId.empty() || claims.licenseId.empty() || claims.tokenId.empty() ||
 	    claims.tokenVersion == 0 ||
-	    payload.value(QStringLiteral("device_activation_id")).toString().toStdString() !=
-		    claims.activationId ||
+	    payload.value(QStringLiteral("device_activation_id")).toString().toStdString() != claims.activationId ||
 	    claims.subscriptionStatus.empty() || claims.machineFingerprintHash.size() != 64 ||
 	    claims.installId.empty() || claims.expiresAt <= claims.issuedAt)
 		return failure(licensing::TokenVerificationError::InvalidClaims,

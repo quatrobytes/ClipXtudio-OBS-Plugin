@@ -10,8 +10,7 @@ class ContextHelpButton;
 
 class ToggleRow final : public QWidget {
 public:
-	explicit ToggleRow(const QString &title, const QString &description, bool checked,
-			   QWidget *parent = nullptr);
+	explicit ToggleRow(const QString &title, const QString &description, bool checked, QWidget *parent = nullptr);
 
 	[[nodiscard]] bool isChecked() const;
 	void setChecked(bool checked);

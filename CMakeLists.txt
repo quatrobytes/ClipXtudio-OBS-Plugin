@@ -14,11 +14,7 @@ option(BUILD_PLUGIN "Build the native OBS plugin" ON)
 option(BUILD_TESTS "Build ClipXtudio unit tests" ON)
 option(BUILD_UI_TESTS "Build ClipXtudio Qt UI tests" ${BUILD_PLUGIN})
 option(CLIPX_ENABLE_QA_LICENSE "Enable the local, non-production ClipXtudio QA license" OFF)
-option(
-  CLIPX_ALLOW_INSECURE_LOCAL_API
-  "Allow plain HTTP only for loopback license API development"
-  OFF
-)
+option(CLIPX_ALLOW_INSECURE_LOCAL_API "Allow plain HTTP only for loopback license API development" OFF)
 option(ENABLE_FRONTEND_API "Use the OBS Frontend API" ON)
 option(ENABLE_QT "Use Qt Widgets for the native dock" ON)
 option(ENABLE_COVERAGE "Instrument C++ targets for line coverage" OFF)
@@ -296,23 +292,22 @@ if(BUILD_PLUGIN OR BUILD_UI_TESTS)
       CLIPX_LOCAL_UPDATE_MANIFEST_URL="${CLIPX_LOCAL_UPDATE_MANIFEST_URL}"
       $<$<BOOL:${CLIPX_ALLOW_INSECURE_LOCAL_API}>:CLIPX_ALLOW_INSECURE_LOCAL_API=1>
   )
-  set_target_properties(clipcoach_ui PROPERTIES AUTOMOC ON AUTORCC ON POSITION_INDEPENDENT_CODE ON)
+  set_target_properties(
+    clipcoach_ui
+    PROPERTIES AUTOMOC ON AUTORCC ON POSITION_INDEPENDENT_CODE ON
+  )
 endif()
 
 if(BUILD_UI_TESTS)
   add_subdirectory(tests/ui)
-  set(_clipcoach_bundled_ffmpeg
-      "${CMAKE_CURRENT_SOURCE_DIR}/data/tools/ffmpeg/ffmpeg${CMAKE_EXECUTABLE_SUFFIX}"
-  )
+  set(_clipcoach_bundled_ffmpeg "${CMAKE_CURRENT_SOURCE_DIR}/data/tools/ffmpeg/ffmpeg${CMAKE_EXECUTABLE_SUFFIX}")
   if(EXISTS "${_clipcoach_bundled_ffmpeg}")
     set(FFMPEG_EXECUTABLE "${_clipcoach_bundled_ffmpeg}")
   else()
     find_program(FFMPEG_EXECUTABLE ffmpeg)
   endif()
   if(TARGET clips-library-tab-test AND FFMPEG_EXECUTABLE)
-    target_compile_definitions(
-      clips-library-tab-test PRIVATE CLIPCOACH_TEST_FFMPEG_EXECUTABLE="${FFMPEG_EXECUTABLE}"
-    )
+    target_compile_definitions(clips-library-tab-test PRIVATE CLIPCOACH_TEST_FFMPEG_EXECUTABLE="${FFMPEG_EXECUTABLE}")
   endif()
   find_program(FFPROBE_EXECUTABLE ffprobe)
   if(FFMPEG_EXECUTABLE AND FFPROBE_EXECUTABLE)
@@ -432,11 +427,9 @@ if(BUILD_PLUGIN)
       TARGET ${CMAKE_PROJECT_NAME}
       POST_BUILD
       COMMAND
-        ${CMAKE_COMMAND} -E make_directory
-        "${CMAKE_BINARY_DIR}/rundir/$<CONFIG>/${CMAKE_PROJECT_NAME}/qt-plugins/tls"
+        ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/rundir/$<CONFIG>/${CMAKE_PROJECT_NAME}/qt-plugins/tls"
       COMMAND
-        ${CMAKE_COMMAND} -E copy_if_different
-        "$<TARGET_FILE:Qt6::QSchannelBackendPlugin>"
+        ${CMAKE_COMMAND} -E copy_if_different "$<TARGET_FILE:Qt6::QSchannelBackendPlugin>"
         "${CMAKE_BINARY_DIR}/rundir/$<CONFIG>/${CMAKE_PROJECT_NAME}/qt-plugins/tls/"
       COMMENT "Packaging Qt Schannel TLS backend"
     )

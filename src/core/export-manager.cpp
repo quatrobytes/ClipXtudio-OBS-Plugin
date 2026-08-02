@@ -249,8 +249,7 @@ bool ExportManager::validate(const ExportRequest &request, std::string *error) c
 		return false;
 	}
 	if (!orientationValid || !isValidPreset(request.preset) || !segmentsValid || request.durationSeconds <= 0 ||
-	    request.endOffsetSeconds < 0 || request.endOffsetSeconds > 86400 ||
-	    request.trimStartMilliseconds < -1 ||
+	    request.endOffsetSeconds < 0 || request.endOffsetSeconds > 86400 || request.trimStartMilliseconds < -1 ||
 	    (request.trimStartMilliseconds >= 0 && request.trimDurationMilliseconds < 500) ||
 	    (request.outputFps != 0 && request.outputFps != 30 && request.outputFps != 60)) {
 		if (error != nullptr) {

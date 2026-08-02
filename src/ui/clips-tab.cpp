@@ -123,8 +123,7 @@ void ClipsTab::buildUi()
 {
 	auto *root = new QVBoxLayout(this);
 	root->setSizeConstraint(QLayout::SetNoConstraint);
-	root->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin,
-				 tokens::kPageMargin, tokens::kPageMargin);
+	root->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin);
 	root->setSpacing(tokens::kSectionGap);
 
 	auto *pageHeader = new QFrame(this);
@@ -132,20 +131,15 @@ void ClipsTab::buildUi()
 	pageHeader->setProperty("clipsRole", QStringLiteral("pageHeader"));
 	pageHeader->setProperty("pageRole", QStringLiteral("header"));
 	auto *pageHeaderLayout = new QHBoxLayout(pageHeader);
-	pageHeaderLayout->setContentsMargins(tokens::kCardPaddingHorizontal,
-					     tokens::kCardPaddingVertical,
-					     tokens::kCardPaddingHorizontal,
-					     tokens::kCardPaddingVertical);
+	pageHeaderLayout->setContentsMargins(tokens::kCardPaddingHorizontal, tokens::kCardPaddingVertical,
+					     tokens::kCardPaddingHorizontal, tokens::kCardPaddingVertical);
 	pageHeaderLayout->setSpacing(tokens::kSpaceMd);
 	auto *headerIcon = new QLabel(pageHeader);
 	headerIcon->setObjectName(QStringLiteral("clipsHeaderIcon"));
 	headerIcon->setProperty("pageRole", QStringLiteral("icon"));
 	headerIcon->setAlignment(Qt::AlignCenter);
-	headerIcon->setPixmap(style()
-				      ->standardIcon(QStyle::SP_FileDialogContentsView)
-				      .pixmap(24, 24));
-	headerIcon->setFixedSize(tokens::kPageHeaderIconSize,
-				 tokens::kPageHeaderIconSize);
+	headerIcon->setPixmap(style()->standardIcon(QStyle::SP_FileDialogContentsView).pixmap(24, 24));
+	headerIcon->setFixedSize(tokens::kPageHeaderIconSize, tokens::kPageHeaderIconSize);
 	auto *headerCopy = new QWidget(pageHeader);
 	auto *headerCopyLayout = new QVBoxLayout(headerCopy);
 	headerCopyLayout->setContentsMargins(0, 0, 0, 0);
@@ -176,21 +170,17 @@ void ClipsTab::buildUi()
 	metricsLayout_->setSpacing(tokens::kSpaceSm);
 	totalCard_ = new StatusCard(text(strings::kClipsTotal), QStringLiteral("0"), false, this);
 	totalCard_->setObjectName(QStringLiteral("clipsTotalCard"));
-	favoriteCard_ =
-		new StatusCard(text(strings::kClipsFilterFavorites), QStringLiteral("0"), false, this);
+	favoriteCard_ = new StatusCard(text(strings::kClipsFilterFavorites), QStringLiteral("0"), false, this);
 	favoriteCard_->setObjectName(QStringLiteral("clipsFavoritesCard"));
-	verticalCard_ =
-		new StatusCard(text(strings::kClipsFilterVertical), QStringLiteral("0"), false, this);
+	verticalCard_ = new StatusCard(text(strings::kClipsFilterVertical), QStringLiteral("0"), false, this);
 	verticalCard_->setObjectName(QStringLiteral("clipsVerticalCard"));
-	pendingCard_ =
-		new StatusCard(text(strings::kClipsFilterPending), QStringLiteral("0"), false, this);
+	pendingCard_ = new StatusCard(text(strings::kClipsFilterPending), QStringLiteral("0"), false, this);
 	pendingCard_->setObjectName(QStringLiteral("clipsPendingCard"));
 	capturedDurationCard_ =
 		new StatusCard(text(strings::kClipsSessionDuration), QStringLiteral("0:00"), false, this);
 	capturedDurationCard_->setObjectName(QStringLiteral("clipsCapturedDurationCard"));
 	int summaryTone = 0;
-	for (auto *card : {totalCard_, favoriteCard_, verticalCard_, pendingCard_,
-			   capturedDurationCard_}) {
+	for (auto *card : {totalCard_, favoriteCard_, verticalCard_, pendingCard_, capturedDurationCard_}) {
 		card->setProperty("cardRole", QStringLiteral("summary"));
 		card->setProperty("summaryTone", summaryTone++);
 		card->setMinimumHeight(tokens::kSummaryCardMinHeight);
@@ -203,8 +193,7 @@ void ClipsTab::buildUi()
 	filtersHost_->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
 	filtersLayout_ = new QGridLayout(filtersHost_);
 	filtersLayout_->setObjectName(QStringLiteral("clipsFiltersGrid"));
-	filtersLayout_->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm,
-					   tokens::kSpaceSm, tokens::kSpaceSm);
+	filtersLayout_->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm);
 	filtersLayout_->setSpacing(tokens::kSpaceXs);
 	filterGroup_ = new QButtonGroup(this);
 	filterGroup_->setExclusive(true);
@@ -241,8 +230,7 @@ void ClipsTab::buildUi()
 	searchBox_->setPlaceholderText(text(strings::kClipsSearchPlaceholder));
 	searchBox_->setClearButtonEnabled(true);
 	searchBox_->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Fixed);
-	searchBox_->addAction(style()->standardIcon(QStyle::SP_FileDialogContentsView),
-			      QLineEdit::LeadingPosition);
+	searchBox_->addAction(style()->standardIcon(QStyle::SP_FileDialogContentsView), QLineEdit::LeadingPosition);
 	historyScope_ = new WheelSafeComboBox(exportHost_);
 	historyScope_->setObjectName(QStringLiteral("clipsHistoryScope"));
 	historyScope_->addItem(text(strings::kClipsScopeCurrent), false);
@@ -250,8 +238,7 @@ void ClipsTab::buildUi()
 	historyScope_->setToolTip(text(strings::kClipsScopeHelp));
 	historyScope_->setAccessibleName(text(strings::kClipsScopeHelp));
 	historyScope_->setCurrentIndex(0);
-	historyScope_->setEnabled(featureGates_ != nullptr &&
-				  featureGates_->isAllowed(Feature::FullHistory));
+	historyScope_->setEnabled(featureGates_ != nullptr && featureGates_->isAllowed(Feature::FullHistory));
 	batchOrientation_ = new WheelSafeComboBox(this);
 	batchOrientation_->setObjectName(QStringLiteral("batchExportOrientation"));
 	batchOrientation_->addItem(text(strings::kOrientationHorizontal),
@@ -373,38 +360,34 @@ void ClipsTab::updateResponsiveLayout()
 	overviewHost_->setProperty("layoutMode", compact ? QStringLiteral("compact") : QStringLiteral("wide"));
 
 	overviewLayout_->removeWidget(cardsHost_);
-	for (auto *card : {totalCard_, favoriteCard_, verticalCard_, pendingCard_,
-			   capturedDurationCard_})
+	for (auto *card : {totalCard_, favoriteCard_, verticalCard_, pendingCard_, capturedDurationCard_})
 		metricsLayout_->removeWidget(card);
 	for (auto *button : filterButtons_)
 		filtersLayout_->removeWidget(button);
 	for (auto *widget : {static_cast<QWidget *>(searchBox_), static_cast<QWidget *>(historyScope_),
-			     static_cast<QWidget *>(batchOrientation_),
-			     static_cast<QWidget *>(batchExportButton_), batchBadge_,
-			     static_cast<QWidget *>(cancelExportButton_),
+			     static_cast<QWidget *>(batchOrientation_), static_cast<QWidget *>(batchExportButton_),
+			     batchBadge_, static_cast<QWidget *>(cancelExportButton_),
 			     static_cast<QWidget *>(batchDeleteButton_), static_cast<QWidget *>(sortCombo_)})
 		exportLayout_->removeWidget(widget);
 
-	const std::array<StatusCard *, 5> metricCards{
-		totalCard_, favoriteCard_, verticalCard_, pendingCard_, capturedDurationCard_};
+	const std::array<StatusCard *, 5> metricCards{totalCard_, favoriteCard_, verticalCard_, pendingCard_,
+						      capturedDurationCard_};
 	for (int index = 0; index < static_cast<int>(metricCards.size()); ++index) {
 		const int row = index / metricColumns;
 		const int column = index % metricColumns;
 		const int span = metricColumns == 2 && index == 4 ? 2 : 1;
-		metricsLayout_->addWidget(metricCards[static_cast<std::size_t>(index)],
-					  row, column, 1, span);
+		metricsLayout_->addWidget(metricCards[static_cast<std::size_t>(index)], row, column, 1, span);
 	}
-	const int metricRows =
-		(static_cast<int>(metricCards.size()) + metricColumns - 1) / metricColumns;
-	cardsHost_->setMinimumHeight(metricRows * 68 +
-				     std::max(0, metricRows - 1) * tokens::kSpaceSm);
+	const int metricRows = (static_cast<int>(metricCards.size()) + metricColumns - 1) / metricColumns;
+	cardsHost_->setMinimumHeight(metricRows * 68 + std::max(0, metricRows - 1) * tokens::kSpaceSm);
 	for (int column = 0; column < metricColumns; ++column)
 		metricsLayout_->setColumnStretch(column, 1);
 	overviewLayout_->addWidget(cardsHost_, 0, 0);
 
 	if (compact) {
 		for (int index = 0; index < 4; ++index)
-			filtersLayout_->addWidget(filterButtons_[static_cast<std::size_t>(index)], index / 2, index % 2);
+			filtersLayout_->addWidget(filterButtons_[static_cast<std::size_t>(index)], index / 2,
+						  index % 2);
 
 		exportLayout_->addWidget(searchBox_, 0, 0, 1, 4);
 		exportLayout_->addWidget(historyScope_, 1, 0, 1, 2);
@@ -440,16 +423,11 @@ void ClipsTab::bindUi()
 {
 	connect(filterGroup_, &QButtonGroup::idClicked, this,
 		[this](int id) { controller_->setFilter(static_cast<ClipFilter>(id)); });
-	auto *search =
-		findChild<QLineEdit *>(QStringLiteral("clipsSearchBox"));
+	auto *search = findChild<QLineEdit *>(QStringLiteral("clipsSearchBox"));
 	connect(search, &QLineEdit::textChanged, this,
-		[this](const QString &query) {
-			controller_->setSearchQuery(query.toStdString());
-		});
+		[this](const QString &query) { controller_->setSearchQuery(query.toStdString()); });
 	connect(historyScope_, &QComboBox::currentIndexChanged, this,
-		[this](int) {
-			controller_->setFullHistory(historyScope_->currentData().toBool());
-		});
+		[this](int) { controller_->setFullHistory(historyScope_->currentData().toBool()); });
 	auto *sort = findChild<QComboBox *>(QStringLiteral("clipsSort"));
 	connect(sort, &QComboBox::currentIndexChanged, this,
 		[this, sort](int) { controller_->setSort(static_cast<ClipSort>(sort->currentData().toInt())); });
@@ -473,8 +451,7 @@ void ClipsTab::bindUi()
 			}
 		}
 	});
-	connect(batchDeleteButton_, &QPushButton::clicked, this,
-		[this] { confirmAndDelete(selectedClipIds_); });
+	connect(batchDeleteButton_, &QPushButton::clicked, this, [this] { confirmAndDelete(selectedClipIds_); });
 	exportPollTimer_ = new QTimer(this);
 	exportPollTimer_->setInterval(250);
 	connect(exportPollTimer_, &QTimer::timeout, this, [this] { refreshExportProgress(); });
@@ -546,14 +523,14 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	data.duration = formatDuration(clip.durationSeconds);
 	data.dateTime = created.toString(QStringLiteral("dd MMM yyyy · HH:mm"));
 	if (clip.triggerLabel == "remote_clipper") {
-		data.trigger = clip.requestedBy.empty()
-			? text(strings::kTriggerRemoteClipper)
-			: text(strings::kTriggerRemoteClipperBy)
-				.arg(QString::fromStdString(clip.requestedBy));
+		data.trigger =
+			clip.requestedBy.empty()
+				? text(strings::kTriggerRemoteClipper)
+				: text(strings::kTriggerRemoteClipperBy).arg(QString::fromStdString(clip.requestedBy));
 	} else {
 		data.trigger = clip.triggerLabel.empty() || clip.triggerType == TriggerType::Manual
-			? triggerText(clip.triggerType)
-			: QString::fromStdString(clip.triggerLabel);
+				       ? triggerText(clip.triggerType)
+				       : QString::fromStdString(clip.triggerLabel);
 	}
 	switch (clip.orientation) {
 	case ClipOrientation::Horizontal:
@@ -570,10 +547,8 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	data.favoriteTooltip = text(strings::kClipsFavorite);
 	data.previewLabel = text(strings::kClipsPreview);
 	data.editLabel = text(strings::kClipsQuickEditor);
-	data.exportLabel =
-		text(clip.orientation == ClipOrientation::Vertical
-			     ? strings::kClipsAlreadyVertical
-			     : strings::kClipsExportVertical);
+	data.exportLabel = text(clip.orientation == ClipOrientation::Vertical ? strings::kClipsAlreadyVertical
+									      : strings::kClipsExportVertical);
 	data.captionLabel = text(strings::kClipsCaption);
 	data.subtitlesLabel = text(strings::kClipsSubtitlesComingSoon);
 	data.openFolderLabel = text(strings::kClipsOpenFolder);
@@ -581,20 +556,13 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	data.scoreLabel = text(strings::kClipsScoreLabel);
 	data.processingLabel = text(strings::kClipsProcessing);
 	data.score = clip.score;
-	data.processing = clip.exportStatus == ExportStatus::Pending ||
-			  clip.exportStatus == ExportStatus::Exporting;
+	data.processing = clip.exportStatus == ExportStatus::Pending || clip.exportStatus == ExportStatus::Exporting;
 	data.favorite = clip.isFavorite;
-	data.selected = std::find(selectedClipIds_.begin(), selectedClipIds_.end(),
-				  clip.id) != selectedClipIds_.end();
-	const bool captionAllowed =
-		featureGates_ == nullptr ||
-		featureGates_->isAllowed(Feature::AiCaptions);
-	data.captionAvailable =
-		captionAllowed &&
-		(!clip.caption.empty() || static_cast<bool>(captionGenerator_));
+	data.selected = std::find(selectedClipIds_.begin(), selectedClipIds_.end(), clip.id) != selectedClipIds_.end();
+	const bool captionAllowed = featureGates_ == nullptr || featureGates_->isAllowed(Feature::AiCaptions);
+	data.captionAvailable = captionAllowed && (!clip.caption.empty() || static_cast<bool>(captionGenerator_));
 	data.subtitlesAvailable = false;
-	data.exportVerticalEnabled =
-		clip.orientation != ClipOrientation::Vertical;
+	data.exportVerticalEnabled = clip.orientation != ClipOrientation::Vertical;
 
 	const auto title = data.title;
 	auto *card = new ClipCard(std::move(data), listContainer_);
@@ -603,18 +571,15 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	card->setPreviewCallback(
 		[this, id] { showActionResult(controller_->preview(id), strings::kClipsActionError); });
 	card->setEditCallback([this, clip] {
-		auto *editor = new QuickClipEditorDialog(
-			translator_, clip, exportManager_, settingsManager_, this);
+		auto *editor = new QuickClipEditorDialog(translator_, clip, exportManager_, settingsManager_, this);
 		QStringList hashtags;
 		for (const auto &hashtag : clip.hashtags)
 			hashtags.push_back(QString::fromStdString(hashtag));
 		if (!clip.caption.empty()) {
-			const auto social = formatSocialCaption(
-				QString::fromStdString(clip.caption), hashtags,
-				QString::fromStdString(clip.aiSummary));
-			editor->setCaption(
-				social, formatYouTubeShortsCaption(
-					QString::fromStdString(clip.title), social));
+			const auto social = formatSocialCaption(QString::fromStdString(clip.caption), hashtags,
+								QString::fromStdString(clip.aiSummary));
+			editor->setCaption(social,
+					   formatYouTubeShortsCaption(QString::fromStdString(clip.title), social));
 		}
 		QPointer<QuickClipEditorDialog> safeEditor(editor);
 		editor->setCaptionRequest([this, clip, safeEditor] {
@@ -640,8 +605,7 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	});
 	card->setExportCallback(
 		[this, id] { showActionResult(controller_->exportVertical(id), strings::kClipsExportFailed); });
-	card->setCaptionCallback(
-		[this, clip, card] { requestCaption(clip, card); });
+	card->setCaptionCallback([this, clip, card] { requestCaption(clip, card); });
 	card->setOpenFolderCallback(
 		[this, id] { showActionResult(controller_->openFolder(id), strings::kClipsActionError); });
 	card->setDeleteCallback([this, id, title] { confirmAndDelete({id}, title); });
@@ -657,21 +621,17 @@ void ClipsTab::addClipCard(const ClipMetadata &clip)
 	listLayout_->addWidget(card);
 }
 
-void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
-			      CaptionReadyCallback ready,
-			      CaptionProgressReadyCallback progressReady,
-			      CaptionFailedCallback failed)
+void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card, CaptionReadyCallback ready,
+			      CaptionProgressReadyCallback progressReady, CaptionFailedCallback failed)
 {
-	const auto clipTitle = QString::fromStdString(
-		clip.title.empty() ? clip.fileName : clip.title);
+	const auto clipTitle = QString::fromStdString(clip.title.empty() ? clip.fileName : clip.title);
 	if (!clip.caption.empty()) {
 		errorLabel_->hide();
 		QStringList hashtags;
 		for (const auto &hashtag : clip.hashtags)
 			hashtags.push_back(QString::fromStdString(hashtag));
-		const auto socialCaption = formatSocialCaption(
-			QString::fromStdString(clip.caption), hashtags,
-			QString::fromStdString(clip.aiSummary));
+		const auto socialCaption = formatSocialCaption(QString::fromStdString(clip.caption), hashtags,
+							       QString::fromStdString(clip.aiSummary));
 		const auto shorts = formatYouTubeShortsCaption(clipTitle, socialCaption);
 		if (ready)
 			ready(socialCaption, shorts);
@@ -679,8 +639,7 @@ void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
 			showCaptionDialog(socialCaption, clipTitle, shorts);
 		return;
 	}
-	if (featureGates_ != nullptr &&
-	    !featureGates_->isAllowed(Feature::AiCaptions)) {
+	if (featureGates_ != nullptr && !featureGates_->isAllowed(Feature::AiCaptions)) {
 		const auto message = text(strings::kErrorProRequired);
 		if (failed)
 			failed(message);
@@ -704,8 +663,7 @@ void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
 	if (card != nullptr)
 		card->setCaptionBusy(true, text(strings::kClipsCaptionGenerating));
 	if (captionBusyCallback_)
-		captionBusyCallback_(
-			true, {1, text(strings::kClipsCaptionValidatingLicense), 10});
+		captionBusyCallback_(true, {1, text(strings::kClipsCaptionValidatingLicense), 10});
 	errorLabel_->setProperty("notificationTone", QStringLiteral("info"));
 	errorLabel_->style()->unpolish(errorLabel_);
 	errorLabel_->style()->polish(errorLabel_);
@@ -728,20 +686,16 @@ void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
 			if (self->captionBusyCallback_)
 				self->captionBusyCallback_(false, {});
 			if (!safeCard.isNull())
-				safeCard->setCaptionBusy(
-					false,
-					self->text(strings::kClipsCaption));
-			if (!result.success ||
-			    result.caption.trimmed().isEmpty()) {
+				safeCard->setCaptionBusy(false, self->text(strings::kClipsCaption));
+			if (!result.success || result.caption.trimmed().isEmpty()) {
 				const auto message = result.error.trimmed().isEmpty()
-					? self->text(strings::kClipsCaptionFailed)
-					: result.error;
+							     ? self->text(strings::kClipsCaptionFailed)
+							     : result.error;
 				if (failed)
 					failed(message);
 				else if (ready)
 					ready({}, {});
-				self->errorLabel_->setProperty(
-					"notificationTone", QStringLiteral("error"));
+				self->errorLabel_->setProperty("notificationTone", QStringLiteral("error"));
 				self->errorLabel_->style()->unpolish(self->errorLabel_);
 				self->errorLabel_->style()->polish(self->errorLabel_);
 				self->errorLabel_->setText(message);
@@ -755,8 +709,7 @@ void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
 			if (ready)
 				ready(result.caption, result.youtubeShortsCaption);
 			else
-				self->showCaptionDialog(result.caption, clipTitle,
-							result.youtubeShortsCaption);
+				self->showCaptionDialog(result.caption, clipTitle, result.youtubeShortsCaption);
 			QTimer::singleShot(0, self, [self] {
 				if (!self.isNull())
 					self->reload();
@@ -764,18 +717,15 @@ void ClipsTab::requestCaption(const ClipMetadata &clip, ClipCard *card,
 		});
 }
 
-void ClipsTab::showCaptionDialog(const QString &caption,
-				 const QString &clipTitle,
-				 const QString &youtubeShortsCaption)
+void ClipsTab::showCaptionDialog(const QString &caption, const QString &clipTitle, const QString &youtubeShortsCaption)
 {
-	const auto seoSubject = clipTitle.trimmed().isEmpty()
-		? text(strings::kClipsCaptionDialogTitle)
-		: clipTitle.trimmed();
-	const auto socialCaption = formatSocialCaption(
-		caption, {}, text(strings::kClipsCaptionSeoFallback).arg(seoSubject));
+	const auto seoSubject = clipTitle.trimmed().isEmpty() ? text(strings::kClipsCaptionDialogTitle)
+							      : clipTitle.trimmed();
+	const auto socialCaption =
+		formatSocialCaption(caption, {}, text(strings::kClipsCaptionSeoFallback).arg(seoSubject));
 	const auto shortsCaption = youtubeShortsCaption.trimmed().isEmpty()
-		? formatYouTubeShortsCaption(clipTitle, socialCaption)
-		: formatYouTubeShortsCaption(youtubeShortsCaption, socialCaption);
+					   ? formatYouTubeShortsCaption(clipTitle, socialCaption)
+					   : formatYouTubeShortsCaption(youtubeShortsCaption, socialCaption);
 	auto *dialog = new QDialog(this);
 	dialog->setObjectName(QStringLiteral("clipCaptionDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose, true);
@@ -784,11 +734,9 @@ void ClipsTab::showCaptionDialog(const QString &caption,
 	dialog->resize(640, 660);
 
 	auto *layout = new QVBoxLayout(dialog);
-	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceLg,
-				   tokens::kSpaceLg, tokens::kSpaceLg);
+	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceLg, tokens::kSpaceLg, tokens::kSpaceLg);
 	layout->setSpacing(tokens::kSpaceMd);
-	auto *title =
-		new QLabel(text(strings::kClipsCaptionDialogTitle), dialog);
+	auto *title = new QLabel(text(strings::kClipsCaptionDialogTitle), dialog);
 	title->setObjectName(QStringLiteral("captionDialogTitle"));
 	title->setProperty("textRole", QStringLiteral("sectionTitle"));
 	layout->addWidget(title);
@@ -798,8 +746,7 @@ void ClipsTab::showCaptionDialog(const QString &caption,
 		clipLabel->setWordWrap(true);
 		layout->addWidget(clipLabel);
 	}
-	auto *description =
-		new QLabel(text(strings::kClipsCaptionDescription), dialog);
+	auto *description = new QLabel(text(strings::kClipsCaptionDescription), dialog);
 	description->setProperty("textRole", QStringLiteral("muted"));
 	description->setWordWrap(true);
 	layout->addWidget(description);
@@ -828,8 +775,8 @@ void ClipsTab::showCaptionDialog(const QString &caption,
 	shortsHeader->addWidget(shortsLabel);
 	shortsHeader->addStretch();
 	auto *shortsCount = new QLabel(
-		QStringLiteral("%1 / %2").arg(shortsCaption.toUcs4().size()).arg(
-			kYouTubeShortsMaximumCharacters), dialog);
+		QStringLiteral("%1 / %2").arg(shortsCaption.toUcs4().size()).arg(kYouTubeShortsMaximumCharacters),
+		dialog);
 	shortsCount->setObjectName(QStringLiteral("youtubeShortsCharacterCount"));
 	shortsCount->setProperty("textRole", QStringLiteral("muted"));
 	shortsHeader->addWidget(shortsCount);
@@ -848,22 +795,16 @@ void ClipsTab::showCaptionDialog(const QString &caption,
 	layout->addLayout(shortsActions);
 
 	auto *buttons = new QDialogButtonBox(dialog);
-	auto *close = buttons->addButton(text(strings::kClipsCaptionClose),
-					 QDialogButtonBox::RejectRole);
-	QObject::connect(copySocial, &QPushButton::clicked, dialog,
-			 [this, editor, copySocial] {
-				 QApplication::clipboard()->setText(
-					 editor->toPlainText());
-				 copySocial->setText(
-					 text(strings::kClipsCaptionCopied));
-			 });
-	QObject::connect(copyShorts, &QPushButton::clicked, dialog,
-			 [this, shortsEditor, copyShorts] {
-				 QApplication::clipboard()->setText(shortsEditor->toPlainText());
-				 copyShorts->setText(text(strings::kClipsCaptionCopied));
-			 });
-	QObject::connect(close, &QPushButton::clicked, dialog,
-			 &QDialog::reject);
+	auto *close = buttons->addButton(text(strings::kClipsCaptionClose), QDialogButtonBox::RejectRole);
+	QObject::connect(copySocial, &QPushButton::clicked, dialog, [this, editor, copySocial] {
+		QApplication::clipboard()->setText(editor->toPlainText());
+		copySocial->setText(text(strings::kClipsCaptionCopied));
+	});
+	QObject::connect(copyShorts, &QPushButton::clicked, dialog, [this, shortsEditor, copyShorts] {
+		QApplication::clipboard()->setText(shortsEditor->toPlainText());
+		copyShorts->setText(text(strings::kClipsCaptionCopied));
+	});
+	QObject::connect(close, &QPushButton::clicked, dialog, &QDialog::reject);
 	layout->addWidget(buttons);
 	dialog->open();
 }
@@ -874,50 +815,39 @@ void ClipsTab::confirmAndDelete(std::vector<std::string> clipIds, const QString 
 		return;
 	const auto count = static_cast<int>(clipIds.size());
 	const auto message =
-		count == 1
-			? text(strings::kClipsDeleteOneConfirm)
-				  .arg(clipTitle.isEmpty() ? QString::fromStdString(clipIds.front())
-							  : clipTitle)
-			: text(strings::kClipsDeleteManyConfirm).arg(count);
-	const auto answer = QMessageBox::warning(
-		this, text(strings::kClipsDeleteConfirmTitle), message,
-		QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+		count == 1 ? text(strings::kClipsDeleteOneConfirm)
+				     .arg(clipTitle.isEmpty() ? QString::fromStdString(clipIds.front()) : clipTitle)
+			   : text(strings::kClipsDeleteManyConfirm).arg(count);
+	const auto answer = QMessageBox::warning(this, text(strings::kClipsDeleteConfirmTitle), message,
+						 QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
 	if (answer != QMessageBox::Yes)
 		return;
 
 	batchDeleteButton_->setEnabled(false);
 	const auto idsForCallback = clipIds;
-	controller_->deleteClips(
-		std::move(clipIds),
-		[this, clipIds = idsForCallback](storage::StorageStatus status) {
-			if (status.success) {
-				for (const auto &id : clipIds) {
-					selectedClipIds_.erase(
-						std::remove(selectedClipIds_.begin(),
-							    selectedClipIds_.end(), id),
-						selectedClipIds_.end());
-				}
-				errorLabel_->setProperty("notificationTone",
-							 QStringLiteral("success"));
-				errorLabel_->style()->unpolish(errorLabel_);
-				errorLabel_->style()->polish(errorLabel_);
-				errorLabel_->setText(
-					text(strings::kClipsDeleteSuccess)
-						.arg(static_cast<int>(clipIds.size())));
-				errorLabel_->show();
-				QTimer::singleShot(3500, errorLabel_, &QWidget::hide);
-			} else {
-				errorLabel_->setProperty("notificationTone",
-							 QStringLiteral("error"));
-				errorLabel_->style()->unpolish(errorLabel_);
-				errorLabel_->style()->polish(errorLabel_);
-				errorLabel_->setText(
-					text(strings::kClipsDeleteFailed)
-						.arg(QString::fromStdString(status.error)));
-				errorLabel_->show();
+	controller_->deleteClips(std::move(clipIds), [this, clipIds = idsForCallback](storage::StorageStatus status) {
+		if (status.success) {
+			for (const auto &id : clipIds) {
+				selectedClipIds_.erase(std::remove(selectedClipIds_.begin(), selectedClipIds_.end(),
+								   id),
+						       selectedClipIds_.end());
 			}
-			updateSelectionActions();
-		});
+			errorLabel_->setProperty("notificationTone", QStringLiteral("success"));
+			errorLabel_->style()->unpolish(errorLabel_);
+			errorLabel_->style()->polish(errorLabel_);
+			errorLabel_->setText(text(strings::kClipsDeleteSuccess).arg(static_cast<int>(clipIds.size())));
+			errorLabel_->show();
+			QTimer::singleShot(3500, errorLabel_, &QWidget::hide);
+		} else {
+			errorLabel_->setProperty("notificationTone", QStringLiteral("error"));
+			errorLabel_->style()->unpolish(errorLabel_);
+			errorLabel_->style()->polish(errorLabel_);
+			errorLabel_->setText(
+				text(strings::kClipsDeleteFailed).arg(QString::fromStdString(status.error)));
+			errorLabel_->show();
+		}
+		updateSelectionActions();
+	});
 }
 
 void ClipsTab::updateSelectionActions()
@@ -926,9 +856,7 @@ void ClipsTab::updateSelectionActions()
 	if (batchDeleteButton_ != nullptr)
 		batchDeleteButton_->setEnabled(hasSelection);
 	if (batchExportButton_ != nullptr) {
-		const bool batchAllowed =
-			featureGates_ != nullptr &&
-			featureGates_->isAllowed(Feature::BatchExport);
+		const bool batchAllowed = featureGates_ != nullptr && featureGates_->isAllowed(Feature::BatchExport);
 		batchExportButton_->setEnabled(batchAllowed && hasSelection);
 	}
 }
@@ -965,9 +893,7 @@ void ClipsTab::refreshExportProgress()
 			text(strings::kClipsExportFailed).arg(QString::fromStdString(visible->error)));
 	} else if (visible->state == ExportJobState::Done) {
 		exportStatusLabel_->setText(
-			text(strings::kClipsExportDone)
-				.arg(QString::fromStdString(
-					visible->outputPath.u8string())));
+			text(strings::kClipsExportDone).arg(QString::fromStdString(visible->outputPath.u8string())));
 	} else if (visible->state == ExportJobState::Cancelled) {
 		exportStatusLabel_->setText(text(strings::kClipsExportCancelled));
 	} else {

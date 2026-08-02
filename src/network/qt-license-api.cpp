@@ -90,8 +90,7 @@ QtLicenseApi::QtLicenseApi(QUrl baseUrl, QNetworkAccessManager *manager)
 {
 }
 
-QtLicenseApi::QtLicenseApi(QList<QUrl> baseUrls, QNetworkAccessManager *manager)
-	: manager_(manager)
+QtLicenseApi::QtLicenseApi(QList<QUrl> baseUrls, QNetworkAccessManager *manager) : manager_(manager)
 {
 	for (auto &url : baseUrls) {
 		if (allowedLicenseUrl(url) && !baseUrls_.contains(url))
@@ -144,10 +143,11 @@ void QtLicenseApi::post(const QString &path, const QJsonObject &body, Completion
 {
 	if (!configured_) {
 		if (completion) {
-			completion({{},
-				    {LicenseApiErrorKind::Server, "LICENSE_API_NOT_CONFIGURED",
-				     "License API requires HTTPS (loopback HTTP is allowed only in local development builds)",
-				     false}});
+			completion(
+				{{},
+				 {LicenseApiErrorKind::Server, "LICENSE_API_NOT_CONFIGURED",
+				  "License API requires HTTPS (loopback HTTP is allowed only in local development builds)",
+				  false}});
 		}
 		return;
 	}
@@ -223,8 +223,8 @@ licensing::LicenseApiResult QtLicenseApi::parseReply(QNetworkReply &reply) const
 	    data.value(QStringLiteral("status")).toString() == QStringLiteral("revoked")) {
 		const auto reason = data.value(QStringLiteral("reason")).toObject();
 		const auto code = reason.value(QStringLiteral("code")).toString();
-		const auto message = data.value(QStringLiteral("message")).toString(
-			reason.value(QStringLiteral("message")).toString());
+		const auto message = data.value(QStringLiteral("message"))
+					     .toString(reason.value(QStringLiteral("message")).toString());
 		return {{},
 			{LicenseApiErrorKind::SubscriptionInactive,
 			 code.isEmpty() ? "SUBSCRIPTION_INACTIVE" : code.toStdString(),

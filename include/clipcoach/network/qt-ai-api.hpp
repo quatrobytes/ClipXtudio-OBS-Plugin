@@ -22,8 +22,8 @@ public:
 	void cancelAll() noexcept override;
 
 private:
-	void analyzeAt(std::size_t index, AiAssistantRequest request,
-		       std::string authorizationToken, Callback callback);
+	void analyzeAt(std::size_t index, AiAssistantRequest request, std::string authorizationToken,
+		       Callback callback);
 
 	QList<QUrl> baseUrls_;
 	QNetworkAccessManager manager_;

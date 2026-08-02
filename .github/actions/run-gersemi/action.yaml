@@ -33,9 +33,11 @@ runs:
       run: |
         : Install Dependencies 🛍️
         echo ::group::Install Dependencies
-        eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
-        echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
-        brew install --quiet zsh
+        sudo apt-get update
+        sudo apt-get install -y python3-venv zsh
+        python3 -m venv .ci-format-tools
+        .ci-format-tools/bin/pip install --disable-pip-version-check gersemi==0.28.0
+        echo "${GITHUB_WORKSPACE}/.ci-format-tools/bin" >> $GITHUB_PATH
         echo ::endgroup::
 
     - name: Run gersemi 🎛️
@@ -49,11 +51,7 @@ runs:
         : Run gersemi 🎛️
         if (( ${+RUNNER_DEBUG} )) setopt XTRACE
 
-        print ::group::Install gersemi
-        brew install --quiet obsproject/tools/gersemi
-        print ::endgroup::
-
         print ::group::Run gersemi
         local -a changes=(${(s:,:)CHANGED_FILES//[\[\]\'\"]/})
-        ./build-aux/run-gersemi --fail-${{ inputs.failCondition }} --check ${changes}
+        FORMATTER_NAME=gersemi zsh build-aux/.run-format.zsh --fail-${{ inputs.failCondition }} --check ${changes}
         print ::endgroup::

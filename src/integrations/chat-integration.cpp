@@ -22,8 +22,7 @@ void appendInt64(SecretBytes &output, std::int64_t value)
 		output.push_back(static_cast<std::uint8_t>(numeric >> shift));
 }
 
-bool readUint32(const SecretBytes &input, std::size_t &offset,
-		std::uint32_t &value)
+bool readUint32(const SecretBytes &input, std::size_t &offset, std::uint32_t &value)
 {
 	if (offset + 4 > input.size())
 		return false;
@@ -33,8 +32,7 @@ bool readUint32(const SecretBytes &input, std::size_t &offset,
 	return true;
 }
 
-bool readInt64(const SecretBytes &input, std::size_t &offset,
-	       std::int64_t &value)
+bool readInt64(const SecretBytes &input, std::size_t &offset, std::int64_t &value)
 {
 	if (offset + 8 > input.size())
 		return false;
@@ -54,15 +52,12 @@ bool appendString(SecretBytes &output, const std::string &value)
 	return true;
 }
 
-bool readString(const SecretBytes &input, std::size_t &offset,
-		std::string &value)
+bool readString(const SecretBytes &input, std::size_t &offset, std::string &value)
 {
 	std::uint32_t length = 0;
-	if (!readUint32(input, offset, length) ||
-	    offset + length > input.size())
+	if (!readUint32(input, offset, length) || offset + length > input.size())
 		return false;
-	value.assign(reinterpret_cast<const char *>(input.data() + offset),
-		     length);
+	value.assign(reinterpret_cast<const char *>(input.data() + offset), length);
 	offset += length;
 	return true;
 }
@@ -70,33 +65,25 @@ bool readString(const SecretBytes &input, std::size_t &offset,
 SecretBytes serializeCredential(const OAuthCredential &credential)
 {
 	SecretBytes result{'C', 'C', 'O', '1'};
-	if (!appendString(result, credential.accessToken) ||
-	    !appendString(result, credential.refreshToken))
+	if (!appendString(result, credential.accessToken) || !appendString(result, credential.refreshToken))
 		return {};
-	appendInt64(
-		result,
-		std::chrono::duration_cast<std::chrono::seconds>(
-			credential.expiresAt.time_since_epoch())
-			.count());
+	appendInt64(result,
+		    std::chrono::duration_cast<std::chrono::seconds>(credential.expiresAt.time_since_epoch()).count());
 	return result;
 }
 
-std::optional<OAuthCredential>
-deserializeCredential(const SecretBytes &secret)
+std::optional<OAuthCredential> deserializeCredential(const SecretBytes &secret)
 {
-	if (secret.size() < 4 || secret[0] != 'C' || secret[1] != 'C' ||
-	    secret[2] != 'O' || secret[3] != '1')
+	if (secret.size() < 4 || secret[0] != 'C' || secret[1] != 'C' || secret[2] != 'O' || secret[3] != '1')
 		return std::nullopt;
 	std::size_t offset = 4;
 	OAuthCredential credential;
 	std::int64_t expiresAt = 0;
 	if (!readString(secret, offset, credential.accessToken) ||
-	    !readString(secret, offset, credential.refreshToken) ||
-	    !readInt64(secret, offset, expiresAt) ||
+	    !readString(secret, offset, credential.refreshToken) || !readInt64(secret, offset, expiresAt) ||
 	    offset != secret.size() || credential.accessToken.empty())
 		return std::nullopt;
-	credential.expiresAt = std::chrono::system_clock::time_point(
-		std::chrono::seconds(expiresAt));
+	credential.expiresAt = std::chrono::system_clock::time_point(std::chrono::seconds(expiresAt));
 	return credential;
 }
 
@@ -115,56 +102,44 @@ const char *chatPlatformName(ChatPlatform platform) noexcept
 	return "unknown";
 }
 
-ChatIntegrationManager::ChatIntegrationManager(
-	security::SecureStorage &secureStorage,
-	ChatPlatformTransport &transport, bool proUnlocked)
+ChatIntegrationManager::ChatIntegrationManager(security::SecureStorage &secureStorage, ChatPlatformTransport &transport,
+					       bool proUnlocked)
 	: secureStorage_(secureStorage),
 	  transport_(transport),
 	  states_{{ChatPlatform::Twitch,
-		   proUnlocked ? ChatConnectionState::Disconnected
-			       : ChatConnectionState::ProRequired},
+		   proUnlocked ? ChatConnectionState::Disconnected : ChatConnectionState::ProRequired},
 		  {ChatPlatform::YouTube,
-		   proUnlocked ? ChatConnectionState::Disconnected
-			       : ChatConnectionState::ProRequired},
-		  {ChatPlatform::Kick,
-		   ChatConnectionState::ComingSoon}},
+		   proUnlocked ? ChatConnectionState::Disconnected : ChatConnectionState::ProRequired},
+		  {ChatPlatform::Kick, ChatConnectionState::ComingSoon}},
 	  proUnlocked_(proUnlocked)
 {
 }
 
-IntegrationResult<AuthorizationRequest>
-ChatIntegrationManager::beginConnect(ChatPlatform platform)
+IntegrationResult<AuthorizationRequest> ChatIntegrationManager::beginConnect(ChatPlatform platform)
 {
 	if (platform == ChatPlatform::Kick) {
 		setState(platform, ChatConnectionState::ComingSoon);
-		return IntegrationResult<AuthorizationRequest>::failure(
-			"Kick integration is coming soon");
+		return IntegrationResult<AuthorizationRequest>::failure("Kick integration is coming soon");
 	}
 	if (!proUnlocked_) {
 		setState(platform, ChatConnectionState::ProRequired);
-		return IntegrationResult<AuthorizationRequest>::failure(
-			"Chat integrations require ClipXtudio Pro");
+		return IntegrationResult<AuthorizationRequest>::failure("Chat integrations require ClipXtudio Pro");
 	}
 	auto result = transport_.beginAuthorization(platform);
-	if (!result.succeeded() || result.value->state.empty() ||
-	    result.value->state.size() < 8 ||
+	if (!result.succeeded() || result.value->state.empty() || result.value->state.size() < 8 ||
 	    result.value->authorizationUrl.rfind("https://", 0) != 0) {
 		setState(platform, ChatConnectionState::NetworkError);
 		return IntegrationResult<AuthorizationRequest>::failure(
-			result.error.empty()
-				? "Invalid OAuth authorization response"
-				: std::move(result.error));
+			result.error.empty() ? "Invalid OAuth authorization response" : std::move(result.error));
 	}
 	auto request = std::move(*result.value);
 	pendingStates_[platform] = request.state;
 	setState(platform, ChatConnectionState::Connecting);
-	return IntegrationResult<AuthorizationRequest>::success(
-		std::move(request));
+	return IntegrationResult<AuthorizationRequest>::success(std::move(request));
 }
 
-bool ChatIntegrationManager::completeConnect(
-	ChatPlatform platform, std::string_view code,
-	std::string_view returnedState, std::string *error)
+bool ChatIntegrationManager::completeConnect(ChatPlatform platform, std::string_view code,
+					     std::string_view returnedState, std::string *error)
 {
 	if (error)
 		error->clear();
@@ -174,14 +149,12 @@ bool ChatIntegrationManager::completeConnect(
 		return false;
 	}
 	const auto pending = pendingStates_.find(platform);
-	if (pending == pendingStates_.end() ||
-	    pending->second != returnedState || code.empty()) {
+	if (pending == pendingStates_.end() || pending->second != returnedState || code.empty()) {
 		if (error)
 			*error = "OAuth state validation failed";
 		return false;
 	}
-	auto exchanged =
-		transport_.exchangeAuthorizationCode(platform, code);
+	auto exchanged = transport_.exchangeAuthorizationCode(platform, code);
 	if (!exchanged.succeeded()) {
 		setState(platform, ChatConnectionState::NetworkError);
 		if (error)
@@ -200,11 +173,9 @@ bool ChatIntegrationManager::completeConnect(
 ChatPollResult ChatIntegrationManager::poll(ChatPlatform platform)
 {
 	if (platform == ChatPlatform::Kick)
-		return {{}, ChatConnectionState::ComingSoon,
-			"Kick integration is coming soon"};
+		return {{}, ChatConnectionState::ComingSoon, "Kick integration is coming soon"};
 	if (!proUnlocked_)
-		return {{}, ChatConnectionState::ProRequired,
-			"Chat integrations require ClipXtudio Pro"};
+		return {{}, ChatConnectionState::ProRequired, "Chat integrations require ClipXtudio Pro"};
 	std::string error;
 	auto credential = loadCredential(platform, &error);
 	if (!credential) {
@@ -214,29 +185,19 @@ ChatPollResult ChatIntegrationManager::poll(ChatPlatform platform)
 	if (credential->expiresAt <= std::chrono::system_clock::now()) {
 		if (credential->refreshToken.empty()) {
 			setState(platform, ChatConnectionState::TokenExpired);
-			return {{}, state(platform),
-				"OAuth token expired and cannot be refreshed"};
+			return {{}, state(platform), "OAuth token expired and cannot be refreshed"};
 		}
-		auto refreshed = transport_.refreshCredential(
-			platform, credential->refreshToken);
-		if (refreshed.succeeded() &&
-		    refreshed.value->refreshToken.empty())
-			refreshed.value->refreshToken =
-				credential->refreshToken;
+		auto refreshed = transport_.refreshCredential(platform, credential->refreshToken);
+		if (refreshed.succeeded() && refreshed.value->refreshToken.empty())
+			refreshed.value->refreshToken = credential->refreshToken;
 		if (!refreshed.succeeded() ||
-		    !persistCredential(platform,
-				       refreshed.value.value_or(
-					       OAuthCredential{}),
-				       &error)) {
+		    !persistCredential(platform, refreshed.value.value_or(OAuthCredential{}), &error)) {
 			setState(platform, ChatConnectionState::TokenExpired);
-			return {{}, state(platform),
-				refreshed.error.empty() ? std::move(error)
-							: refreshed.error};
+			return {{}, state(platform), refreshed.error.empty() ? std::move(error) : refreshed.error};
 		}
 		credential = std::move(refreshed.value);
 	}
-	auto messages =
-		transport_.readMessages(platform, credential->accessToken);
+	auto messages = transport_.readMessages(platform, credential->accessToken);
 	if (!messages.succeeded()) {
 		setState(platform, ChatConnectionState::NetworkError);
 		return {{}, state(platform), std::move(messages.error)};
@@ -245,55 +206,44 @@ ChatPollResult ChatIntegrationManager::poll(ChatPlatform platform)
 	return {std::move(*messages.value), state(platform), {}};
 }
 
-bool ChatIntegrationManager::disconnect(ChatPlatform platform,
-					std::string *error)
+bool ChatIntegrationManager::disconnect(ChatPlatform platform, std::string *error)
 {
 	if (error)
 		error->clear();
 	std::string ignored;
-	if (auto credential = loadCredential(platform, &ignored);
-	    credential && !credential->accessToken.empty())
+	if (auto credential = loadCredential(platform, &ignored); credential && !credential->accessToken.empty())
 		transport_.revoke(platform, credential->accessToken);
 	if (!secureStorage_.remove(storageKey(platform), error))
 		return false;
 	pendingStates_.erase(platform);
-	setState(platform, platform == ChatPlatform::Kick
-				   ? ChatConnectionState::ComingSoon
-				   : proUnlocked_
-					     ? ChatConnectionState::Disconnected
-					     : ChatConnectionState::ProRequired);
+	setState(platform, platform == ChatPlatform::Kick ? ChatConnectionState::ComingSoon
+			   : proUnlocked_                 ? ChatConnectionState::Disconnected
+							  : ChatConnectionState::ProRequired);
 	return true;
 }
 
-ChatConnectionState
-ChatIntegrationManager::state(ChatPlatform platform) const noexcept
+ChatConnectionState ChatIntegrationManager::state(ChatPlatform platform) const noexcept
 {
 	const auto iterator = states_.find(platform);
-	return iterator == states_.end() ? ChatConnectionState::Disconnected
-					: iterator->second;
+	return iterator == states_.end() ? ChatConnectionState::Disconnected : iterator->second;
 }
 
 void ChatIntegrationManager::setProUnlocked(bool unlocked) noexcept
 {
 	proUnlocked_ = unlocked;
-	for (const auto platform :
-	     {ChatPlatform::Twitch, ChatPlatform::YouTube})
-		setState(platform, unlocked ? ChatConnectionState::Disconnected
-					   : ChatConnectionState::ProRequired);
+	for (const auto platform : {ChatPlatform::Twitch, ChatPlatform::YouTube})
+		setState(platform, unlocked ? ChatConnectionState::Disconnected : ChatConnectionState::ProRequired);
 }
 
-std::string
-ChatIntegrationManager::storageKey(ChatPlatform platform) const
+std::string ChatIntegrationManager::storageKey(ChatPlatform platform) const
 {
 	return "oauth.chat." + std::string(chatPlatformName(platform));
 }
 
-bool ChatIntegrationManager::persistCredential(
-	ChatPlatform platform, const OAuthCredential &credential,
-	std::string *error)
+bool ChatIntegrationManager::persistCredential(ChatPlatform platform, const OAuthCredential &credential,
+					       std::string *error)
 {
-	if (credential.accessToken.empty() ||
-	    credential.expiresAt.time_since_epoch().count() <= 0) {
+	if (credential.accessToken.empty() || credential.expiresAt.time_since_epoch().count() <= 0) {
 		if (error)
 			*error = "OAuth credential is invalid";
 		return false;
@@ -307,16 +257,12 @@ bool ChatIntegrationManager::persistCredential(
 	return secureStorage_.store(storageKey(platform), serialized, error);
 }
 
-std::optional<OAuthCredential>
-ChatIntegrationManager::loadCredential(ChatPlatform platform,
-				       std::string *error)
+std::optional<OAuthCredential> ChatIntegrationManager::loadCredential(ChatPlatform platform, std::string *error)
 {
 	const auto stored = secureStorage_.load(storageKey(platform));
 	if (!stored.succeeded() || !stored.value) {
 		if (error)
-			*error = stored.message.empty()
-					 ? "OAuth credential is unavailable"
-					 : stored.message;
+			*error = stored.message.empty() ? "OAuth credential is unavailable" : stored.message;
 		return std::nullopt;
 	}
 	auto decoded = deserializeCredential(*stored.value);
@@ -325,8 +271,7 @@ ChatIntegrationManager::loadCredential(ChatPlatform platform,
 	return decoded;
 }
 
-void ChatIntegrationManager::setState(ChatPlatform platform,
-				      ChatConnectionState state)
+void ChatIntegrationManager::setState(ChatPlatform platform, ChatConnectionState state)
 {
 	states_[platform] = state;
 }

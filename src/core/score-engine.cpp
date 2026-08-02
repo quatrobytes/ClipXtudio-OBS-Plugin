@@ -51,12 +51,10 @@ double signalScore(const TriggerSignal &signal) noexcept
 
 int ScoreEngine::calculate(const TriggerSignal &signal) const noexcept
 {
-	return std::clamp(static_cast<int>(std::lround(signalScore(signal))), 0,
-			  100);
+	return std::clamp(static_cast<int>(std::lround(signalScore(signal))), 0, 100);
 }
 
-int ScoreEngine::calculate(
-	const std::vector<TriggerSignal> &inputSignals) const noexcept
+int ScoreEngine::calculate(const std::vector<TriggerSignal> &inputSignals) const noexcept
 {
 	if (inputSignals.empty())
 		return 0;
@@ -75,12 +73,8 @@ int ScoreEngine::calculate(
 		types.insert(signal.type);
 	}
 
-	const auto combinationBonus =
-		std::min(18.0, static_cast<double>(types.size() - 1) * 6.0);
-	return std::clamp(
-		static_cast<int>(
-			std::lround(strongest + supporting + combinationBonus)),
-		0, 100);
+	const auto combinationBonus = std::min(18.0, static_cast<double>(types.size() - 1) * 6.0);
+	return std::clamp(static_cast<int>(std::lround(strongest + supporting + combinationBonus)), 0, 100);
 }
 
 double ScoreEngine::durationQuality(int durationSeconds) noexcept
@@ -90,16 +84,10 @@ double ScoreEngine::durationQuality(int durationSeconds) noexcept
 	if (durationSeconds <= 8)
 		return static_cast<double>(durationSeconds) / 16.0;
 	if (durationSeconds <= 60)
-		return std::min(1.0, 0.5 +
-					      static_cast<double>(
-						      durationSeconds - 8) /
-						      44.0);
+		return std::min(1.0, 0.5 + static_cast<double>(durationSeconds - 8) / 44.0);
 	if (durationSeconds <= 120)
-		return 1.0 - static_cast<double>(durationSeconds - 60) /
-				     240.0;
-	return std::max(0.25, 0.75 -
-				      static_cast<double>(durationSeconds - 120) /
-					      720.0);
+		return 1.0 - static_cast<double>(durationSeconds - 60) / 240.0;
+	return std::max(0.25, 0.75 - static_cast<double>(durationSeconds - 120) / 720.0);
 }
 
 } // namespace clipcoach

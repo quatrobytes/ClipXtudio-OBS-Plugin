@@ -10,11 +10,10 @@ int main()
 
 	clipcoach::test::expect(settings.schemaVersion == 14, "initial schema version must be 14");
 	clipcoach::test::expect(!settings.initialSetupCompleted,
-			       "initial microphone and vertical scene setup must run once");
-	clipcoach::test::expect(
-		settings.voiceSpeechMode == clipcoach::SpeechProcessingMode::Local &&
-			!settings.voiceCloudConsent,
-		"Voice Trigger must default to local processing without cloud consent");
+				"initial microphone and vertical scene setup must run once");
+	clipcoach::test::expect(settings.voiceSpeechMode == clipcoach::SpeechProcessingMode::Local &&
+					!settings.voiceCloudConsent,
+				"Voice Trigger must default to local processing without cloud consent");
 	clipcoach::test::expect(!settings.aiAssistantEnabled && !settings.aiPrivacyConsent &&
 					settings.aiLanguage == "auto",
 				"AI Assistant must default to disabled without inferred consent");
@@ -27,7 +26,7 @@ int main()
 	clipcoach::test::expect(settings.openDockAtStartup, "dock must open at startup by default");
 	clipcoach::test::expect(!settings.autoStartReplayBuffer, "Replay Buffer auto-start must be opt-in");
 	clipcoach::test::expect(settings.outputMode == clipcoach::CaptureOutputMode::Vertical,
-			       "new and skipped setup profiles must default to vertical clips");
+				"new and skipped setup profiles must default to vertical clips");
 	clipcoach::test::expect(settings.defaultDurationSeconds == 30 && settings.preRollSeconds == 0 &&
 					settings.postRollSeconds == 0,
 				"capture timing defaults must be conservative");

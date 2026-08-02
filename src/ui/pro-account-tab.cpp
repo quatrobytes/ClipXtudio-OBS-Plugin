@@ -127,8 +127,7 @@ void ProAccountTab::activate()
 		message_->show();
 		return;
 	}
-	static const QRegularExpression licensePattern(
-		QStringLiteral("^CCS1-(?:[A-Fa-f0-9]{5}-){3}[A-Fa-f0-9]{5}$"));
+	static const QRegularExpression licensePattern(QStringLiteral("^CCS1-(?:[A-Fa-f0-9]{5}-){3}[A-Fa-f0-9]{5}$"));
 	if (!licensePattern.match(key).hasMatch()) {
 		message_->setText(text(strings::kSettingsLicenseKeyInvalid));
 		message_->setProperty("notificationTone", QStringLiteral("error"));
@@ -163,22 +162,21 @@ void ProAccountTab::update(const licensing::LicenseSnapshot &snapshot)
 	if (snapshot.refreshInProgress) {
 		planValue_->setText(text(strings::kPlanValidating));
 	} else {
-	switch (snapshot.state) {
-	case licensing::LicenseState::ProActive:
-		planValue_->setText(text(strings::kPlanProActive));
-		break;
-	case licensing::LicenseState::ProGrace:
-		planValue_->setText(text(strings::kPlanProGrace));
-		break;
-	case licensing::LicenseState::Free:
-		planValue_->setText(text(strings::kPlanFree));
-		break;
+		switch (snapshot.state) {
+		case licensing::LicenseState::ProActive:
+			planValue_->setText(text(strings::kPlanProActive));
+			break;
+		case licensing::LicenseState::ProGrace:
+			planValue_->setText(text(strings::kPlanProGrace));
+			break;
+		case licensing::LicenseState::Free:
+			planValue_->setText(text(strings::kPlanFree));
+			break;
+		}
 	}
-	}
-	expirationValue_->setText(snapshot.perpetual
-					  ? text(strings::kSettingsDateNever)
-					  : (snapshot.renewsAt ? formatDate(snapshot.renewsAt)
-							      : formatDate(snapshot.tokenExpiresAt)));
+	expirationValue_->setText(snapshot.perpetual ? text(strings::kSettingsDateNever)
+						     : (snapshot.renewsAt ? formatDate(snapshot.renewsAt)
+									  : formatDate(snapshot.tokenExpiresAt)));
 	if (snapshot.perpetual) {
 		usageValue_->setText(text(strings::kSettingsUsageUnlimited));
 	} else if (snapshot.monthlyUsage && snapshot.monthlyLimit) {
@@ -202,16 +200,15 @@ void ProAccountTab::update(const licensing::LicenseSnapshot &snapshot)
 	activateButton_->setVisible(showActivation);
 	changeLicenseButton_->setVisible(snapshot.proEnabled());
 	changeLicenseButton_->setEnabled(!snapshot.refreshInProgress && snapshot.secureStorageAvailable);
-	changeLicenseButton_->setText(text(changingLicense_ ? strings::kSettingsCancelLicenseChange
-							 : strings::kSettingsChangeLicense));
+	changeLicenseButton_->setText(
+		text(changingLicense_ ? strings::kSettingsCancelLicenseChange : strings::kSettingsChangeLicense));
 
 	if (!snapshot.lastErrorMessage.empty()) {
 		const auto errorCode = QString::fromStdString(snapshot.lastErrorCode);
-		message_->setText(
-			errorCode == QStringLiteral("LICENSE_SIGNING_UNAVAILABLE") ||
-					errorCode == QStringLiteral("SERVER_MISCONFIGURED")
-				? text(strings::kSettingsLicenseActivationUnavailable)
-				: QString::fromStdString(snapshot.lastErrorMessage));
+		message_->setText(errorCode == QStringLiteral("LICENSE_SIGNING_UNAVAILABLE") ||
+						  errorCode == QStringLiteral("SERVER_MISCONFIGURED")
+					  ? text(strings::kSettingsLicenseActivationUnavailable)
+					  : QString::fromStdString(snapshot.lastErrorMessage));
 		message_->setProperty("notificationTone", QStringLiteral("error"));
 		message_->style()->unpolish(message_);
 		message_->style()->polish(message_);

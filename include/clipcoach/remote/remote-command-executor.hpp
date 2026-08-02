@@ -23,9 +23,8 @@ public:
 	[[nodiscard]] bool busy() const noexcept;
 	[[nodiscard]] std::size_t queuedCount() const noexcept;
 
-	[[nodiscard]] static std::optional<RemoteCapturePlan> planFor(const RemoteCommand &command,
-								std::string *errorCode = nullptr,
-								std::string *errorMessage = nullptr);
+	[[nodiscard]] static std::optional<RemoteCapturePlan>
+	planFor(const RemoteCommand &command, std::string *errorCode = nullptr, std::string *errorMessage = nullptr);
 
 private:
 	struct Pending {

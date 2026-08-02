@@ -72,16 +72,12 @@ int main()
 	       "output mode must support Vertical Canvas");
 	expect(proManager.setOutputMode(CaptureOutputMode::Both, &error), "output mode must support Both");
 	expect(proManager.setObsSelection("Gameplay", "Camera", &error) &&
-		       proManager.selectedSceneName() == "Gameplay" &&
-		       proManager.selectedSourceName() == "Camera",
+		       proManager.selectedSceneName() == "Gameplay" && proManager.selectedSourceName() == "Camera",
 	       "OBS scene and source selection must be stored through the core manager");
-	expect(proManager.setFraming(140, 25, -10, &error) &&
-		       proManager.settings().zoomPercent == 140 &&
-		       proManager.settings().panXPercent == 25 &&
-		       proManager.settings().panYPercent == -10,
+	expect(proManager.setFraming(140, 25, -10, &error) && proManager.settings().zoomPercent == 140 &&
+		       proManager.settings().panXPercent == 25 && proManager.settings().panYPercent == -10,
 	       "vertical source framing must accept and expose zoom and pan");
-	expect(!proManager.setFraming(99, 0, 0, &error),
-	       "vertical framing must reject unsupported zoom");
+	expect(!proManager.setFraming(99, 0, 0, &error), "vertical framing must reject unsupported zoom");
 
 	SettingsManager reloadedStore(path);
 	expect(reloadedStore.load(&error), "saved vertical settings must reload");
@@ -89,10 +85,8 @@ int main()
 	expect(reloaded.settings().resolution == VerticalResolution::Portrait720 &&
 		       reloaded.settings().selectedTemplate == VerticalTemplateId::TalkingHead &&
 		       reloaded.settings().outputMode == CaptureOutputMode::Both &&
-		       reloaded.selectedSceneName() == "Gameplay" &&
-		       reloaded.selectedSourceName() == "Camera" &&
-		       reloaded.settings().zoomPercent == 140 &&
-		       reloaded.settings().panXPercent == 25 &&
+		       reloaded.selectedSceneName() == "Gameplay" && reloaded.selectedSourceName() == "Camera" &&
+		       reloaded.settings().zoomPercent == 140 && reloaded.settings().panXPercent == 25 &&
 		       reloaded.settings().panYPercent == -10,
 	       "canvas resolution, template, output mode and OBS selection must persist");
 

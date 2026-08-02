@@ -6,8 +6,7 @@
 
 namespace clipcoach::ui {
 
-SettingsController::SettingsController(SettingsManager *manager, QObject *parent)
-	: QObject(parent), manager_(manager)
+SettingsController::SettingsController(SettingsManager *manager, QObject *parent) : QObject(parent), manager_(manager)
 {
 }
 
@@ -16,8 +15,7 @@ const Settings &SettingsController::settings() const noexcept
 	return manager_ != nullptr ? manager_->settings() : fallback_;
 }
 
-bool SettingsController::update(
-	const std::function<void(Settings &)> &mutation)
+bool SettingsController::update(const std::function<void(Settings &)> &mutation)
 {
 	if (manager_ == nullptr) {
 		if (errorCallback_) {

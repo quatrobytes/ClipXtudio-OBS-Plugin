@@ -129,8 +129,7 @@ FeatureGateDecision FeatureGateService::check(Feature feature) const
 	if (isAllowed(feature)) {
 		return {true, {}, {}};
 	}
-	return {false, "PRO_REQUIRED",
-		std::string(PlanPolicy::featureName(feature)) + " requires ClipXtudio Pro"};
+	return {false, "PRO_REQUIRED", std::string(PlanPolicy::featureName(feature)) + " requires ClipXtudio Pro"};
 }
 
 } // namespace clipcoach

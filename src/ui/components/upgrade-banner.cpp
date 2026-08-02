@@ -10,16 +10,15 @@
 
 namespace clipcoach::ui {
 
-UpgradeBanner::UpgradeBanner(const QString &title, const QString &description,
-			     const QString &buttonText, const QString &badgeText, QWidget *parent)
+UpgradeBanner::UpgradeBanner(const QString &title, const QString &description, const QString &buttonText,
+			     const QString &badgeText, QWidget *parent)
 	: QFrame(parent)
 {
 	setObjectName(QStringLiteral("UpgradeBanner"));
 	setFrameShape(QFrame::NoFrame);
 
 	auto *layout = new QHBoxLayout(this);
-	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg,
-				   tokens::kSpaceMd);
+	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceMd);
 	layout->setSpacing(tokens::kSpaceMd);
 
 	auto *badge = new ProBadge(badgeText, this);
@@ -41,11 +40,10 @@ UpgradeBanner::UpgradeBanner(const QString &title, const QString &description,
 	purchaseUrl.setFragment(QStringLiteral("pricing"));
 	button->setProperty("externalUrl", purchaseUrl.toString());
 	connect(button, &QPushButton::clicked, this, [purchaseUrl] {
-		if (purchaseUrl.isValid() &&
-		    (purchaseUrl.scheme() == QStringLiteral("https") ||
-		     ((purchaseUrl.host() == QStringLiteral("127.0.0.1") ||
-		       purchaseUrl.host() == QStringLiteral("localhost")) &&
-		      purchaseUrl.scheme() == QStringLiteral("http"))))
+		if (purchaseUrl.isValid() && (purchaseUrl.scheme() == QStringLiteral("https") ||
+					      ((purchaseUrl.host() == QStringLiteral("127.0.0.1") ||
+						purchaseUrl.host() == QStringLiteral("localhost")) &&
+					       purchaseUrl.scheme() == QStringLiteral("http"))))
 			QDesktopServices::openUrl(purchaseUrl);
 	});
 

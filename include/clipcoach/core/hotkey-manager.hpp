@@ -27,10 +27,7 @@ struct HotkeyActionResult {
 	std::string error;
 
 	[[nodiscard]] static HotkeyActionResult ok() { return {true, {}}; }
-	[[nodiscard]] static HotkeyActionResult fail(std::string message)
-	{
-		return {false, std::move(message)};
-	}
+	[[nodiscard]] static HotkeyActionResult fail(std::string message) { return {false, std::move(message)}; }
 };
 
 struct HotkeyRegistration {
@@ -44,9 +41,8 @@ public:
 	using Callback = std::function<void(bool pressed)>;
 
 	virtual ~HotkeyRegistrar() = default;
-	[[nodiscard]] virtual HotkeyRegistration
-	registerHotkey(std::string name, std::string description,
-		       Callback callback) = 0;
+	[[nodiscard]] virtual HotkeyRegistration registerHotkey(std::string name, std::string description,
+								Callback callback) = 0;
 	virtual void unregisterHotkey(HotkeyHandle handle) noexcept = 0;
 };
 
@@ -60,10 +56,8 @@ struct HotkeyServices {
 
 class HotkeyManager final {
 public:
-	using DescriptionProvider =
-		std::function<std::string(HotkeyAction action)>;
-	using ErrorCallback =
-		std::function<void(HotkeyAction action, const std::string &error)>;
+	using DescriptionProvider = std::function<std::string(HotkeyAction action)>;
+	using ErrorCallback = std::function<void(HotkeyAction action, const std::string &error)>;
 
 	HotkeyManager(HotkeyRegistrar &registrar, HotkeyServices services,
 		      DescriptionProvider descriptionProvider = {});
@@ -74,8 +68,7 @@ public:
 
 	[[nodiscard]] bool registerAll();
 	void unregisterAll() noexcept;
-	[[nodiscard]] HotkeyActionResult execute(HotkeyAction action,
-						 bool pressed = true);
+	[[nodiscard]] HotkeyActionResult execute(HotkeyAction action, bool pressed = true);
 	void setErrorCallback(ErrorCallback callback);
 	[[nodiscard]] bool registered() const noexcept;
 
@@ -87,8 +80,7 @@ private:
 
 	[[nodiscard]] HotkeyActionResult executePressed(HotkeyAction action);
 	[[nodiscard]] HotkeyActionResult capture(int seconds);
-	void reportFailure(HotkeyAction action,
-			   const HotkeyActionResult &result) const;
+	void reportFailure(HotkeyAction action, const HotkeyActionResult &result) const;
 
 	HotkeyRegistrar &registrar_;
 	HotkeyServices services_;

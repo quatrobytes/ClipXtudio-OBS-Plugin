@@ -46,14 +46,12 @@
 namespace clipcoach::ui {
 namespace {
 
-QWidget *formRow(const QString &label, const QString &description, QWidget *control,
-		 QWidget *parent)
+QWidget *formRow(const QString &label, const QString &description, QWidget *control, QWidget *parent)
 {
 	auto *row = new QWidget(parent);
 	row->setObjectName(QStringLiteral("SettingsFormRow"));
 	auto *layout = new QHBoxLayout(row);
-	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceSm,
-				   tokens::kSpaceLg, tokens::kSpaceSm);
+	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceSm, tokens::kSpaceLg, tokens::kSpaceSm);
 	layout->setSpacing(tokens::kSpaceMd);
 	auto *copyColumn = new QHBoxLayout();
 	copyColumn->setSpacing(tokens::kSpaceSm);
@@ -77,16 +75,14 @@ QWidget *formRow(const QString &label, const QString &description, QWidget *cont
 	return row;
 }
 
-QWidget *pathFormRow(const QString &label, const QString &description,
-		     QWidget *control, QWidget *parent)
+QWidget *pathFormRow(const QString &label, const QString &description, QWidget *control, QWidget *parent)
 {
 	auto *row = new QWidget(parent);
 	row->setObjectName(QStringLiteral("SettingsPathRow"));
 	row->setProperty("settingsRole", QStringLiteral("pathRow"));
 
 	auto *layout = new QVBoxLayout(row);
-	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceSm,
-				   tokens::kSpaceLg, tokens::kSpaceSm);
+	layout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceSm, tokens::kSpaceLg, tokens::kSpaceSm);
 	layout->setSpacing(tokens::kSpaceSm);
 
 	auto *heading = new QHBoxLayout();
@@ -108,14 +104,13 @@ QWidget *pathFormRow(const QString &label, const QString &description,
 
 	control->setMinimumWidth(0);
 	control->setMaximumWidth(QWIDGETSIZE_MAX);
-	control->setSizePolicy(QSizePolicy::Expanding,
-			       control->sizePolicy().verticalPolicy());
+	control->setSizePolicy(QSizePolicy::Expanding, control->sizePolicy().verticalPolicy());
 	layout->addWidget(control);
 	return row;
 }
 
-QWidget *remoteStatusTile(const QString &title, QLabel *&value, const QString &initial,
-			  const QString &objectName, QWidget *parent)
+QWidget *remoteStatusTile(const QString &title, QLabel *&value, const QString &initial, const QString &objectName,
+			  QWidget *parent)
 {
 	auto *tile = new QFrame(parent);
 	tile->setObjectName(QStringLiteral("RemoteClipperStatusTile"));
@@ -191,8 +186,7 @@ QByteArray helpKey(const QString &objectName)
 } // namespace
 
 SettingsTab::SettingsTab(TranslationFunction translator, SettingsManager *manager, QWidget *parent,
-			 integrations::ChatIntegrationManager *chatManager,
-			 licensing::LicenseManager *licenseManager,
+			 integrations::ChatIntegrationManager *chatManager, licensing::LicenseManager *licenseManager,
 			 VerticalObsBridge replayObsBridge)
 	: QWidget(parent),
 	  translator_(std::move(translator)),
@@ -231,8 +225,7 @@ void SettingsTab::setSetupRequestedCallback(SetupRequestedCallback callback)
 	setupRequestedCallback_ = std::move(callback);
 }
 
-bool SettingsTab::exportProfileTo(const std::filesystem::path &path,
-				  std::string *error) const
+bool SettingsTab::exportProfileTo(const std::filesystem::path &path, std::string *error) const
 {
 	if (settingsManager_ == nullptr) {
 		if (error != nullptr)
@@ -242,8 +235,7 @@ bool SettingsTab::exportProfileTo(const std::filesystem::path &path,
 	return settingsManager_->exportProfile(path, error);
 }
 
-bool SettingsTab::importProfileFrom(const std::filesystem::path &path,
-				    std::string *error)
+bool SettingsTab::importProfileFrom(const std::filesystem::path &path, std::string *error)
 {
 	if (settingsManager_ == nullptr) {
 		if (error != nullptr)
@@ -253,8 +245,7 @@ bool SettingsTab::importProfileFrom(const std::filesystem::path &path,
 	const auto before = settingsManager_->settings();
 	if (!settingsManager_->importProfile(path, error))
 		return false;
-	profileImportChangedLanguage_ =
-		before.language != settingsManager_->settings().language;
+	profileImportChangedLanguage_ = before.language != settingsManager_->settings().language;
 	if (appliedCallback_)
 		appliedCallback_(before, settingsManager_->settings());
 	return true;
@@ -280,8 +271,7 @@ void SettingsTab::buildUi()
 	auto *content = new QWidget(scroll);
 	content->setObjectName(QStringLiteral("settingsContent"));
 	auto *layout = new QVBoxLayout(content);
-	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin,
-				   tokens::kPageMargin, tokens::kPageMargin);
+	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin);
 	layout->setSpacing(tokens::kSectionGap);
 
 	auto *pageHeader = new QFrame(content);
@@ -289,17 +279,14 @@ void SettingsTab::buildUi()
 	pageHeader->setProperty("settingsRole", QStringLiteral("pageHeader"));
 	pageHeader->setProperty("pageRole", QStringLiteral("header"));
 	auto *pageHeaderLayout = new QHBoxLayout(pageHeader);
-	pageHeaderLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd,
-					    tokens::kSpaceLg, tokens::kSpaceMd);
+	pageHeaderLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceMd);
 	pageHeaderLayout->setSpacing(tokens::kSpaceMd);
 	auto *headerIcon = new QLabel(pageHeader);
 	headerIcon->setObjectName(QStringLiteral("settingsPageIcon"));
 	headerIcon->setProperty("pageRole", QStringLiteral("icon"));
 	headerIcon->setAlignment(Qt::AlignCenter);
-	headerIcon->setPixmap(style()->standardIcon(QStyle::SP_FileDialogDetailedView)
-				      .pixmap(22, 22));
-	headerIcon->setFixedSize(tokens::kPageHeaderIconSize,
-				 tokens::kPageHeaderIconSize);
+	headerIcon->setPixmap(style()->standardIcon(QStyle::SP_FileDialogDetailedView).pixmap(22, 22));
+	headerIcon->setFixedSize(tokens::kPageHeaderIconSize, tokens::kPageHeaderIconSize);
 	auto *headerCopy = new QVBoxLayout();
 	headerCopy->setSpacing(tokens::kSpaceXs);
 	auto *title = new QLabel(text(strings::kSettingsTitle), pageHeader);
@@ -336,8 +323,7 @@ void SettingsTab::buildUi()
 	layout->addWidget(sectionsContainer_);
 
 	auto *general = addSection(strings::kSettingsGeneral, QStringLiteral("settingsGeneralSection"));
-	const int interfaceLanguage =
-		settings.language == "en-US" ? 1 : settings.language == "es-ES" ? 2 : 0;
+	const int interfaceLanguage = settings.language == "en-US" ? 1 : settings.language == "es-ES" ? 2 : 0;
 	addCombo(general, strings::kSettingsInterfaceLanguage, QStringLiteral("pluginLanguageCombo"),
 		 {text(strings::kSettingsLanguageSystem), text(strings::kSettingsLanguageEnglish),
 		  text(strings::kSettingsLanguageSpanish)},
@@ -352,15 +338,12 @@ void SettingsTab::buildUi()
 		  settings.openDockAtStartup);
 	addToggle(general, strings::kSettingsAutoReplay, QStringLiteral("autoStartReplayCheck"),
 		  settings.autoStartReplayBuffer);
-	addToggle(general, strings::kSettingsConfirmDelete,
-		  QStringLiteral("confirmDeleteCheck"),
+	addToggle(general, strings::kSettingsConfirmDelete, QStringLiteral("confirmDeleteCheck"),
 		  settings.confirmBeforeDelete);
 
-	auto *profile = addSection(strings::kSettingsProfile,
-				   QStringLiteral("settingsProfileSection"));
+	auto *profile = addSection(strings::kSettingsProfile, QStringLiteral("settingsProfileSection"));
 	profile->setHelpText(text(strings::kSettingsProfileDescription));
-	auto *profileDescription = new QLabel(
-		text(strings::kSettingsProfileDescription), profile);
+	auto *profileDescription = new QLabel(text(strings::kSettingsProfileDescription), profile);
 	profileDescription->setObjectName(QStringLiteral("settingsProfileDescription"));
 	profileDescription->setWordWrap(true);
 	profileDescription->setProperty("class", QStringLiteral("supporting"));
@@ -370,19 +353,16 @@ void SettingsTab::buildUi()
 	auto *profileActionsLayout = new QHBoxLayout(profileActions);
 	profileActionsLayout->setContentsMargins(0, 0, 0, 0);
 	profileActionsLayout->setSpacing(tokens::kSpaceSm);
-	auto *exportProfile = new QPushButton(
-		text(strings::kSettingsProfileExport), profileActions);
+	auto *exportProfile = new QPushButton(text(strings::kSettingsProfileExport), profileActions);
 	exportProfile->setObjectName(QStringLiteral("exportSettingsProfileButton"));
 	exportProfile->setProperty("controlRole", QStringLiteral("primary"));
-	auto *importProfile = new QPushButton(
-		text(strings::kSettingsProfileImport), profileActions);
+	auto *importProfile = new QPushButton(text(strings::kSettingsProfileImport), profileActions);
 	importProfile->setObjectName(QStringLiteral("importSettingsProfileButton"));
 	importProfile->setProperty("controlRole", QStringLiteral("secondary"));
 	profileActionsLayout->addWidget(exportProfile, 1);
 	profileActionsLayout->addWidget(importProfile, 1);
 	profile->contentLayout()->addWidget(profileActions);
-	auto *openSetup = new QPushButton(
-		text(strings::kSettingsSetupOpen), profile);
+	auto *openSetup = new QPushButton(text(strings::kSettingsSetupOpen), profile);
 	openSetup->setObjectName(QStringLiteral("openInitialSetupButton"));
 	openSetup->setProperty("controlRole", QStringLiteral("secondary"));
 	profile->contentLayout()->addWidget(openSetup);
@@ -397,79 +377,66 @@ void SettingsTab::buildUi()
 	profile->contentLayout()->addWidget(profileStatus_);
 	connect(exportProfile, &QPushButton::clicked, this, [this] {
 		const auto suggested = QDir::homePath() + QStringLiteral("/clipxtudio-profile.json");
-		auto path = QFileDialog::getSaveFileName(
-			this, text(strings::kSettingsProfileExportDialog), suggested,
-			text(strings::kSettingsProfileJsonFilter));
+		auto path = QFileDialog::getSaveFileName(this, text(strings::kSettingsProfileExportDialog), suggested,
+							 text(strings::kSettingsProfileJsonFilter));
 		if (path.isEmpty())
 			return;
 		if (!path.endsWith(QStringLiteral(".json"), Qt::CaseInsensitive))
 			path += QStringLiteral(".json");
 		std::string error;
-		const bool saved = exportProfileTo(
-			std::filesystem::u8path(path.toUtf8().constData()), &error);
+		const bool saved = exportProfileTo(std::filesystem::u8path(path.toUtf8().constData()), &error);
 		profileStatus_->setProperty("notificationTone",
-			saved ? QStringLiteral("success") : QStringLiteral("error"));
-		profileStatus_->setText(saved
-			? text(strings::kSettingsProfileExported).arg(path)
-			: text(strings::kSettingsProfileExportFailed)
-				.arg(QString::fromStdString(error)));
+					    saved ? QStringLiteral("success") : QStringLiteral("error"));
+		profileStatus_->setText(
+			saved ? text(strings::kSettingsProfileExported).arg(path)
+			      : text(strings::kSettingsProfileExportFailed).arg(QString::fromStdString(error)));
 		profileStatus_->style()->unpolish(profileStatus_);
 		profileStatus_->style()->polish(profileStatus_);
 		profileStatus_->show();
 	});
 	connect(importProfile, &QPushButton::clicked, this, [this] {
-		const auto path = QFileDialog::getOpenFileName(
-			this, text(strings::kSettingsProfileImportDialog), QDir::homePath(),
-			text(strings::kSettingsProfileJsonFilter));
+		const auto path = QFileDialog::getOpenFileName(this, text(strings::kSettingsProfileImportDialog),
+							       QDir::homePath(),
+							       text(strings::kSettingsProfileJsonFilter));
 		if (path.isEmpty())
 			return;
-		if (QMessageBox::question(
-			    this, text(strings::kSettingsProfileImportConfirmTitle),
-			    text(strings::kSettingsProfileImportConfirmBody),
-			    QMessageBox::Yes | QMessageBox::Cancel,
-			    QMessageBox::Cancel) != QMessageBox::Yes)
+		if (QMessageBox::question(this, text(strings::kSettingsProfileImportConfirmTitle),
+					  text(strings::kSettingsProfileImportConfirmBody),
+					  QMessageBox::Yes | QMessageBox::Cancel,
+					  QMessageBox::Cancel) != QMessageBox::Yes)
 			return;
 		std::string error;
-		const bool loaded = importProfileFrom(
-			std::filesystem::u8path(path.toUtf8().constData()), &error);
+		const bool loaded = importProfileFrom(std::filesystem::u8path(path.toUtf8().constData()), &error);
 		if (!loaded) {
 			profileStatus_->setProperty("notificationTone", QStringLiteral("error"));
-			profileStatus_->setText(text(strings::kSettingsProfileImportFailed)
-				.arg(QString::fromStdString(error)));
+			profileStatus_->setText(
+				text(strings::kSettingsProfileImportFailed).arg(QString::fromStdString(error)));
 			profileStatus_->style()->unpolish(profileStatus_);
 			profileStatus_->style()->polish(profileStatus_);
 			profileStatus_->show();
 			return;
 		}
-		QMessageBox::information(this,
-			text(strings::kSettingsProfileImportedTitle),
-			text(strings::kSettingsProfileImportedBody));
+		QMessageBox::information(this, text(strings::kSettingsProfileImportedTitle),
+					 text(strings::kSettingsProfileImportedBody));
 		QTimer::singleShot(0, this, [this] {
 			if (profileImportedCallback_ && !profileImportChangedLanguage_)
 				profileImportedCallback_();
 		});
 	});
 
-	auto *replay = addSection(strings::kVerticalReplayTitle,
-				  QStringLiteral("settingsReplayPerformanceSection"));
-	replay->setHelpText(
-		text("Settings.Section.Help.settingsReplayPerformanceSection") +
-		QStringLiteral("\n\n") +
-		text(strings::kVerticalReplayPipelineValue));
+	auto *replay = addSection(strings::kVerticalReplayTitle, QStringLiteral("settingsReplayPerformanceSection"));
+	replay->setHelpText(text("Settings.Section.Help.settingsReplayPerformanceSection") + QStringLiteral("\n\n") +
+			    text(strings::kVerticalReplayPipelineValue));
 
 	replayEncoder_ = new WheelSafeComboBox(replay);
 	replayEncoder_->setObjectName(QStringLiteral("settingsReplayEncoderCombo"));
-	replayEncoder_->setSizeAdjustPolicy(
-		QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	replayEncoder_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	replayEncoder_->setMinimumContentsLength(28);
 	replayEncoder_->setMinimumWidth(280);
-	replayEncoder_->setSizePolicy(QSizePolicy::Expanding,
-				      replayEncoder_->sizePolicy().verticalPolicy());
+	replayEncoder_->setSizePolicy(QSizePolicy::Expanding, replayEncoder_->sizePolicy().verticalPolicy());
 	replayEncoder_->view()->setTextElideMode(Qt::ElideNone);
-	auto *replayEncoderRow = pathFormRow(
-		text(strings::kVerticalReplayEncoder),
-		text("Settings.Help.settingsReplayEncoderCombo"),
-		replayEncoder_, replay);
+	auto *replayEncoderRow = pathFormRow(text(strings::kVerticalReplayEncoder),
+					     text("Settings.Help.settingsReplayEncoderCombo"), replayEncoder_, replay);
 	replayEncoderRow->setObjectName(QStringLiteral("SettingsWideControlRow"));
 	replayEncoderRow->setProperty("settingsRole", QStringLiteral("wideControlRow"));
 	// pathFormRow expands path-like controls to the full card width. Restore a
@@ -481,31 +448,26 @@ void SettingsTab::buildUi()
 	replayEnabled_ = new QCheckBox(replay);
 	replayEnabled_->setObjectName(QStringLiteral("settingsReplayEnabledCheck"));
 	replayEnabled_->setAccessibleName(text(strings::kVerticalReplayEnabled));
-	replay->contentLayout()->addWidget(formRow(
-		text(strings::kVerticalReplayEnabled),
-		text("Settings.Help.settingsReplayEnabledCheck"),
-		replayEnabled_, replay));
+	replay->contentLayout()->addWidget(formRow(text(strings::kVerticalReplayEnabled),
+						   text("Settings.Help.settingsReplayEnabledCheck"), replayEnabled_,
+						   replay));
 
 	auto *replayActions = new QWidget(replay);
 	replayActions->setObjectName(QStringLiteral("settingsReplayActions"));
 	auto *replayActionsLayout = new QHBoxLayout(replayActions);
 	replayActionsLayout->setContentsMargins(0, 0, 0, 0);
 	replayActionsLayout->setSpacing(tokens::kSpaceSm);
-	applyReplayProfile_ =
-		new QPushButton(text(strings::kVerticalReplayApply), replayActions);
-	applyReplayProfile_->setObjectName(
-		QStringLiteral("settingsReplayApplyButton"));
+	applyReplayProfile_ = new QPushButton(text(strings::kVerticalReplayApply), replayActions);
+	applyReplayProfile_->setObjectName(QStringLiteral("settingsReplayApplyButton"));
 	applyReplayProfile_->setProperty("controlRole", QStringLiteral("primary"));
 	replayActionsLayout->addWidget(applyReplayProfile_);
 	replayActionsLayout->addStretch(1);
 	replay->contentLayout()->addWidget(replayActions);
 
 	replayProfileStatus_ = new QLabel(replay);
-	replayProfileStatus_->setObjectName(
-		QStringLiteral("settingsReplayProfileStatus"));
+	replayProfileStatus_->setObjectName(QStringLiteral("settingsReplayProfileStatus"));
 	replayProfileStatus_->setWordWrap(true);
-	replayProfileStatus_->setProperty("notificationTone",
-					 QStringLiteral("info"));
+	replayProfileStatus_->setProperty("notificationTone", QStringLiteral("info"));
 	replay->contentLayout()->addWidget(replayProfileStatus_);
 
 	auto *paths = addSection(strings::kSettingsPaths, QStringLiteral("settingsPathsSection"));
@@ -527,8 +489,8 @@ void SettingsTab::buildUi()
 	addText(names, strings::kSettingsNameTemplate, QStringLiteral("fileNameTemplateEdit"),
 		QString::fromStdString(settings.fileNameTemplate));
 
-	auto *notifications = addSection(strings::kSettingsNotificationsSection,
-					 QStringLiteral("settingsNotificationsSection"));
+	auto *notifications =
+		addSection(strings::kSettingsNotificationsSection, QStringLiteral("settingsNotificationsSection"));
 	addToggle(notifications, strings::kSettingsInsideObs, QStringLiteral("insideObsNotificationCheck"),
 		  settings.notificationsEnabled);
 	addCombo(notifications, strings::kSettingsDetail, QStringLiteral("notificationDetailCombo"),
@@ -561,42 +523,35 @@ void SettingsTab::buildUi()
 		 {text(strings::kSettingsLow), text(strings::kSettingsBalanced), text(strings::kSettingsHigh),
 		  text(strings::kSettingsMaximum)},
 		 settings.exportQuality == ExportQuality::Low ? 0 : static_cast<int>(settings.exportQuality) + 1);
-	auto *verticalResolution =
-		addCombo(exportSection, strings::kSettingsVerticalResolution,
-			 QStringLiteral("verticalResolutionCombo"),
-			 {QStringLiteral("1080p · %1 × %2")
-				  .arg(settings_constraints::kPortrait1080Width)
-				  .arg(settings_constraints::kPortrait1080Height),
-			  QStringLiteral("2K · %1 × %2")
-				  .arg(settings_constraints::kPortrait1440Width)
-				  .arg(settings_constraints::kPortrait1440Height),
-			  QStringLiteral("4K · %1 × %2")
-				  .arg(settings_constraints::kPortrait2160Width)
-				  .arg(settings_constraints::kPortrait2160Height),
-			  QStringLiteral("8K · %1 × %2")
-				  .arg(settings_constraints::kPortrait4320Width)
-				  .arg(settings_constraints::kPortrait4320Height),
-			  QStringLiteral("720p · %1 × %2")
-				  .arg(settings_constraints::kPortrait720Width)
-				  .arg(settings_constraints::kPortrait720Height),
-			  text(strings::kVerticalCustom)},
-			 0);
+	auto *verticalResolution = addCombo(exportSection, strings::kSettingsVerticalResolution,
+					    QStringLiteral("verticalResolutionCombo"),
+					    {QStringLiteral("1080p · %1 × %2")
+						     .arg(settings_constraints::kPortrait1080Width)
+						     .arg(settings_constraints::kPortrait1080Height),
+					     QStringLiteral("2K · %1 × %2")
+						     .arg(settings_constraints::kPortrait1440Width)
+						     .arg(settings_constraints::kPortrait1440Height),
+					     QStringLiteral("4K · %1 × %2")
+						     .arg(settings_constraints::kPortrait2160Width)
+						     .arg(settings_constraints::kPortrait2160Height),
+					     QStringLiteral("8K · %1 × %2")
+						     .arg(settings_constraints::kPortrait4320Width)
+						     .arg(settings_constraints::kPortrait4320Height),
+					     QStringLiteral("720p · %1 × %2")
+						     .arg(settings_constraints::kPortrait720Width)
+						     .arg(settings_constraints::kPortrait720Height),
+					     text(strings::kVerticalCustom)},
+					    0);
 	static constexpr VerticalResolution resolutionValues[] = {
-		VerticalResolution::Portrait1080, VerticalResolution::Portrait1440,
-		VerticalResolution::Portrait2160, VerticalResolution::Portrait4320,
-		VerticalResolution::Portrait720, VerticalResolution::Custom};
+		VerticalResolution::Portrait1080, VerticalResolution::Portrait1440, VerticalResolution::Portrait2160,
+		VerticalResolution::Portrait4320, VerticalResolution::Portrait720,  VerticalResolution::Custom};
 	for (int index = 0; index < verticalResolution->count(); ++index)
-		verticalResolution->setItemData(
-			index, static_cast<int>(resolutionValues[index]));
-	const auto selectedResolution = verticalResolution->findData(
-		static_cast<int>(settings.verticalResolution));
-	verticalResolution->setCurrentIndex(selectedResolution < 0 ? 0
-								 : selectedResolution);
-	verticalResolution->setProperty("lastValidValue",
-					verticalResolution->currentIndex());
+		verticalResolution->setItemData(index, static_cast<int>(resolutionValues[index]));
+	const auto selectedResolution = verticalResolution->findData(static_cast<int>(settings.verticalResolution));
+	verticalResolution->setCurrentIndex(selectedResolution < 0 ? 0 : selectedResolution);
+	verticalResolution->setProperty("lastValidValue", verticalResolution->currentIndex());
 
-	auto *integrations =
-		addSection(strings::kSettingsIntegrations, QStringLiteral("settingsIntegrationsSection"));
+	auto *integrations = addSection(strings::kSettingsIntegrations, QStringLiteral("settingsIntegrationsSection"));
 	integrations->contentLayout()->addWidget(new IntegrationsPanel(translator_, chatManager_, {}, integrations));
 
 	auto *ai = addSection(strings::kSettingsAiAssistant, QStringLiteral("settingsAiSection"));
@@ -629,15 +584,18 @@ void SettingsTab::buildUi()
 	auto *account = addSection(strings::kSettingsProAccount, QStringLiteral("settingsProAccountSection"));
 	auto *remote = addSection(strings::kSettingsRemoteClipper, QStringLiteral("settingsRemoteClipperSection"));
 	remote->setHelpText(text(strings::kSettingsRemoteDescription));
-	addToggle(remote, strings::kSettingsRemoteAllowCommands,
-		  QStringLiteral("remoteCommandsEnabledCheck"), settings.remoteCommandsEnabled);
+	addToggle(remote, strings::kSettingsRemoteAllowCommands, QStringLiteral("remoteCommandsEnabledCheck"),
+		  settings.remoteCommandsEnabled);
 	auto *statusGrid = new RemoteStatusGrid(remote);
 	statusGrid->addTile(remoteStatusTile(text(strings::kSettingsRemoteConnectionTitle), remoteConnectionStatus_,
-		text(strings::kSettingsRemoteOffline), QStringLiteral("remoteClipperConnectionStatus"), statusGrid));
+					     text(strings::kSettingsRemoteOffline),
+					     QStringLiteral("remoteClipperConnectionStatus"), statusGrid));
 	statusGrid->addTile(remoteStatusTile(text(strings::kSettingsRemoteSessionTitle), remoteSessionStatus_,
-		text(strings::kSettingsRemoteNoSession), QStringLiteral("remoteClipperSessionStatus"), statusGrid));
+					     text(strings::kSettingsRemoteNoSession),
+					     QStringLiteral("remoteClipperSessionStatus"), statusGrid));
 	statusGrid->addTile(remoteStatusTile(text(strings::kSettingsRemoteHeartbeatTitle), remoteHeartbeatStatus_,
-		text(strings::kSettingsRemoteNoHeartbeat), QStringLiteral("remoteClipperHeartbeatStatus"), statusGrid));
+					     text(strings::kSettingsRemoteNoHeartbeat),
+					     QStringLiteral("remoteClipperHeartbeatStatus"), statusGrid));
 	remote->contentLayout()->addWidget(statusGrid);
 	remoteAuthenticateButton_ = new QPushButton(text(strings::kSettingsRemoteAuthenticate), remote);
 	remoteAuthenticateButton_->setObjectName(QStringLiteral("remoteClipperAuthenticateButton"));
@@ -650,8 +608,7 @@ void SettingsTab::buildUi()
 	remoteAuthenticationMessage_->setWordWrap(true);
 	remoteAuthenticationMessage_->hide();
 	remote->contentLayout()->addWidget(remoteAuthenticationMessage_);
-	auto *remoteAccountButton = new QPushButton(
-		text(strings::kSettingsRemoteOpenAccount), remote);
+	auto *remoteAccountButton = new QPushButton(text(strings::kSettingsRemoteOpenAccount), remote);
 	remoteAccountButton->setObjectName(QStringLiteral("remoteClipperOpenAccountButton"));
 	remoteAccountButton->setProperty("buttonRole", QStringLiteral("secondary"));
 	remote->contentLayout()->addWidget(remoteAccountButton);
@@ -663,8 +620,7 @@ void SettingsTab::buildUi()
 	QUrl membershipUrl(QStringLiteral(CLIPX_SERVICE_BASE_URL));
 	membershipUrl.setPath(QStringLiteral("/account"));
 	membershipUrl.setFragment(QString());
-	account->contentLayout()->addWidget(new ProAccountTab(
-		translator_, licenseManager_, membershipUrl, account));
+	account->contentLayout()->addWidget(new ProAccountTab(translator_, licenseManager_, membershipUrl, account));
 
 	auto *support = addSection(strings::kSettingsSupport, QStringLiteral("settingsSupportSection"));
 	support->setHelpText(text(strings::kSettingsSupportDescription));
@@ -684,15 +640,13 @@ void SettingsTab::buildUi()
 	auto *reportBug = new QPushButton(text(strings::kSettingsReportBug), support);
 	reportBug->setObjectName(QStringLiteral("reportBugButton"));
 	reportBug->setProperty("controlRole", QStringLiteral("primary"));
-	connect(reportBug, &QPushButton::clicked, support, [supportUrl] {
-		QDesktopServices::openUrl(supportUrl(QStringLiteral("bug")));
-	});
+	connect(reportBug, &QPushButton::clicked, support,
+		[supportUrl] { QDesktopServices::openUrl(supportUrl(QStringLiteral("bug"))); });
 	auto *sendSuggestion = new QPushButton(text(strings::kSettingsSendSuggestion), support);
 	sendSuggestion->setObjectName(QStringLiteral("sendSuggestionButton"));
 	sendSuggestion->setProperty("controlRole", QStringLiteral("secondary"));
-	connect(sendSuggestion, &QPushButton::clicked, support, [supportUrl] {
-		QDesktopServices::openUrl(supportUrl(QStringLiteral("suggestion")));
-	});
+	connect(sendSuggestion, &QPushButton::clicked, support,
+		[supportUrl] { QDesktopServices::openUrl(supportUrl(QStringLiteral("suggestion"))); });
 	auto *supportActions = new QWidget(support);
 	supportActions->setObjectName(QStringLiteral("settingsSupportActions"));
 	auto *supportActionsLayout = new QHBoxLayout(supportActions);
@@ -718,31 +672,24 @@ void SettingsTab::updateResponsiveLayout()
 {
 	const bool compact = width() < 620;
 	compactLayout_ = compact;
-	if (auto *profileActions = findChild<QWidget *>(
-		    QStringLiteral("settingsProfileActions"))) {
+	if (auto *profileActions = findChild<QWidget *>(QStringLiteral("settingsProfileActions"))) {
 		if (auto *actions = qobject_cast<QBoxLayout *>(profileActions->layout()))
-			actions->setDirection(compact ? QBoxLayout::TopToBottom
-						      : QBoxLayout::LeftToRight);
+			actions->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
 	}
 	if (widthHint_ != nullptr)
 		widthHint_->setVisible(compact);
 
-	const int availableWidth = sectionsContainer_ != nullptr
-					   ? qMax(1, sectionsContainer_->width())
-					   : qMax(1, width());
-	const int columns = availableWidth >= 1600 ? 4
-			    : availableWidth >= 1080 ? 3
-			    : availableWidth >= 640  ? 2
-						     : 1;
+	const int availableWidth = sectionsContainer_ != nullptr ? qMax(1, sectionsContainer_->width())
+								 : qMax(1, width());
+	const int columns = availableWidth >= 1600 ? 4 : availableWidth >= 1080 ? 3 : availableWidth >= 640 ? 2 : 1;
 	if (sectionsGrid_ != nullptr && columns != sectionColumns_) {
 		while (auto *item = sectionsGrid_->takeAt(0))
 			delete item;
 		for (int column = 0; column < 4; ++column)
 			sectionsGrid_->setColumnStretch(column, 0);
 		for (std::size_t index = 0; index < sections_.size(); ++index) {
-			sectionsGrid_->addWidget(sections_[index],
-						static_cast<int>(index) / columns,
-						static_cast<int>(index) % columns);
+			sectionsGrid_->addWidget(sections_[index], static_cast<int>(index) / columns,
+						 static_cast<int>(index) % columns);
 		}
 		for (int column = 0; column < columns; ++column)
 			sectionsGrid_->setColumnStretch(column, 1);
@@ -783,8 +730,7 @@ void SettingsTab::refreshLicenseState()
 
 void SettingsTab::setRemoteClipperStatus(const remote::RemoteClipperStatus &status)
 {
-	if (remoteConnectionStatus_ == nullptr || remoteSessionStatus_ == nullptr ||
-	    remoteHeartbeatStatus_ == nullptr)
+	if (remoteConnectionStatus_ == nullptr || remoteSessionStatus_ == nullptr || remoteHeartbeatStatus_ == nullptr)
 		return;
 	QString connection = text(strings::kSettingsRemoteOffline);
 	QString tone = QStringLiteral("warning");
@@ -798,11 +744,9 @@ void SettingsTab::setRemoteClipperStatus(const remote::RemoteClipperStatus &stat
 		tone = QStringLiteral("info");
 		break;
 	case remote::RemoteConnectionState::Unauthorized:
-		connection = status.errorCode == "REMOTE_ADDON_REQUIRED"
-			? text(strings::kSettingsRemoteAddonRequired)
-			: status.errorCode == "PRO_REQUIRED"
-				? text(strings::kSettingsRemoteProRequired)
-				: text(strings::kSettingsRemoteUnauthorized);
+		connection = status.errorCode == "REMOTE_ADDON_REQUIRED" ? text(strings::kSettingsRemoteAddonRequired)
+			     : status.errorCode == "PRO_REQUIRED"        ? text(strings::kSettingsRemoteProRequired)
+									 : text(strings::kSettingsRemoteUnauthorized);
 		tone = QStringLiteral("error");
 		break;
 	case remote::RemoteConnectionState::Unavailable:
@@ -817,36 +761,36 @@ void SettingsTab::setRemoteClipperStatus(const remote::RemoteClipperStatus &stat
 	remoteConnectionStatus_->setProperty("notificationTone", tone);
 	remoteConnectionStatus_->style()->unpolish(remoteConnectionStatus_);
 	remoteConnectionStatus_->style()->polish(remoteConnectionStatus_);
-	remoteSessionStatus_->setText(status.sessionId.empty()
-		? text(strings::kSettingsRemoteNoSession)
-		: text(strings::kSettingsRemoteSession).arg(QString::fromStdString(status.sessionId)));
+	remoteSessionStatus_->setText(
+		status.sessionId.empty()
+			? text(strings::kSettingsRemoteNoSession)
+			: text(strings::kSettingsRemoteSession).arg(QString::fromStdString(status.sessionId)));
 	if (status.lastHeartbeatAt.has_value()) {
-		const auto seconds = std::max<long long>(0, std::chrono::duration_cast<std::chrono::seconds>(
-			std::chrono::system_clock::now() - *status.lastHeartbeatAt).count());
+		const auto seconds =
+			std::max<long long>(0, std::chrono::duration_cast<std::chrono::seconds>(
+						       std::chrono::system_clock::now() - *status.lastHeartbeatAt)
+						       .count());
 		remoteHeartbeatStatus_->setText(text(strings::kSettingsRemoteLastHeartbeat).arg(seconds));
 	} else {
 		remoteHeartbeatStatus_->setText(text(strings::kSettingsRemoteNoHeartbeat));
 	}
-	const bool authorizationRequired =
-		status.connection == remote::RemoteConnectionState::Unauthorized &&
-		status.errorCode != "REMOTE_ADDON_REQUIRED" && status.errorCode != "PRO_REQUIRED";
+	const bool authorizationRequired = status.connection == remote::RemoteConnectionState::Unauthorized &&
+					   status.errorCode != "REMOTE_ADDON_REQUIRED" &&
+					   status.errorCode != "PRO_REQUIRED";
 	if (remoteAuthenticateButton_ != nullptr) {
 		remoteAuthenticateButton_->setVisible(false);
 		remoteAuthenticateButton_->setEnabled(!remoteAuthenticationPending_ && licenseManager_ != nullptr);
 	}
-	if (!authorizationRequired && !remoteAuthenticationPending_ &&
-	    remoteAuthenticationMessage_ != nullptr)
+	if (!authorizationRequired && !remoteAuthenticationPending_ && remoteAuthenticationMessage_ != nullptr)
 		remoteAuthenticationMessage_->hide();
 }
 
-void SettingsTab::setRemoteAuthenticationRequestedCallback(
-	RemoteAuthenticationRequestedCallback callback)
+void SettingsTab::setRemoteAuthenticationRequestedCallback(RemoteAuthenticationRequestedCallback callback)
 {
 	remoteAuthenticationRequestedCallback_ = std::move(callback);
 }
 
-void SettingsTab::setRemoteClipperOpenRequestedCallback(
-	RemoteClipperOpenRequestedCallback callback)
+void SettingsTab::setRemoteClipperOpenRequestedCallback(RemoteClipperOpenRequestedCallback callback)
 {
 	remoteClipperOpenRequestedCallback_ = std::move(callback);
 }
@@ -856,8 +800,8 @@ void SettingsTab::setRemoteAuthenticationBusy(bool busy)
 	remoteAuthenticationPending_ = busy;
 	if (remoteAuthenticateButton_ == nullptr)
 		return;
-	remoteAuthenticateButton_->setText(text(busy ? strings::kSettingsRemoteAuthenticating
-						     : strings::kSettingsRemoteAuthenticate));
+	remoteAuthenticateButton_->setText(
+		text(busy ? strings::kSettingsRemoteAuthenticating : strings::kSettingsRemoteAuthenticate));
 	remoteAuthenticateButton_->setEnabled(!busy && licenseManager_ != nullptr);
 	if (busy)
 		remoteAuthenticateButton_->hide();
@@ -865,8 +809,7 @@ void SettingsTab::setRemoteAuthenticationBusy(bool busy)
 
 void SettingsTab::setRemoteCommandsEnabled(bool enabled)
 {
-	if (auto *control = findChild<QCheckBox *>(
-		    QStringLiteral("remoteCommandsEnabledCheck"))) {
+	if (auto *control = findChild<QCheckBox *>(QStringLiteral("remoteCommandsEnabledCheck"))) {
 		const QSignalBlocker blocker(control);
 		control->setChecked(enabled);
 	}
@@ -887,11 +830,10 @@ void SettingsTab::bindUi()
 	check("openDockAtStartupCheck", [](Settings &s, bool v) { s.openDockAtStartup = v; });
 	check("autoStartReplayCheck", [](Settings &s, bool v) { s.autoStartReplayBuffer = v; });
 	check("remoteCommandsEnabledCheck", [](Settings &s, bool v) { s.remoteCommandsEnabled = v; });
-	connect(remoteAuthenticateButton_, &QPushButton::clicked, this,
-		[this] {
-			if (remoteAuthenticationRequestedCallback_)
-				remoteAuthenticationRequestedCallback_();
-		});
+	connect(remoteAuthenticateButton_, &QPushButton::clicked, this, [this] {
+		if (remoteAuthenticationRequestedCallback_)
+			remoteAuthenticationRequestedCallback_();
+	});
 	check("confirmDeleteCheck", [](Settings &s, bool v) { s.confirmBeforeDelete = v; });
 	check("includeDateCheck", [](Settings &s, bool v) { s.includeDateInFileName = v; });
 	check("includeScoreCheck", [](Settings &s, bool v) { s.includeScoreInFileName = v; });
@@ -926,29 +868,23 @@ void SettingsTab::bindUi()
 							   ExportQuality::High, ExportQuality::Maximum};
 		s.exportQuality = values[v];
 	});
-	auto *verticalResolution =
-		findChild<QComboBox *>(QStringLiteral("verticalResolutionCombo"));
-	connect(verticalResolution, &QComboBox::currentIndexChanged, this,
-		[this, verticalResolution](int index) {
-			const auto value = static_cast<VerticalResolution>(
-				verticalResolution->itemData(index).toInt());
-			if (controller_->update([&](Settings &settings) {
-				    settings.verticalResolution = value;
-				    if (value != VerticalResolution::Custom) {
-					    const auto dimensions =
-						    verticalResolutionDimensions(value);
-					    settings.verticalWidth = dimensions.width;
-					    settings.verticalHeight = dimensions.height;
-				    }
-			    })) {
-				verticalResolution->setProperty("lastValidValue", index);
-			} else {
-				const QSignalBlocker blocker(verticalResolution);
-				verticalResolution->setCurrentIndex(
-					verticalResolution->property("lastValidValue")
-						.toInt());
-			}
-		});
+	auto *verticalResolution = findChild<QComboBox *>(QStringLiteral("verticalResolutionCombo"));
+	connect(verticalResolution, &QComboBox::currentIndexChanged, this, [this, verticalResolution](int index) {
+		const auto value = static_cast<VerticalResolution>(verticalResolution->itemData(index).toInt());
+		if (controller_->update([&](Settings &settings) {
+			    settings.verticalResolution = value;
+			    if (value != VerticalResolution::Custom) {
+				    const auto dimensions = verticalResolutionDimensions(value);
+				    settings.verticalWidth = dimensions.width;
+				    settings.verticalHeight = dimensions.height;
+			    }
+		    })) {
+			verticalResolution->setProperty("lastValidValue", index);
+		} else {
+			const QSignalBlocker blocker(verticalResolution);
+			verticalResolution->setCurrentIndex(verticalResolution->property("lastValidValue").toInt());
+		}
+	});
 	combo("aiLanguageCombo", [](Settings &s, int v) {
 		static constexpr const char *values[] = {"auto", "es", "en"};
 		s.aiLanguage = values[v];
@@ -1015,33 +951,24 @@ void SettingsTab::bindUi()
 	}
 
 	connect(applyReplayProfile_, &QPushButton::clicked, this, [this] {
-		if (!replayObsBridge_.applyReplayProfile ||
-		    replayEncoder_ == nullptr || replayEnabled_ == nullptr ||
+		if (!replayObsBridge_.applyReplayProfile || replayEncoder_ == nullptr || replayEnabled_ == nullptr ||
 		    replayProfileStatus_ == nullptr)
 			return;
 
 		const auto result = replayObsBridge_.applyReplayProfile(
-			replayEncoder_->currentData().toString().toStdString(),
-			replayEnabled_->isChecked());
+			replayEncoder_->currentData().toString().toStdString(), replayEnabled_->isChecked());
 		if (!result.success) {
-			replayProfileStatus_->setProperty(
-				"notificationTone", QStringLiteral("error"));
-			replayProfileStatus_->setText(
-				QString::fromStdString(result.message));
-			replayProfileStatus_->style()->unpolish(
-				replayProfileStatus_);
-			replayProfileStatus_->style()->polish(
-				replayProfileStatus_);
+			replayProfileStatus_->setProperty("notificationTone", QStringLiteral("error"));
+			replayProfileStatus_->setText(QString::fromStdString(result.message));
+			replayProfileStatus_->style()->unpolish(replayProfileStatus_);
+			replayProfileStatus_->style()->polish(replayProfileStatus_);
 			return;
 		}
 
 		refreshReplayProfile();
-		replayProfileStatus_->setProperty(
-			"notificationTone", QStringLiteral("success"));
-		replayProfileStatus_->setText(
-			result.restartRequired
-				? text(strings::kVerticalReplayRestart)
-				: QString::fromStdString(result.message));
+		replayProfileStatus_->setProperty("notificationTone", QStringLiteral("success"));
+		replayProfileStatus_->setText(result.restartRequired ? text(strings::kVerticalReplayRestart)
+								     : QString::fromStdString(result.message));
 		replayProfileStatus_->style()->unpolish(replayProfileStatus_);
 		replayProfileStatus_->style()->polish(replayProfileStatus_);
 		if (result.restartRequired)
@@ -1051,22 +978,19 @@ void SettingsTab::bindUi()
 
 void SettingsTab::refreshReplayProfile()
 {
-	if (replayEncoder_ == nullptr || replayEnabled_ == nullptr ||
-	    applyReplayProfile_ == nullptr || replayProfileStatus_ == nullptr)
+	if (replayEncoder_ == nullptr || replayEnabled_ == nullptr || applyReplayProfile_ == nullptr ||
+	    replayProfileStatus_ == nullptr)
 		return;
 
-	const bool available =
-		static_cast<bool>(replayObsBridge_.replayEncoders) &&
-		static_cast<bool>(replayObsBridge_.replayProfile) &&
-		static_cast<bool>(replayObsBridge_.applyReplayProfile);
+	const bool available = static_cast<bool>(replayObsBridge_.replayEncoders) &&
+			       static_cast<bool>(replayObsBridge_.replayProfile) &&
+			       static_cast<bool>(replayObsBridge_.applyReplayProfile);
 	replayEncoder_->setEnabled(available);
 	replayEnabled_->setEnabled(available);
 	applyReplayProfile_->setEnabled(available);
 	if (!available) {
-		replayProfileStatus_->setProperty(
-			"notificationTone", QStringLiteral("info"));
-		replayProfileStatus_->setText(
-			text(strings::kVerticalReplayUnavailable));
+		replayProfileStatus_->setProperty("notificationTone", QStringLiteral("info"));
+		replayProfileStatus_->setText(text(strings::kVerticalReplayUnavailable));
 		replayProfileStatus_->style()->unpolish(replayProfileStatus_);
 		replayProfileStatus_->style()->polish(replayProfileStatus_);
 		return;
@@ -1077,19 +1001,14 @@ void SettingsTab::refreshReplayProfile()
 	const QSignalBlocker blockEnabled(replayEnabled_);
 	replayEncoder_->clear();
 	for (const auto &option : replayObsBridge_.replayEncoders()) {
-		const auto label =
-			QString::fromStdString(option.displayName) +
-			(option.hardware ? QStringLiteral(" - GPU")
-					 : QStringLiteral(" - CPU"));
-		replayEncoder_->addItem(
-			label, QString::fromStdString(option.id));
+		const auto label = QString::fromStdString(option.displayName) +
+				   (option.hardware ? QStringLiteral(" - GPU") : QStringLiteral(" - CPU"));
+		replayEncoder_->addItem(label, QString::fromStdString(option.id));
 	}
-	auto index = replayEncoder_->findData(
-		QString::fromStdString(profile.encoderId));
+	auto index = replayEncoder_->findData(QString::fromStdString(profile.encoderId));
 	if (index < 0 && !profile.encoderId.empty()) {
-		replayEncoder_->addItem(
-			QString::fromStdString(profile.encoderDisplayName),
-			QString::fromStdString(profile.encoderId));
+		replayEncoder_->addItem(QString::fromStdString(profile.encoderDisplayName),
+					QString::fromStdString(profile.encoderId));
 		index = replayEncoder_->count() - 1;
 	}
 	int popupWidth = replayEncoder_->minimumWidth();
@@ -1097,65 +1016,42 @@ void SettingsTab::refreshReplayProfile()
 	for (int item = 0; item < replayEncoder_->count(); ++item) {
 		const auto label = replayEncoder_->itemText(item);
 		replayEncoder_->setItemData(item, label, Qt::ToolTipRole);
-		popupWidth = std::max(
-			popupWidth, popupMetrics.horizontalAdvance(label) + 48);
+		popupWidth = std::max(popupWidth, popupMetrics.horizontalAdvance(label) + 48);
 	}
 	replayEncoder_->view()->setMinimumWidth(popupWidth);
 	replayEncoder_->setCurrentIndex(index < 0 ? 0 : index);
 	replayEnabled_->setChecked(profile.replayBufferEnabled);
-	replayProfileStatus_->setProperty(
-		"notificationTone",
-		profile.hardwareEncoder ? QStringLiteral("success")
-					: QStringLiteral("warning"));
+	replayProfileStatus_->setProperty("notificationTone", profile.hardwareEncoder ? QStringLiteral("success")
+										      : QStringLiteral("warning"));
 	replayProfileStatus_->setText(
-		(profile.hardwareEncoder
-			 ? text(strings::kVerticalReplayHardware)
-			 : text(strings::kVerticalReplayCpu))
+		(profile.hardwareEncoder ? text(strings::kVerticalReplayHardware) : text(strings::kVerticalReplayCpu))
 			.arg(QString::fromStdString(profile.outputMode),
-			     QString::fromStdString(
-				     profile.encoderDisplayName)));
+			     QString::fromStdString(profile.encoderDisplayName)));
 	replayProfileStatus_->style()->unpolish(replayProfileStatus_);
 	replayProfileStatus_->style()->polish(replayProfileStatus_);
 }
 
 void SettingsTab::showReplayRestartDialog()
 {
-	auto *dialog = new QMessageBox(
-		QMessageBox::Question,
-		text(strings::kVerticalReplayRestartTitle),
-		text(strings::kVerticalReplayRestartBody),
-		QMessageBox::NoButton, this);
-	dialog->setObjectName(
-		QStringLiteral("settingsReplayRestartDialog"));
+	auto *dialog = new QMessageBox(QMessageBox::Question, text(strings::kVerticalReplayRestartTitle),
+				       text(strings::kVerticalReplayRestartBody), QMessageBox::NoButton, this);
+	dialog->setObjectName(QStringLiteral("settingsReplayRestartDialog"));
 	dialog->setAttribute(Qt::WA_DeleteOnClose);
-	auto *restartButton = dialog->addButton(
-		text(strings::kVerticalReplayRestartNow),
-		QMessageBox::AcceptRole);
-	restartButton->setObjectName(
-		QStringLiteral("settingsReplayRestartNowButton"));
-	dialog->addButton(text(strings::kVerticalReplayRestartLater),
-			  QMessageBox::RejectRole);
-	restartButton->setEnabled(
-		static_cast<bool>(replayObsBridge_.restartObs));
+	auto *restartButton = dialog->addButton(text(strings::kVerticalReplayRestartNow), QMessageBox::AcceptRole);
+	restartButton->setObjectName(QStringLiteral("settingsReplayRestartNowButton"));
+	dialog->addButton(text(strings::kVerticalReplayRestartLater), QMessageBox::RejectRole);
+	restartButton->setEnabled(static_cast<bool>(replayObsBridge_.restartObs));
 	connect(restartButton, &QPushButton::clicked, this, [this] {
 		std::string error;
-		if (!replayObsBridge_.restartObs ||
-		    !replayObsBridge_.restartObs(&error)) {
-			replayProfileStatus_->setProperty(
-				"notificationTone", QStringLiteral("error"));
-			replayProfileStatus_->setText(
-				QString::fromStdString(error));
+		if (!replayObsBridge_.restartObs || !replayObsBridge_.restartObs(&error)) {
+			replayProfileStatus_->setProperty("notificationTone", QStringLiteral("error"));
+			replayProfileStatus_->setText(QString::fromStdString(error));
 		} else {
-			replayProfileStatus_->setProperty(
-				"notificationTone",
-				QStringLiteral("success"));
-			replayProfileStatus_->setText(text(
-				strings::kVerticalReplayRestartScheduled));
+			replayProfileStatus_->setProperty("notificationTone", QStringLiteral("success"));
+			replayProfileStatus_->setText(text(strings::kVerticalReplayRestartScheduled));
 		}
-		replayProfileStatus_->style()->unpolish(
-			replayProfileStatus_);
-		replayProfileStatus_->style()->polish(
-			replayProfileStatus_);
+		replayProfileStatus_->style()->unpolish(replayProfileStatus_);
+		replayProfileStatus_->style()->polish(replayProfileStatus_);
 	});
 	dialog->setWindowModality(Qt::WindowModal);
 	dialog->show();
@@ -1170,8 +1066,7 @@ QCheckBox *SettingsTab::addToggle(SettingsSection *section, const char *labelKey
 	control->setProperty("lastValidValue", checked);
 	control->setAccessibleName(text(labelKey));
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		formRow(text(labelKey), text(key.constData()), control, section));
+	section->contentLayout()->addWidget(formRow(text(labelKey), text(key.constData()), control, section));
 	return control;
 }
 
@@ -1185,8 +1080,7 @@ QSpinBox *SettingsTab::addSpin(SettingsSection *section, const char *labelKey, c
 	control->setProperty("lastValidValue", value);
 	control->setSuffix(text(strings::kSettingsSecondsSuffix));
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		formRow(text(labelKey), text(key.constData()), control, section));
+	section->contentLayout()->addWidget(formRow(text(labelKey), text(key.constData()), control, section));
 	return control;
 }
 
@@ -1199,8 +1093,7 @@ QComboBox *SettingsTab::addCombo(SettingsSection *section, const char *labelKey,
 	control->setCurrentIndex(current);
 	control->setProperty("lastValidValue", current);
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		formRow(text(labelKey), text(key.constData()), control, section));
+	section->contentLayout()->addWidget(formRow(text(labelKey), text(key.constData()), control, section));
 	return control;
 }
 
@@ -1232,8 +1125,7 @@ QLineEdit *SettingsTab::addPath(SettingsSection *section, const char *labelKey, 
 	layout->addWidget(change);
 	layout->addWidget(open);
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		pathFormRow(text(labelKey), text(key.constData()), container, section));
+	section->contentLayout()->addWidget(pathFormRow(text(labelKey), text(key.constData()), container, section));
 	return field;
 }
 
@@ -1244,8 +1136,7 @@ QLineEdit *SettingsTab::addText(SettingsSection *section, const char *labelKey, 
 	control->setObjectName(objectName);
 	control->setMaxLength(settings_constraints::kMaxFileNameTemplateLength);
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		formRow(text(labelKey), text(key.constData()), control, section));
+	section->contentLayout()->addWidget(formRow(text(labelKey), text(key.constData()), control, section));
 	return control;
 }
 
@@ -1257,28 +1148,23 @@ QKeySequenceEdit *SettingsTab::addHotkey(SettingsSection *section, const char *l
 	control->setProperty("lastValidValue", control->keySequence().toString(QKeySequence::PortableText));
 	control->setToolTip(text(strings::kSettingsHotkeysManagedByObs));
 	const auto key = helpKey(objectName);
-	section->contentLayout()->addWidget(
-		formRow(text(labelKey), text(key.constData()), control, section));
+	section->contentLayout()->addWidget(formRow(text(labelKey), text(key.constData()), control, section));
 	return control;
 }
 
 SettingsSection *SettingsTab::addSection(const char *titleKey, const QString &objectName)
 {
 	const auto sectionNumber = static_cast<int>(sections_.size()) + 1;
-	auto *section = new SettingsSection(
-		QStringLiteral("%1. %2").arg(sectionNumber).arg(text(titleKey)),
-		sectionsContainer_ != nullptr ? sectionsContainer_ : this);
+	auto *section = new SettingsSection(QStringLiteral("%1. %2").arg(sectionNumber).arg(text(titleKey)),
+					    sectionsContainer_ != nullptr ? sectionsContainer_ : this);
 	section->setObjectName(objectName);
 	section->setProperty("settingsRole", QStringLiteral("section"));
-	section->setProperty("sectionTone", sectionNumber % 3 == 1
-						 ? QStringLiteral("purple")
-					 : sectionNumber % 3 == 2
-						 ? QStringLiteral("cyan")
-						 : QStringLiteral("blue"));
+	section->setProperty("sectionTone", sectionNumber % 3 == 1   ? QStringLiteral("purple")
+					    : sectionNumber % 3 == 2 ? QStringLiteral("cyan")
+								     : QStringLiteral("blue"));
 	section->setMinimumWidth(0);
 	section->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
-	const auto sectionHelpKey =
-		QStringLiteral("Settings.Section.Help.%1").arg(objectName).toUtf8();
+	const auto sectionHelpKey = QStringLiteral("Settings.Section.Help.%1").arg(objectName).toUtf8();
 	section->setHelpText(text(sectionHelpKey.constData()));
 	sections_.push_back(section);
 	return section;

@@ -11,8 +11,7 @@ namespace {
 
 const QRegularExpression &hashtagExpression()
 {
-	static const QRegularExpression expression(
-		QStringLiteral(R"((?<!\S)#[\p{L}\p{M}\p{N}_]+)"));
+	static const QRegularExpression expression(QStringLiteral(R"((?<!\S)#[\p{L}\p{M}\p{N}_]+)"));
 	return expression;
 }
 
@@ -64,8 +63,7 @@ QString boundedSocialBody(QString value)
 	value = oneLine(std::move(value));
 	if (characterCount(value) <= kSocialCaptionMaximumBodyCharacters)
 		return value;
-	QString clipped = leftCharacters(
-		value, kSocialCaptionMaximumBodyCharacters - 1).trimmed();
+	QString clipped = leftCharacters(value, kSocialCaptionMaximumBodyCharacters - 1).trimmed();
 	const auto lastSpace = clipped.lastIndexOf(QLatin1Char(' '));
 	if (lastSpace >= kSocialCaptionMaximumBodyCharacters * 3 / 4)
 		clipped = clipped.left(lastSpace).trimmed();
@@ -74,8 +72,7 @@ QString boundedSocialBody(QString value)
 
 } // namespace
 
-QString formatSocialCaption(const QString &caption, const QStringList &hashtags,
-			    const QString &supportingParagraph)
+QString formatSocialCaption(const QString &caption, const QStringList &hashtags, const QString &supportingParagraph)
 {
 	QStringList candidates = hashtags;
 	candidates.append(hashtagsIn(caption));
@@ -99,10 +96,8 @@ QString formatSocialCaption(const QString &caption, const QStringList &hashtags,
 		QString supporting = supportingParagraph;
 		supporting.remove(hashtagExpression());
 		supporting = oneLine(supporting);
-		if (!supporting.isEmpty() &&
-		    !body.contains(supporting, Qt::CaseInsensitive))
-			body = body.isEmpty() ? supporting
-					      : body + QLatin1Char(' ') + supporting;
+		if (!supporting.isEmpty() && !body.contains(supporting, Qt::CaseInsensitive))
+			body = body.isEmpty() ? supporting : body + QLatin1Char(' ') + supporting;
 	}
 	body = boundedSocialBody(body);
 	if (accepted.isEmpty())
@@ -125,16 +120,14 @@ QString formatYouTubeShortsCaption(const QString &title, const QString &socialCa
 	QString result;
 	if (!hashtags.isEmpty()) {
 		const auto first = hashtags.front();
-		const int titleLimit = std::max(
-			0, kYouTubeShortsMaximumCharacters - characterCount(first) - 1);
+		const int titleLimit = std::max(0, kYouTubeShortsMaximumCharacters - characterCount(first) - 1);
 		result = leftCharacters(cleanTitle, titleLimit).trimmed();
 		if (!result.isEmpty())
 			result += QLatin1Char(' ');
 		result += leftCharacters(first, kYouTubeShortsMaximumCharacters);
 		for (int index = 1; index < hashtags.size(); ++index) {
 			const auto candidate = QStringLiteral(" ") + hashtags[index];
-			if (characterCount(result) + characterCount(candidate) >
-			    kYouTubeShortsMaximumCharacters)
+			if (characterCount(result) + characterCount(candidate) > kYouTubeShortsMaximumCharacters)
 				break;
 			result += candidate;
 		}

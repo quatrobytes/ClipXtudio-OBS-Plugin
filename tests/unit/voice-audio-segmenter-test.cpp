@@ -21,8 +21,7 @@ int main()
 	VoiceAudioSegmenter segmenter(config);
 
 	std::vector<std::int16_t> silence(250, 0);
-	expect(segmenter.push(silence.data(), silence.size()).empty(),
-	       "silence must not produce recognition work");
+	expect(segmenter.push(silence.data(), silence.size()).empty(), "silence must not produce recognition work");
 
 	std::vector<std::int16_t> sparseNoise(100, 0);
 	for (std::size_t index = 0; index < sparseNoise.size(); index += 10)
@@ -31,15 +30,12 @@ int main()
 	       "isolated sample spikes must not open a speech segment");
 
 	std::vector<std::int16_t> speech(250, 4000);
-	expect(segmenter.push(speech.data(), speech.size()).empty(),
-	       "active speech must remain buffered");
+	expect(segmenter.push(speech.data(), speech.size()).empty(), "active speech must remain buffered");
 	auto completed = segmenter.push(silence.data(), 100);
 	expect(completed.size() == 1, "trailing silence must close one utterance");
-	expect(completed.front().sampleRateHz == 1000 &&
-		       completed.front().duration.count() == 350,
+	expect(completed.front().sampleRateHz == 1000 && completed.front().duration.count() == 350,
 	       "segment metadata must describe captured OBS audio");
-	expect(std::count(completed.front().pcmMono.begin(),
-			  completed.front().pcmMono.end(), 4000) == 250,
+	expect(std::count(completed.front().pcmMono.begin(), completed.front().pcmMono.end(), 4000) == 250,
 	       "segment must preserve speech samples");
 
 	std::vector<std::int16_t> shortNoise(50, 4000);
@@ -49,8 +45,7 @@ int main()
 
 	std::vector<std::int16_t> longSpeech(1100, 5000);
 	completed = segmenter.push(longSpeech.data(), longSpeech.size());
-	expect(completed.size() == 1 &&
-		       completed.front().duration.count() == 1000,
+	expect(completed.size() == 1 && completed.front().duration.count() == 1000,
 	       "maximum duration must bound recognition latency and memory");
 
 	VoiceAudioSegmenter responsive;
@@ -64,8 +59,7 @@ int main()
 	VoiceAudioSegmenter continuousSpeech;
 	std::vector<std::int16_t> maximumWindow(19200, 2500);
 	completed = continuousSpeech.push(maximumWindow.data(), maximumWindow.size());
-	expect(completed.size() == 1 &&
-		       completed.front().duration.count() == 1200,
+	expect(completed.size() == 1 && completed.front().duration.count() == 1200,
 	       "continuous microphone input must reach recognition within 1.2 seconds");
 
 	return clipcoach::test::pass("voice-audio-segmenter-test");

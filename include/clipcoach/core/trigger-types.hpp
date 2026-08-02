@@ -38,8 +38,7 @@ struct TriggerConfiguration {
 
 struct TriggerSignal {
 	SmartTriggerType type{SmartTriggerType::Manual};
-	std::chrono::system_clock::time_point occurredAt{
-		std::chrono::system_clock::now()};
+	std::chrono::system_clock::time_point occurredAt{std::chrono::system_clock::now()};
 	double audioIntensity{0.0};
 	double chatActivity{0.0};
 	double voiceConfidence{0.0};

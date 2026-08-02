@@ -111,10 +111,8 @@ ClipLibrarySummary ClipLibraryViewModel::summary() const
 		result.favoriteClips += clip.isFavorite ? 1U : 0U;
 		result.verticalClips += isVertical(clip) ? 1U : 0U;
 		result.pendingClips +=
-			clip.exportStatus == ExportStatus::Pending ||
-					clip.exportStatus == ExportStatus::Exporting
-				? 1U
-				: 0U;
+			clip.exportStatus == ExportStatus::Pending || clip.exportStatus == ExportStatus::Exporting ? 1U
+														   : 0U;
 		result.capturedDurationSeconds += std::max(clip.durationSeconds, 0);
 	}
 

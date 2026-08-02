@@ -92,10 +92,8 @@ int main()
 	const auto verified = verifier.verify(token);
 	clipcoach::test::expect(verified.succeeded() && verified.claims->activationId == "activation",
 				"valid RS256 token must expose trusted claims");
-	clipcoach::test::expect(
-		verified.claims->licenseId == "42" &&
-			verified.claims->tokenVersion == 1,
-		"license id and revocation version must be verified claims");
+	clipcoach::test::expect(verified.claims->licenseId == "42" && verified.claims->tokenVersion == 1,
+				"license id and revocation version must be verified claims");
 
 	const auto legacyToken =
 		sign(key.get(), {{QStringLiteral("iss"), QStringLiteral("clipcoach-studio")},
@@ -108,10 +106,9 @@ int main()
 				 {QStringLiteral("install_id"), QStringLiteral("971a1d9e-d0f0-4e28-9483-1fc3b84c0c64")},
 				 {QStringLiteral("iat"), 2'000'000'000},
 				 {QStringLiteral("exp"), 2'000'003'600}});
-	clipcoach::test::expect(
-		verifier.verify(legacyToken).error ==
-			clipcoach::licensing::TokenVerificationError::InvalidClaims,
-		"tokens without license binding and token version must fail closed");
+	clipcoach::test::expect(verifier.verify(legacyToken).error ==
+					clipcoach::licensing::TokenVerificationError::InvalidClaims,
+				"tokens without license binding and token version must fail closed");
 
 	auto tampered = token;
 	tampered[tampered.size() / 2] = tampered[tampered.size() / 2] == 'a' ? 'b' : 'a';

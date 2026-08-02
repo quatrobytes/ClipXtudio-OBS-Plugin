@@ -48,9 +48,8 @@ int main()
 	clipcoach::test::expect(error.empty(), "first load must not produce an error");
 	clipcoach::test::expect(std::filesystem::exists(settingsPath), "settings file must exist after first load");
 	clipcoach::test::expect(firstRun.settings().language == "system", "first load must expose defaults");
-	clipcoach::test::expect(
-		firstRun.settings().verticalSceneName == "ClipXtudio Vertical",
-		"first load must select the managed vertical OBS scene by default");
+	clipcoach::test::expect(firstRun.settings().verticalSceneName == "ClipXtudio Vertical",
+				"first load must select the managed vertical OBS scene by default");
 
 	auto modified = firstRun.settings();
 	modified.language = "es-ES";
@@ -174,49 +173,43 @@ int main()
 					secondRun.settings().voiceAudioSourceName == "Mic/Aux" &&
 					secondRun.settings().voiceSpeechMode ==
 						clipcoach::SpeechProcessingMode::Local &&
-				!secondRun.settings().voiceCloudConsent,
+					!secondRun.settings().voiceCloudConsent,
 				"Voice Trigger local processing settings must persist");
 	const auto profilePath = temporaryDirectory.path() / "clipxtudio-profile.json";
-	clipcoach::test::expect(
-		secondRun.exportProfile(profilePath, &error) &&
-			std::filesystem::is_regular_file(profilePath),
-		"a complete portable JSON profile must be exported");
+	clipcoach::test::expect(secondRun.exportProfile(profilePath, &error) &&
+					std::filesystem::is_regular_file(profilePath),
+				"a complete portable JSON profile must be exported");
 	auto changedAfterExport = secondRun.settings();
 	changedAfterExport.voiceTriggerPhrasesCsv = "temporary phrase";
 	changedAfterExport.verticalSceneName = "Temporary Scene";
 	changedAfterExport.outputMode = clipcoach::CaptureOutputMode::Horizontal;
 	clipcoach::test::expect(secondRun.save(changedAfterExport, &error),
-			       "settings must be changeable after exporting a profile");
-	clipcoach::test::expect(
-		secondRun.importProfile(profilePath, &error) &&
-			secondRun.settings().voiceTriggerPhrasesCsv ==
-				"clip,save that,modo grinch" &&
-			secondRun.settings().verticalSceneName == "Gameplay" &&
-			secondRun.settings().outputMode ==
-				clipcoach::CaptureOutputMode::Both,
-		"importing a profile must atomically restore voice, vertical and capture settings");
+				"settings must be changeable after exporting a profile");
+	clipcoach::test::expect(secondRun.importProfile(profilePath, &error) &&
+					secondRun.settings().voiceTriggerPhrasesCsv == "clip,save that,modo grinch" &&
+					secondRun.settings().verticalSceneName == "Gameplay" &&
+					secondRun.settings().outputMode == clipcoach::CaptureOutputMode::Both,
+				"importing a profile must atomically restore voice, vertical and capture settings");
 	const auto corruptProfile = temporaryDirectory.path() / "corrupt-profile.json";
 	{
 		std::ofstream output(corruptProfile);
 		output << "{not valid json}";
 	}
 	const auto settingsBeforeCorruptImport = secondRun.settings();
-	clipcoach::test::expect(
-		!secondRun.importProfile(corruptProfile, &error) &&
-			secondRun.settings().voiceTriggerPhrasesCsv ==
-				settingsBeforeCorruptImport.voiceTriggerPhrasesCsv &&
-			secondRun.settings().verticalSceneName ==
-				settingsBeforeCorruptImport.verticalSceneName,
-		"an invalid profile must be rejected without changing active settings");
+	clipcoach::test::expect(!secondRun.importProfile(corruptProfile, &error) &&
+					secondRun.settings().voiceTriggerPhrasesCsv ==
+						settingsBeforeCorruptImport.voiceTriggerPhrasesCsv &&
+					secondRun.settings().verticalSceneName ==
+						settingsBeforeCorruptImport.verticalSceneName,
+				"an invalid profile must be rejected without changing active settings");
 	auto emptySceneSettings = secondRun.settings();
 	emptySceneSettings.verticalSceneName.clear();
 	clipcoach::test::expect(secondRun.save(emptySceneSettings, &error),
-			       "legacy empty vertical scene fixture must be saved");
+				"legacy empty vertical scene fixture must be saved");
 	clipcoach::SettingsManager repairedRun(settingsPath);
-	clipcoach::test::expect(
-		repairedRun.load(&error) &&
-			repairedRun.settings().verticalSceneName == "ClipXtudio Vertical",
-		"an existing empty vertical scene must be repaired to the managed default on load");
+	clipcoach::test::expect(repairedRun.load(&error) &&
+					repairedRun.settings().verticalSceneName == "ClipXtudio Vertical",
+				"an existing empty vertical scene must be repaired to the managed default on load");
 
 	return clipcoach::test::pass("settings-manager-test");
 }

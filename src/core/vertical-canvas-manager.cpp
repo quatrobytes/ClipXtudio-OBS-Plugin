@@ -179,11 +179,10 @@ bool VerticalCanvasManager::setObsSelection(std::string sceneName, std::string s
 	return settingsManager_.save(stored, error);
 }
 
-bool VerticalCanvasManager::setFraming(int zoomPercent, int panXPercent, int panYPercent,
-				       std::string *error)
+bool VerticalCanvasManager::setFraming(int zoomPercent, int panXPercent, int panYPercent, std::string *error)
 {
-	if (zoomPercent < 100 || zoomPercent > 300 || panXPercent < -100 ||
-	    panXPercent > 100 || panYPercent < -100 || panYPercent > 100)
+	if (zoomPercent < 100 || zoomPercent > 300 || panXPercent < -100 || panXPercent > 100 || panYPercent < -100 ||
+	    panYPercent > 100)
 		return fail(error, "vertical framing values are outside the supported range");
 	auto stored = settingsManager_.settings();
 	stored.verticalZoomPercent = zoomPercent;

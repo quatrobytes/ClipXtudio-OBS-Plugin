@@ -92,7 +92,8 @@ jobs:
           --filter 'src/security/'
           --exclude 'tests/'
           --fail-under-line 65
-          --xml-pretty coverage-native.xml
+          --cobertura-pretty
+          --cobertura coverage-native.xml
           --html-details coverage-native.html
 
       - name: Publish native coverage

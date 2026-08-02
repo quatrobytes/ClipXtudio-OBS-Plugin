@@ -142,10 +142,8 @@ bool validateSettings(const Settings &settings, std::string *error)
 	    settings.voiceTriggerPhrasesCsv.size() >
 		    static_cast<std::size_t>(settings_constraints::kMaxVoicePhraseListLength) ||
 	    !validTriggerText(settings.voiceTriggerPhrasesCsv) || !supportedVoiceLanguage ||
-	    settings.voiceAudioSourceName.size() > 512 ||
-	    !validTriggerText(settings.voiceAudioSourceName) ||
-	    settings.voiceSpeechMode != SpeechProcessingMode::Local ||
-	    settings.voiceCloudConsent) {
+	    settings.voiceAudioSourceName.size() > 512 || !validTriggerText(settings.voiceAudioSourceName) ||
+	    settings.voiceSpeechMode != SpeechProcessingMode::Local || settings.voiceCloudConsent) {
 		return fail(error, "voice trigger settings are invalid");
 	}
 	if (settings.aiLanguage != "auto" && settings.aiLanguage != "es" && settings.aiLanguage != "en")

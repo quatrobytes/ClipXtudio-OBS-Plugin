@@ -64,10 +64,8 @@ public:
 	[[nodiscard]] CaptureResult startReplayBuffer();
 	[[nodiscard]] CaptureResult stopReplayBuffer();
 	[[nodiscard]] CaptureResult captureManual(int durationSeconds);
-	[[nodiscard]] CaptureResult captureTriggered(int durationSeconds,
-						     TriggerType triggerType,
-						     std::string triggerLabel,
-						     int score = 0,
+	[[nodiscard]] CaptureResult captureTriggered(int durationSeconds, TriggerType triggerType,
+						     std::string triggerLabel, int score = 0,
 						     std::string requestedBy = {});
 	[[nodiscard]] bool capturePending() const noexcept;
 	[[nodiscard]] CaptureResult markMoment(std::string label = "manual", int secondsBeforeNow = 0);
@@ -95,11 +93,8 @@ private:
 		std::chrono::system_clock::time_point capturedAt;
 	};
 
-	[[nodiscard]] CaptureResult beginCapture(int durationSeconds,
-						TriggerType triggerType,
-						std::string triggerLabel,
-						int score,
-						std::string requestedBy = {});
+	[[nodiscard]] CaptureResult beginCapture(int durationSeconds, TriggerType triggerType, std::string triggerLabel,
+						 int score, std::string requestedBy = {});
 	void handleReplaySaved(const std::filesystem::path &sourcePath);
 	void reportError(CaptureError error, std::string message);
 

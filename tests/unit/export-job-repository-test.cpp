@@ -36,23 +36,18 @@ int main()
 	job.state = ExportJobState::Exporting;
 	job.progressPercent = 46;
 	job.updatedAt += std::chrono::seconds(1);
-	expect(exports.record(job).success,
-	       "export progress metadata must update");
+	expect(exports.record(job).success, "export progress metadata must update");
 	job.state = ExportJobState::Done;
 	job.progressPercent = 100;
 	job.updatedAt += std::chrono::seconds(1);
 	expect(exports.record(job).success, "done export metadata must update");
 
 	const auto restored = exports.findById(job.id);
-	expect(restored.success && restored.value.has_value() &&
-		       restored.value->state == ExportJobState::Done &&
-		       restored.value->progressPercent == 100 &&
-		       restored.value->outputPath == job.outputPath,
+	expect(restored.success && restored.value.has_value() && restored.value->state == ExportJobState::Done &&
+		       restored.value->progressPercent == 100 && restored.value->outputPath == job.outputPath,
 	       "export metadata must reconstruct from SQLite");
 	const auto byClip = exports.listByClip(clip.id);
-	expect(byClip.success && byClip.value.size() == 1,
-	       "exports must list by source clip");
+	expect(byClip.success && byClip.value.size() == 1, "exports must list by source clip");
 
 	return clipcoach::test::pass("export-job-repository-test");
 }
-

@@ -20,9 +20,8 @@ public:
 	ObsHotkeyAdapter();
 	~ObsHotkeyAdapter() override;
 
-	[[nodiscard]] HotkeyRegistration
-	registerHotkey(std::string name, std::string description,
-		       Callback callback) override;
+	[[nodiscard]] HotkeyRegistration registerHotkey(std::string name, std::string description,
+							Callback callback) override;
 	void unregisterHotkey(HotkeyHandle handle) noexcept override;
 
 	void startPersistence();
@@ -33,10 +32,8 @@ public:
 private:
 	struct Entry;
 
-	static void hotkeyCallback(void *data, obs_hotkey_id id,
-				   obs_hotkey_t *hotkey, bool pressed);
-	static void frontendSaveCallback(obs_data_t *saveData, bool saving,
-					 void *privateData);
+	static void hotkeyCallback(void *data, obs_hotkey_id id, obs_hotkey_t *hotkey, bool pressed);
+	static void frontendSaveCallback(obs_data_t *saveData, bool saving, void *privateData);
 	void save(obs_data_t *saveData);
 	void load(obs_data_t *saveData);
 

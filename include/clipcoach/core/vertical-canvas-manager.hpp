@@ -22,10 +22,8 @@ public:
 					 std::string *error = nullptr);
 	[[nodiscard]] bool selectTemplate(VerticalTemplateId id, std::string *error = nullptr);
 	[[nodiscard]] bool setElementEnabled(VerticalElementType type, bool enabled, std::string *error = nullptr);
-	[[nodiscard]] bool setObsSelection(std::string sceneName, std::string sourceName,
-					   std::string *error = nullptr);
-	[[nodiscard]] bool setFraming(int zoomPercent, int panXPercent, int panYPercent,
-				      std::string *error = nullptr);
+	[[nodiscard]] bool setObsSelection(std::string sceneName, std::string sourceName, std::string *error = nullptr);
+	[[nodiscard]] bool setFraming(int zoomPercent, int panXPercent, int panYPercent, std::string *error = nullptr);
 	[[nodiscard]] std::string selectedSceneName() const;
 	[[nodiscard]] std::string selectedSourceName() const;
 

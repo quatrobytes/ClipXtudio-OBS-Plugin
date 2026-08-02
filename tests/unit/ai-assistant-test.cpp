@@ -95,15 +95,14 @@ int main()
 	expect(SubtitleWriter::toSrt({{1000, 2500, "Hello"}}).find("00:00:01,000 --> 00:00:02,500") !=
 			       std::string::npos &&
 		       SubtitleWriter::toVtt({{1000, 2500, "Hello"}}).find("WEBVTT") == 0,
-		       "subtitle writers must use valid SRT and VTT timestamps");
+	       "subtitle writers must use valid SRT and VTT timestamps");
 
 	auto excessiveHashtags = *api.next.response;
 	excessiveHashtags.hashtags = {"#one", "#two", "#three", "#four", "#five", "#six"};
 	api.next.response = std::move(excessiveHashtags);
-	service.analyzeClip(clip, "text", configuration,
-			    [&](AiAssistantResult value) { result = std::move(value); });
-	expect(result.success && result.response.has_value() &&
-		       result.response->hashtags.size() == 5 && persisted.hashtags.size() == 5,
+	service.analyzeClip(clip, "text", configuration, [&](AiAssistantResult value) { result = std::move(value); });
+	expect(result.success && result.response.has_value() && result.response->hashtags.size() == 5 &&
+		       persisted.hashtags.size() == 5,
 	       "legacy backend responses must be accepted and normalized to five publishable hashtags");
 
 	configuration.language = static_cast<AiLanguage>(99);

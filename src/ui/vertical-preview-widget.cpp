@@ -7,8 +7,7 @@
 
 namespace clipcoach::ui {
 
-VerticalPreviewWidget::VerticalPreviewWidget(QWidget *parent)
-	: QWidget(parent)
+VerticalPreviewWidget::VerticalPreviewWidget(QWidget *parent) : QWidget(parent)
 {
 	setObjectName(QStringLiteral("verticalCanvasPreview"));
 	setMinimumSize(180, 320);
@@ -50,9 +49,7 @@ void VerticalPreviewWidget::paintEvent(QPaintEvent *)
 		canvasWidth = availableWidth;
 		canvasHeight = canvasWidth * 16 / 9;
 	}
-	const QRectF canvas((width() - canvasWidth) / 2.0,
-			    (height() - canvasHeight) / 2.0, canvasWidth,
-			    canvasHeight);
+	const QRectF canvas((width() - canvasWidth) / 2.0, (height() - canvasHeight) / 2.0, canvasWidth, canvasHeight);
 	painter.setPen(QPen(QColor(tokens::kBorder), 2));
 	painter.setBrush(QColor(tokens::kBackground));
 	painter.drawRoundedRect(canvas, tokens::kRadiusMd, tokens::kRadiusMd);
@@ -65,19 +62,14 @@ void VerticalPreviewWidget::paintEvent(QPaintEvent *)
 		if (!item.enabled) {
 			continue;
 		}
-		const QRectF elementRect(
-			canvas.x() + item.x * canvas.width(),
-			canvas.y() + item.y * canvas.height(),
-			item.width * canvas.width(),
-			item.height * canvas.height());
+		const QRectF elementRect(canvas.x() + item.x * canvas.width(), canvas.y() + item.y * canvas.height(),
+					 item.width * canvas.width(), item.height * canvas.height());
 		auto color = colors[static_cast<int>(item.type)];
 		color.setAlpha(145);
 		painter.setPen(QPen(color.lighter(145), 1));
 		painter.setBrush(color);
-		painter.drawRoundedRect(elementRect, tokens::kRadiusSm,
-					tokens::kRadiusSm);
+		painter.drawRoundedRect(elementRect, tokens::kRadiusSm, tokens::kRadiusSm);
 	}
 }
 
 } // namespace clipcoach::ui
-

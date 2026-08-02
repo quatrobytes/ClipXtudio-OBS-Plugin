@@ -23,4 +23,3 @@ private:
 };
 
 } // namespace clipcoach::ui
-

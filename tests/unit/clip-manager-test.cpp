@@ -17,10 +17,7 @@ namespace {
 class MockReplayManager final : public clipcoach::ReplayManager {
 public:
 	[[nodiscard]] clipcoach::ReplayState state() const noexcept override { return state_; }
-	[[nodiscard]] int bufferedDurationSeconds() const noexcept override
-	{
-		return bufferedSeconds;
-	}
+	[[nodiscard]] int bufferedDurationSeconds() const noexcept override { return bufferedSeconds; }
 
 	clipcoach::ReplayOperationResult start() override
 	{
@@ -115,20 +112,18 @@ int main()
 	replay.bufferedSeconds = 17;
 	ClipManager warmingManager(replay);
 	const auto warming = warmingManager.captureManual(30);
-	expect(!warming.accepted &&
-		       warming.error == CaptureError::ReplayBufferWarmingUp &&
-		       replay.saveCalls == 0,
+	expect(!warming.accepted && warming.error == CaptureError::ReplayBufferWarmingUp && replay.saveCalls == 0,
 	       "capture must not silently save a shorter clip while Replay Buffer is still filling");
 	replay.bufferedSeconds = std::numeric_limits<int>::max();
 	const auto fixedTime = system_clock::from_time_t(1785247509);
 	ClipManager manager(replay, [fixedTime] { return fixedTime; });
 	const auto marker = manager.markMoment("remote_clipper");
 	expect(marker.accepted && manager.markedMoments().size() == 1 &&
-	       manager.markedMoments().front().label == "remote_clipper",
+		       manager.markedMoments().front().label == "remote_clipper",
 	       "mark moment must record an immediate local timeline marker without saving Replay Buffer");
 	const auto delayedMarker = manager.markMoment("remote_clipper", 20);
 	expect(delayedMarker.accepted && manager.markedMoments().size() == 2 &&
-	       manager.markedMoments().back().markedAt == fixedTime - seconds(20),
+		       manager.markedMoments().back().markedAt == fixedTime - seconds(20),
 	       "remote mark moment must apply the editor delay to its local timeline timestamp");
 	manager.setCaptureContext("session-persisted", "0.2.0", [] { return std::string("Gameplay"); });
 	std::optional<clipcoach::ClipMetadata> persistenceCandidate;
@@ -161,37 +156,28 @@ int main()
 
 	const auto voiceReplayPath = directory / "Replay voice.mp4";
 	std::ofstream(voiceReplayPath).put('\0');
-	const auto voiceCapture =
-		manager.captureTriggered(90, clipcoach::TriggerType::Voice,
-					 "saca clip", 87);
-	expect(voiceCapture.accepted,
-	       "active Replay Buffer must accept a typed trigger capture");
+	const auto voiceCapture = manager.captureTriggered(90, clipcoach::TriggerType::Voice, "saca clip", 87);
+	expect(voiceCapture.accepted, "active Replay Buffer must accept a typed trigger capture");
 	replay.emitSaved(voiceReplayPath);
 	const auto &voiceClip = manager.sessionClips().back();
 	expect(voiceClip.triggerType == clipcoach::TriggerType::Voice,
 	       "triggered capture must preserve its trigger type");
-	expect(voiceClip.triggerLabel == "saca clip",
-	       "triggered capture must preserve the matched phrase");
-	expect(voiceClip.score == 87,
-	       "triggered capture must preserve the trigger score");
-	expect(voiceClip.fileName ==
-		       "ClipX_2026-07-28_14-05-09_sacaclip.mp4",
+	expect(voiceClip.triggerLabel == "saca clip", "triggered capture must preserve the matched phrase");
+	expect(voiceClip.score == 87, "triggered capture must preserve the trigger score");
+	expect(voiceClip.fileName == "ClipX_2026-07-28_14-05-09_sacaclip.mp4",
 	       "trigger phrase must produce a readable safe file name");
 
 	const auto remoteReplayPath = directory / "Replay remote.mp4";
 	std::ofstream(remoteReplayPath).put('\0');
-	const auto remoteCapture = manager.captureTriggered(
-		60, clipcoach::TriggerType::Manual, "remote_clipper", 0,
-		"editor@example.com");
+	const auto remoteCapture =
+		manager.captureTriggered(60, clipcoach::TriggerType::Manual, "remote_clipper", 0, "editor@example.com");
 	expect(remoteCapture.accepted, "remote capture must use the normal Replay Buffer path");
 	replay.emitSaved(remoteReplayPath);
 	const auto &remoteClip = manager.sessionClips().back();
 	expect(remoteClip.triggerType == clipcoach::TriggerType::Manual,
 	       "remote capture remains a manual OBS save at the trigger level");
-	expect(remoteClip.triggerLabel == "remote_clipper",
-	       "remote capture origin must not be overwritten as manual");
-	expect(remoteClip.requestedBy == "editor@example.com",
-	       "remote capture must preserve who requested it");
+	expect(remoteClip.triggerLabel == "remote_clipper", "remote capture origin must not be overwritten as manual");
+	expect(remoteClip.requestedBy == "editor@example.com", "remote capture must preserve who requested it");
 
 	std::filesystem::remove_all(directory);
 	return clipcoach::test::pass("clip-manager-test");

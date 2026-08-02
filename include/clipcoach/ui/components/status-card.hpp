@@ -17,8 +17,7 @@ enum class StatusTone {
 
 class StatusCard final : public QFrame {
 public:
-	explicit StatusCard(const QString &title, const QString &value, bool active = true,
-			    QWidget *parent = nullptr);
+	explicit StatusCard(const QString &title, const QString &value, bool active = true, QWidget *parent = nullptr);
 
 	void setValue(const QString &value);
 	void setActive(bool active);

@@ -12,9 +12,7 @@ namespace {
 std::string lower(std::string value)
 {
 	std::transform(value.begin(), value.end(), value.begin(),
-		       [](unsigned char character) {
-			       return static_cast<char>(std::tolower(character));
-		       });
+		       [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
 	return value;
 }
 
@@ -39,14 +37,11 @@ double strength(const TriggerSignal &signal) noexcept
 	return 0.0;
 }
 
-bool containsCaseInsensitive(const std::vector<std::string> &values,
-			     const std::string &candidate)
+bool containsCaseInsensitive(const std::vector<std::string> &values, const std::string &candidate)
 {
 	const auto expected = lower(candidate);
 	return std::any_of(values.begin(), values.end(),
-			   [&expected](const std::string &value) {
-				   return lower(value) == expected;
-			   });
+			   [&expected](const std::string &value) { return lower(value) == expected; });
 }
 
 } // namespace
@@ -91,30 +86,23 @@ const char *triggerActionName(TriggerAction action) noexcept
 
 TriggerEngine::TriggerEngine(bool proUnlocked) : proUnlocked_(proUnlocked)
 {
-	for (const auto type :
-	     {SmartTriggerType::Manual, SmartTriggerType::Voice,
-	      SmartTriggerType::AudioSpike, SmartTriggerType::ChatPulse,
-	      SmartTriggerType::Scene, SmartTriggerType::Keyword,
-	      SmartTriggerType::FutureAiHook}) {
+	for (const auto type : {SmartTriggerType::Manual, SmartTriggerType::Voice, SmartTriggerType::AudioSpike,
+				SmartTriggerType::ChatPulse, SmartTriggerType::Scene, SmartTriggerType::Keyword,
+				SmartTriggerType::FutureAiHook}) {
 		TriggerConfiguration config;
 		config.enabled = type == SmartTriggerType::Manual;
-		config.action = type == SmartTriggerType::Manual
-					? TriggerAction::MarkMoment
-					: TriggerAction::AddToRecommended;
+		config.action = type == SmartTriggerType::Manual ? TriggerAction::MarkMoment
+								 : TriggerAction::AddToRecommended;
 		configurations_.emplace(type, std::move(config));
 	}
 }
 
-bool TriggerEngine::setConfiguration(
-	SmartTriggerType type, const TriggerConfiguration &configuration,
-	std::string *error)
+bool TriggerEngine::setConfiguration(SmartTriggerType type, const TriggerConfiguration &configuration,
+				     std::string *error)
 {
-	if (configuration.preRollSeconds < 0 ||
-	    configuration.postRollSeconds < 0 ||
-	    configuration.preRollSeconds > 120 ||
-	    configuration.postRollSeconds > 120 ||
-	    configuration.sensitivity < 0 || configuration.sensitivity > 100 ||
-	    configuration.cooldown.count() < 0 ||
+	if (configuration.preRollSeconds < 0 || configuration.postRollSeconds < 0 ||
+	    configuration.preRollSeconds > 120 || configuration.postRollSeconds > 120 ||
+	    configuration.sensitivity < 0 || configuration.sensitivity > 100 || configuration.cooldown.count() < 0 ||
 	    configuration.duplicateWindow.count() < 0) {
 		if (error)
 			*error = "Invalid trigger timing or sensitivity";
@@ -131,13 +119,11 @@ bool TriggerEngine::setConfiguration(
 	return true;
 }
 
-TriggerConfiguration
-TriggerEngine::configuration(SmartTriggerType type) const
+TriggerConfiguration TriggerEngine::configuration(SmartTriggerType type) const
 {
 	std::scoped_lock lock(mutex_);
 	const auto iterator = configurations_.find(type);
-	return iterator == configurations_.end() ? TriggerConfiguration{}
-						 : iterator->second;
+	return iterator == configurations_.end() ? TriggerConfiguration{} : iterator->second;
 }
 
 void TriggerEngine::setProUnlocked(bool unlocked) noexcept
@@ -168,9 +154,7 @@ TriggerResult TriggerEngine::process(const TriggerSignal &signal)
 	return evaluateMoment({signal});
 }
 
-TriggerResult
-TriggerEngine::evaluateMoment(
-	const std::vector<TriggerSignal> &inputSignals)
+TriggerResult TriggerEngine::evaluateMoment(const std::vector<TriggerSignal> &inputSignals)
 {
 	TriggerResult result;
 	EventCallback callback;
@@ -189,8 +173,7 @@ TriggerEngine::evaluateMoment(
 	return result;
 }
 
-bool TriggerEngine::isEligible(const TriggerSignal &signal,
-			       const TriggerConfiguration &config,
+bool TriggerEngine::isEligible(const TriggerSignal &signal, const TriggerConfiguration &config,
 			       TriggerRejection &rejection) const
 {
 	if (!config.enabled) {
@@ -206,39 +189,30 @@ bool TriggerEngine::isEligible(const TriggerSignal &signal,
 		return false;
 	}
 	if (signal.type == SmartTriggerType::Keyword) {
-		const auto configured =
-			!signal.keyword.empty() &&
-			containsCaseInsensitive(config.keywords, signal.keyword);
-		const auto foundInText =
-			std::any_of(config.keywords.begin(), config.keywords.end(),
-				    [&signal](const std::string &keyword) {
-					    return !keyword.empty() &&
-						   lower(signal.text).find(
-							   lower(keyword)) !=
-							   std::string::npos;
-				    });
+		const auto configured = !signal.keyword.empty() &&
+					containsCaseInsensitive(config.keywords, signal.keyword);
+		const auto foundInText = std::any_of(
+			config.keywords.begin(), config.keywords.end(), [&signal](const std::string &keyword) {
+				return !keyword.empty() && lower(signal.text).find(lower(keyword)) != std::string::npos;
+			});
 		if (!configured && !foundInText) {
 			rejection = TriggerRejection::NotConfigured;
 			return false;
 		}
 	}
 	if (signal.type == SmartTriggerType::Scene &&
-	    (signal.scene.empty() ||
-	     !containsCaseInsensitive(config.scenes, signal.scene))) {
+	    (signal.scene.empty() || !containsCaseInsensitive(config.scenes, signal.scene))) {
 		rejection = TriggerRejection::NotConfigured;
 		return false;
 	}
-	if (std::clamp(strength(signal), 0.0, 1.0) <
-	    static_cast<double>(config.sensitivity) / 100.0) {
+	if (std::clamp(strength(signal), 0.0, 1.0) < static_cast<double>(config.sensitivity) / 100.0) {
 		rejection = TriggerRejection::BelowThreshold;
 		return false;
 	}
 	return true;
 }
 
-TriggerResult
-TriggerEngine::evaluateLocked(
-	const std::vector<TriggerSignal> &inputSignals)
+TriggerResult TriggerEngine::evaluateLocked(const std::vector<TriggerSignal> &inputSignals)
 {
 	if (inputSignals.empty())
 		return {{}, TriggerRejection::InvalidSignal};
@@ -260,37 +234,31 @@ TriggerEngine::evaluateLocked(
 	if (eligible.empty())
 		return {{}, lastRejection};
 
-	const auto primary = std::max_element(
-		eligible.begin(), eligible.end(),
-		[](const TriggerSignal &left, const TriggerSignal &right) {
-			return strength(left) < strength(right);
-		});
+	const auto primary = std::max_element(eligible.begin(), eligible.end(),
+					      [](const TriggerSignal &left, const TriggerSignal &right) {
+						      return strength(left) < strength(right);
+					      });
 	const auto &config = configurations_.at(primary->type);
 	const auto occurredAt = primary->occurredAt;
 
 	if (lastEventAt_) {
-		const auto delta = occurredAt >= *lastEventAt_
-					   ? occurredAt - *lastEventAt_
-					   : *lastEventAt_ - occurredAt;
+		const auto delta = occurredAt >= *lastEventAt_ ? occurredAt - *lastEventAt_
+							       : *lastEventAt_ - occurredAt;
 		if (delta <= config.duplicateWindow)
 			return {{}, TriggerRejection::Duplicate};
 	}
 	const bool savesMedia = config.action == TriggerAction::SaveClip ||
 				config.action == TriggerAction::SaveVerticalClip ||
 				config.action == TriggerAction::SaveBoth;
-	if (savesMedia && lastClipAt_ &&
-	    occurredAt >= *lastClipAt_ &&
-	    occurredAt - *lastClipAt_ < config.cooldown)
+	if (savesMedia && lastClipAt_ && occurredAt >= *lastClipAt_ && occurredAt - *lastClipAt_ < config.cooldown)
 		return {{}, TriggerRejection::Cooldown};
 
 	TriggerEvent event;
 	event.id = "trigger-" + std::to_string(nextEventId_++);
 	event.primaryType = primary->type;
 	event.occurredAt = occurredAt;
-	event.captureStart =
-		occurredAt - std::chrono::seconds(config.preRollSeconds);
-	event.captureEnd =
-		occurredAt + std::chrono::seconds(config.postRollSeconds);
+	event.captureStart = occurredAt - std::chrono::seconds(config.preRollSeconds);
+	event.captureEnd = occurredAt + std::chrono::seconds(config.postRollSeconds);
 	event.action = config.action;
 	event.score = scoreEngine_.calculate(eligible);
 	event.keyword = primary->keyword;
@@ -309,13 +277,11 @@ TriggerEngine::evaluateLocked(
 	return {event, TriggerRejection::None};
 }
 
-std::vector<TriggerEvent>
-TriggerEngine::recentEvents(std::size_t limit) const
+std::vector<TriggerEvent> TriggerEngine::recentEvents(std::size_t limit) const
 {
 	std::scoped_lock lock(mutex_);
 	const auto count = std::min(limit, recentEvents_.size());
-	return {recentEvents_.begin(), recentEvents_.begin() +
-						 static_cast<std::ptrdiff_t>(count)};
+	return {recentEvents_.begin(), recentEvents_.begin() + static_cast<std::ptrdiff_t>(count)};
 }
 
 void TriggerEngine::clearRecentEvents()

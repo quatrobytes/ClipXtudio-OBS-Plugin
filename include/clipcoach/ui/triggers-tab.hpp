@@ -22,7 +22,7 @@ class SettingsManager;
 class TriggerEngine;
 class VoiceTriggerController;
 struct VoiceRuntimeStatus;
-}
+} // namespace clipcoach
 
 namespace clipcoach::ui {
 
@@ -32,10 +32,8 @@ public:
 	using SceneProvider = std::function<std::vector<std::string>()>;
 	using TimingChangedCallback = std::function<void(int)>;
 
-	TriggersTab(TranslationFunction translator, TriggerEngine *engine,
-		    SettingsManager *settingsManager,
-		    QWidget *parent = nullptr,
-		    VoiceTriggerController *voiceController = nullptr,
+	TriggersTab(TranslationFunction translator, TriggerEngine *engine, SettingsManager *settingsManager,
+		    QWidget *parent = nullptr, VoiceTriggerController *voiceController = nullptr,
 		    SceneProvider sceneProvider = {});
 
 	void refreshRecentEvents();
@@ -46,10 +44,8 @@ public:
 private:
 	void resizeEvent(QResizeEvent *event) override;
 	[[nodiscard]] QString text(const char *key) const;
-	QCheckBox *addTriggerToggle(QVBoxLayout *layout, const QString &title,
-				    const QString &description,
-				    const QString &objectName, bool checked,
-				    bool requiresPro);
+	QCheckBox *addTriggerToggle(QVBoxLayout *layout, const QString &title, const QString &description,
+				    const QString &objectName, bool checked, bool requiresPro);
 	void load();
 	void applyAndSave();
 	void applyEngineConfiguration();

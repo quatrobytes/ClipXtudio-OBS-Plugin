@@ -14,24 +14,18 @@ namespace {
 std::string lowerAscii(std::string value)
 {
 	std::transform(value.begin(), value.end(), value.begin(),
-		       [](unsigned char character) {
-			       return static_cast<char>(std::tolower(character));
-		       });
+		       [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
 	return value;
 }
 
-bool containsClipCommand(const ChatMessage &message,
-			 const ChatPulseConfiguration &configuration)
+bool containsClipCommand(const ChatMessage &message, const ChatPulseConfiguration &configuration)
 {
-	if (configuration.clipCommandRequiresModerator &&
-	    !message.authorIsModerator)
+	if (configuration.clipCommandRequiresModerator && !message.authorIsModerator)
 		return false;
 	std::istringstream stream(lowerAscii(message.text));
 	std::string token;
 	while (stream >> token) {
-		while (token.size() > 1 &&
-		       std::ispunct(
-			       static_cast<unsigned char>(token.back())))
+		while (token.size() > 1 && std::ispunct(static_cast<unsigned char>(token.back())))
 			token.pop_back();
 		if (token == "!clip")
 			return true;
@@ -39,8 +33,7 @@ bool containsClipCommand(const ChatMessage &message,
 	return false;
 }
 
-std::optional<std::uint32_t> nextCodePoint(std::string_view value,
-					   std::size_t &offset)
+std::optional<std::uint32_t> nextCodePoint(std::string_view value, std::size_t &offset)
 {
 	if (offset >= value.size())
 		return std::nullopt;
@@ -64,8 +57,7 @@ std::optional<std::uint32_t> nextCodePoint(std::string_view value,
 	if (offset + continuationCount > value.size())
 		return std::nullopt;
 	for (int index = 0; index < continuationCount; ++index) {
-		const auto continuation =
-			static_cast<unsigned char>(value[offset++]);
+		const auto continuation = static_cast<unsigned char>(value[offset++]);
 		if ((continuation & 0xC0) != 0x80)
 			return std::nullopt;
 		codePoint = (codePoint << 6) | (continuation & 0x3F);
@@ -81,8 +73,7 @@ std::size_t emojiCount(std::string_view text)
 		const auto point = nextCodePoint(text, offset);
 		if (!point)
 			continue;
-		if ((*point >= 0x1F300 && *point <= 0x1FAFF) ||
-		    (*point >= 0x2600 && *point <= 0x27BF) ||
+		if ((*point >= 0x1F300 && *point <= 0x1FAFF) || (*point >= 0x2600 && *point <= 0x27BF) ||
 		    (*point >= 0x1F1E6 && *point <= 0x1F1FF))
 			++count;
 	}
@@ -92,9 +83,8 @@ std::size_t emojiCount(std::string_view text)
 std::vector<std::string> meaningfulWords(std::string text)
 {
 	text = VoicePhraseMatcher::normalize(text);
-	static const std::set<std::string> ignored = {
-		"the", "and", "that", "this", "que", "para", "por", "con",
-		"una", "uno", "los", "las", "del", "clip"};
+	static const std::set<std::string> ignored = {"the", "and", "that", "this", "que", "para", "por",
+						      "con", "una", "uno",  "los",  "las", "del",  "clip"};
 	std::istringstream stream(text);
 	std::vector<std::string> result;
 	std::string word;
@@ -107,11 +97,8 @@ std::vector<std::string> meaningfulWords(std::string text)
 
 double ratio(std::size_t actual, std::size_t threshold)
 {
-	return threshold == 0
-		       ? 1.0
-		       : std::clamp(static_cast<double>(actual) /
-					    static_cast<double>(threshold),
-				    0.0, 1.0);
+	return threshold == 0 ? 1.0
+			      : std::clamp(static_cast<double>(actual) / static_cast<double>(threshold), 0.0, 1.0);
 }
 
 } // namespace
@@ -123,28 +110,18 @@ ChatPulseDetector::ChatPulseDetector(ChatPulseConfiguration configuration)
 		configuration_ = {};
 }
 
-bool ChatPulseDetector::configure(
-	const ChatPulseConfiguration &configuration, std::string *error)
+bool ChatPulseDetector::configure(const ChatPulseConfiguration &configuration, std::string *error)
 {
 	if (error)
 		error->clear();
-	if (configuration.window <= std::chrono::seconds::zero() ||
-	    configuration.window > std::chrono::minutes(5) ||
-	    configuration.burstMessageCount < 2 ||
-	    configuration.burstMessageCount > 10000 ||
+	if (configuration.window <= std::chrono::seconds::zero() || configuration.window > std::chrono::minutes(5) ||
+	    configuration.burstMessageCount < 2 || configuration.burstMessageCount > 10000 ||
 	    configuration.minimumUniqueAuthors < 1 ||
-	    configuration.minimumUniqueAuthors >
-		    configuration.burstMessageCount ||
-	    configuration.emojiCount < 2 ||
-	    configuration.repeatedWordCount < 2 ||
-	    configuration.cooldown < std::chrono::seconds::zero() ||
-	    configuration.cooldown > std::chrono::hours(1) ||
-	    configuration.sensitivity < 0 ||
-	    configuration.sensitivity > 100 ||
-	    configuration.preRollSeconds < 0 ||
-	    configuration.preRollSeconds > 120 ||
-	    configuration.postRollSeconds < 0 ||
-	    configuration.postRollSeconds > 120) {
+	    configuration.minimumUniqueAuthors > configuration.burstMessageCount || configuration.emojiCount < 2 ||
+	    configuration.repeatedWordCount < 2 || configuration.cooldown < std::chrono::seconds::zero() ||
+	    configuration.cooldown > std::chrono::hours(1) || configuration.sensitivity < 0 ||
+	    configuration.sensitivity > 100 || configuration.preRollSeconds < 0 || configuration.preRollSeconds > 120 ||
+	    configuration.postRollSeconds < 0 || configuration.postRollSeconds > 120) {
 		if (error)
 			*error = "Chat Pulse configuration is invalid";
 		return false;
@@ -154,13 +131,10 @@ bool ChatPulseDetector::configure(
 	return true;
 }
 
-std::optional<ChatPulseEvent>
-ChatPulseDetector::ingest(ChatPlatform platform, const ChatMessage &message)
+std::optional<ChatPulseEvent> ChatPulseDetector::ingest(ChatPlatform platform, const ChatMessage &message)
 {
-	if (!configuration_.enabled || message.id.empty() ||
-	    message.id.size() > 256 || message.authorId.empty() ||
-	    message.authorId.size() > 256 || message.text.empty() ||
-	    message.text.size() > 4096)
+	if (!configuration_.enabled || message.id.empty() || message.id.size() > 256 || message.authorId.empty() ||
+	    message.authorId.size() > 256 || message.text.empty() || message.text.size() > 4096)
 		return std::nullopt;
 	auto &window = windows_[platform];
 	auto &ids = messageIds_[platform];
@@ -168,9 +142,7 @@ ChatPulseDetector::ingest(ChatPlatform platform, const ChatMessage &message)
 		return std::nullopt;
 	if (!window.empty() && message.sentAt < window.back().sentAt)
 		return std::nullopt;
-	while (!window.empty() &&
-	       message.sentAt - window.front().sentAt >
-		       configuration_.window) {
+	while (!window.empty() && message.sentAt - window.front().sentAt > configuration_.window) {
 		ids.erase(window.front().id);
 		window.pop_front();
 	}
@@ -179,8 +151,7 @@ ChatPulseDetector::ingest(ChatPlatform platform, const ChatMessage &message)
 		ids.insert(message.id);
 
 	auto &lastPulse = lastPulseAt_[platform];
-	if (lastPulse &&
-	    message.sentAt - *lastPulse < configuration_.cooldown)
+	if (lastPulse && message.sentAt - *lastPulse < configuration_.cooldown)
 		return std::nullopt;
 
 	std::set<std::string> authors;
@@ -209,24 +180,18 @@ ChatPulseDetector::ingest(ChatPlatform platform, const ChatMessage &message)
 	} else if (window.size() >= configuration_.burstMessageCount &&
 		   authors.size() >= configuration_.minimumUniqueAuthors) {
 		event.reason = ChatPulseReason::MessageBurst;
-		event.intensity =
-			std::max(ratio(window.size(),
-				       configuration_.burstMessageCount),
-				 ratio(authors.size(),
-				       configuration_.minimumUniqueAuthors));
+		event.intensity = std::max(ratio(window.size(), configuration_.burstMessageCount),
+					   ratio(authors.size(), configuration_.minimumUniqueAuthors));
 	} else {
-		const auto repeated = std::max_element(
-			frequencies.begin(), frequencies.end(),
-			[](const auto &left, const auto &right) {
-				return left.second < right.second;
-			});
-		if (repeated == frequencies.end() ||
-		    repeated->second < configuration_.repeatedWordCount)
+		const auto repeated = std::max_element(frequencies.begin(), frequencies.end(),
+						       [](const auto &left, const auto &right) {
+							       return left.second < right.second;
+						       });
+		if (repeated == frequencies.end() || repeated->second < configuration_.repeatedWordCount)
 			return std::nullopt;
 		event.reason = ChatPulseReason::RepeatedWord;
 		event.repeatedWord = repeated->first;
-		event.intensity = ratio(repeated->second,
-					configuration_.repeatedWordCount);
+		event.intensity = ratio(repeated->second, configuration_.repeatedWordCount);
 	}
 	lastPulse = message.sentAt;
 	return event;
@@ -239,16 +204,14 @@ void ChatPulseDetector::reset()
 	lastPulseAt_.clear();
 }
 
-ChatPulseService::ChatPulseService(TriggerEngine &triggerEngine,
-				   bool proUnlocked)
+ChatPulseService::ChatPulseService(TriggerEngine &triggerEngine, bool proUnlocked)
 	: triggerEngine_(triggerEngine),
 	  proUnlocked_(proUnlocked)
 {
 	triggerEngine_.setProUnlocked(proUnlocked);
 }
 
-bool ChatPulseService::configure(
-	const ChatPulseConfiguration &configuration, std::string *error)
+bool ChatPulseService::configure(const ChatPulseConfiguration &configuration, std::string *error)
 {
 	if (configuration.enabled && !proUnlocked_) {
 		if (error)
@@ -264,19 +227,16 @@ bool ChatPulseService::configure(
 	triggerConfig.sensitivity = configuration.sensitivity;
 	triggerConfig.action = configuration.action;
 	triggerConfig.cooldown = configuration.cooldown;
-	if (!triggerEngine_.setConfiguration(SmartTriggerType::ChatPulse,
-					     triggerConfig, error))
+	if (!triggerEngine_.setConfiguration(SmartTriggerType::ChatPulse, triggerConfig, error))
 		return false;
 	configuration_ = configuration;
 	return true;
 }
 
-ChatPulseResult ChatPulseService::process(ChatPlatform platform,
-					  const ChatMessage &message)
+ChatPulseResult ChatPulseService::process(ChatPlatform platform, const ChatMessage &message)
 {
 	if (!proUnlocked_)
-		return {{}, {}, TriggerRejection::ProRequired,
-			"Chat Pulse requires ClipXtudio Pro"};
+		return {{}, {}, TriggerRejection::ProRequired, "Chat Pulse requires ClipXtudio Pro"};
 	const auto pulse = detector_.ingest(platform, message);
 	if (!pulse)
 		return {};
@@ -284,13 +244,11 @@ ChatPulseResult ChatPulseService::process(ChatPlatform platform,
 	signal.type = SmartTriggerType::ChatPulse;
 	signal.occurredAt = pulse->occurredAt;
 	signal.chatActivity = pulse->intensity;
-	signal.durationSeconds = static_cast<int>(
-		configuration_.window.count());
+	signal.durationSeconds = static_cast<int>(configuration_.window.count());
 	signal.keyword = pulse->repeatedWord;
 	const auto triggered = triggerEngine_.process(signal);
 	return {pulse, triggered.event, triggered.rejection,
-		triggered.event ? std::string{}
-				: "Trigger engine rejected Chat Pulse"};
+		triggered.event ? std::string{} : "Trigger engine rejected Chat Pulse"};
 }
 
 void ChatPulseService::setProUnlocked(bool unlocked) noexcept
@@ -306,8 +264,7 @@ void ChatPulseService::reset()
 	detector_.reset();
 }
 
-ChatIntegrationController::ChatIntegrationController(
-	ChatIntegrationManager &manager, ChatPulseService &pulseService)
+ChatIntegrationController::ChatIntegrationController(ChatIntegrationManager &manager, ChatPulseService &pulseService)
 	: manager_(manager),
 	  pulseService_(pulseService)
 {

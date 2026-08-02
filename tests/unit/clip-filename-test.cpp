@@ -10,8 +10,7 @@ int main()
 	using clipcoach::test::expect;
 
 	const auto fixedTime = system_clock::from_time_t(1785247509);
-	const auto fileName =
-		clipcoach::ClipManager::createReadableFileName(fixedTime, "manual", ".mp4");
+	const auto fileName = clipcoach::ClipManager::createReadableFileName(fixedTime, "manual", ".mp4");
 
 	expect(fileName == "ClipX_2026-07-28_14-05-09_manual.mp4",
 	       "clip file name must be stable, readable and filesystem-safe");

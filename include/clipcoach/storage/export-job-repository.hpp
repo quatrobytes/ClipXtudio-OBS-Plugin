@@ -16,14 +16,11 @@ public:
 	explicit ExportJobRepository(SqliteDatabase &database);
 
 	[[nodiscard]] StorageStatus record(const ExportJob &job);
-	[[nodiscard]] RepositoryResult<std::optional<ExportJob>>
-	findById(const std::string &id) const;
-	[[nodiscard]] RepositoryResult<std::vector<ExportJob>>
-	listByClip(const std::string &clipId) const;
+	[[nodiscard]] RepositoryResult<std::optional<ExportJob>> findById(const std::string &id) const;
+	[[nodiscard]] RepositoryResult<std::vector<ExportJob>> listByClip(const std::string &clipId) const;
 
 private:
 	SqliteDatabase &database_;
 };
 
 } // namespace clipcoach::storage
-

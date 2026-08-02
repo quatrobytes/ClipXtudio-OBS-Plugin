@@ -161,8 +161,7 @@ INSERT INTO clips (
 		detail::bindText(query, 17, clip.sourceScene) && detail::bindText(query, 18, clip.appVersion) &&
 		detail::bindText(query, 19, encodeList(clip.suggestedTitles)) &&
 		detail::bindText(query, 20, encodeList(clip.hashtags)) && detail::bindText(query, 21, clip.aiSummary) &&
-		detail::bindText(query, 22, clip.aiLanguage) &&
-		detail::bindText(query, 23, clip.triggerLabel) &&
+		detail::bindText(query, 22, clip.aiLanguage) && detail::bindText(query, 23, clip.triggerLabel) &&
 		detail::bindText(query, 24, clip.requestedBy);
 	if (!bound || sqlite3_step(query) != SQLITE_DONE) {
 		return detail::failure(database_.handle(), "could not insert clip");
@@ -170,27 +169,19 @@ INSERT INTO clips (
 	return StorageStatus::ok();
 }
 
-StorageStatus ClipRepository::updateThumbnail(
-	const std::string &id, const std::filesystem::path &thumbnailPath)
+StorageStatus ClipRepository::updateThumbnail(const std::string &id, const std::filesystem::path &thumbnailPath)
 {
 	if (!database_.isOpen() || id.empty() || thumbnailPath.empty())
-		return StorageStatus::fail(
-			"cannot update thumbnail: clip id and path are required");
-	detail::Statement statement(
-		database_.handle(),
-		"UPDATE clips SET thumbnail_path=?1 WHERE id=?2;");
+		return StorageStatus::fail("cannot update thumbnail: clip id and path are required");
+	detail::Statement statement(database_.handle(), "UPDATE clips SET thumbnail_path=?1 WHERE id=?2;");
 	if (!statement.valid())
-		return detail::failure(database_.handle(),
-				       "could not prepare thumbnail update");
+		return detail::failure(database_.handle(), "could not prepare thumbnail update");
 	const auto path = thumbnailPath.u8string();
-	if (!detail::bindText(statement.get(), 1, path) ||
-	    !detail::bindText(statement.get(), 2, id) ||
+	if (!detail::bindText(statement.get(), 1, path) || !detail::bindText(statement.get(), 2, id) ||
 	    sqlite3_step(statement.get()) != SQLITE_DONE)
-		return detail::failure(database_.handle(),
-				       "could not update clip thumbnail");
+		return detail::failure(database_.handle(), "could not update clip thumbnail");
 	if (sqlite3_changes(database_.handle()) == 0)
-		return StorageStatus::fail(
-			"cannot update thumbnail: clip was not found");
+		return StorageStatus::fail("cannot update thumbnail: clip was not found");
 	return StorageStatus::ok();
 }
 

@@ -19,8 +19,10 @@ constexpr int kNetworkTimeoutMs = 10'000;
 
 bool safeBaseUrl(const QUrl &url)
 {
-	if (!url.isValid() || url.host().isEmpty()) return false;
-	if (url.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0) return true;
+	if (!url.isValid() || url.host().isEmpty())
+		return false;
+	if (url.scheme().compare(QStringLiteral("https"), Qt::CaseInsensitive) == 0)
+		return true;
 #ifdef CLIPX_ALLOW_INSECURE_LOCAL_API
 	return url.scheme().compare(QStringLiteral("http"), Qt::CaseInsensitive) == 0 &&
 	       (url.host() == QStringLiteral("127.0.0.1") ||
@@ -45,15 +47,15 @@ remote::RemoteClientError replyError(QNetworkReply &reply, const QJsonObject &bo
 {
 	const auto status = reply.attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 	const auto nestedError = body.value(QStringLiteral("error")).toObject();
-	const auto code = body.value(QStringLiteral("code")).toString(
-		body.value(QStringLiteral("error_code")).toString(
-			nestedError.value(QStringLiteral("code")).toString()));
-	auto message = body.value(QStringLiteral("message")).toString(
-		nestedError.value(QStringLiteral("message")).toString());
-	if (message.isEmpty()) message = reply.errorString();
+	const auto code = body.value(QStringLiteral("code"))
+				  .toString(body.value(QStringLiteral("error_code"))
+						    .toString(nestedError.value(QStringLiteral("code")).toString()));
+	auto message =
+		body.value(QStringLiteral("message")).toString(nestedError.value(QStringLiteral("message")).toString());
+	if (message.isEmpty())
+		message = reply.errorString();
 	return {status, code.toStdString(), message.toStdString(),
-		status == 0 || status == 408 || status == 429 || status >= 500,
-		status == 401 || status == 403};
+		status == 0 || status == 408 || status == 429 || status >= 500, status == 401 || status == 403};
 }
 
 QJsonObject parseObject(QNetworkReply &reply, bool *valid)
@@ -76,14 +78,16 @@ remote::RemoteCommand parseCommand(const QJsonObject &object)
 	command.requestedBy = object.value(QStringLiteral("requested_by")).toString().toStdString();
 	const auto expiry = QDateTime::fromString(object.value(QStringLiteral("expires_at")).toString(), Qt::ISODate);
 	if (expiry.isValid())
-		command.expiresAt = std::chrono::system_clock::time_point(std::chrono::milliseconds(expiry.toMSecsSinceEpoch()));
+		command.expiresAt =
+			std::chrono::system_clock::time_point(std::chrono::milliseconds(expiry.toMSecsSinceEpoch()));
 	return command;
 }
 
 } // namespace
 
 RemoteClipperClient::RemoteClipperClient(QUrl baseUrl, QNetworkAccessManager *manager)
-	: baseUrl_(std::move(baseUrl)), manager_(manager)
+	: baseUrl_(std::move(baseUrl)),
+	  manager_(manager)
 {
 	if (manager_ == nullptr) {
 		ownedManager_ = std::make_unique<QNetworkAccessManager>();
@@ -92,7 +96,10 @@ RemoteClipperClient::RemoteClipperClient(QUrl baseUrl, QNetworkAccessManager *ma
 }
 
 RemoteClipperClient::~RemoteClipperClient() = default;
-bool RemoteClipperClient::configured() const noexcept { return manager_ != nullptr && safeBaseUrl(baseUrl_); }
+bool RemoteClipperClient::configured() const noexcept
+{
+	return manager_ != nullptr && safeBaseUrl(baseUrl_);
+}
 
 QUrl RemoteClipperClient::endpoint(const QString &path) const
 {
@@ -107,8 +114,9 @@ void RemoteClipperClient::heartbeat(const remote::RemoteHeartbeatRequest &value,
 				    HeartbeatCompletion completion)
 {
 	if (!configured() || token.empty()) {
-		completion({{}, {0, "REMOTE_API_NOT_CONFIGURED", "Remote Clipper API or token is unavailable", false,
-				 token.empty()}});
+		completion({{},
+			    {0, "REMOTE_API_NOT_CONFIGURED", "Remote Clipper API or token is unavailable", false,
+			     token.empty()}});
 		return;
 	}
 	const QJsonObject body{
@@ -128,14 +136,16 @@ void RemoteClipperClient::heartbeat(const remote::RemoteHeartbeatRequest &value,
 		const auto status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 		if (reply->error() != QNetworkReply::NoError || status < 200 || status >= 300 || !valid) {
 			auto error = replyError(*reply, body);
-			if (!valid && error.code.empty()) error.code = "INVALID_RESPONSE";
+			if (!valid && error.code.empty())
+				error.code = "INVALID_RESPONSE";
 			completion({{}, std::move(error)});
 			reply->deleteLater();
 			return;
 		}
 		remote::RemoteHeartbeatResponse response;
 		response.remoteEnabled = body.value(QStringLiteral("remote_enabled")).toBool();
-		response.pollIntervalSeconds = std::clamp(body.value(QStringLiteral("poll_interval_seconds")).toInt(3), 2, 60);
+		response.pollIntervalSeconds =
+			std::clamp(body.value(QStringLiteral("poll_interval_seconds")).toInt(3), 2, 60);
 		response.sessionId = body.value(QStringLiteral("session_id")).toVariant().toString().toStdString();
 		response.message = body.value(QStringLiteral("message")).toString().toStdString();
 		completion({response, {}});
@@ -143,12 +153,12 @@ void RemoteClipperClient::heartbeat(const remote::RemoteHeartbeatRequest &value,
 	});
 }
 
-void RemoteClipperClient::commands(const std::string &deviceId, const std::string &token,
-				   CommandsCompletion completion)
+void RemoteClipperClient::commands(const std::string &deviceId, const std::string &token, CommandsCompletion completion)
 {
 	if (!configured() || token.empty() || deviceId.empty()) {
-		completion({{}, {0, "REMOTE_AUTH_UNAVAILABLE", "Remote device identity or token is unavailable", false,
-				 true}});
+		completion({{},
+			    {0, "REMOTE_AUTH_UNAVAILABLE", "Remote device identity or token is unavailable", false,
+			     true}});
 		return;
 	}
 	auto url = endpoint(QStringLiteral("/api/plugin/remote/commands"));
@@ -163,14 +173,16 @@ void RemoteClipperClient::commands(const std::string &deviceId, const std::strin
 		if (reply->error() != QNetworkReply::NoError || status < 200 || status >= 300 || !valid ||
 		    !body.value(QStringLiteral("commands")).isArray()) {
 			auto error = replyError(*reply, body);
-			if (error.code.empty()) error.code = "INVALID_RESPONSE";
+			if (error.code.empty())
+				error.code = "INVALID_RESPONSE";
 			completion({{}, std::move(error)});
 			reply->deleteLater();
 			return;
 		}
 		std::vector<remote::RemoteCommand> commands;
 		for (const auto &entry : body.value(QStringLiteral("commands")).toArray())
-			if (entry.isObject()) commands.push_back(parseCommand(entry.toObject()));
+			if (entry.isObject())
+				commands.push_back(parseCommand(entry.toObject()));
 		completion({std::move(commands), {}});
 		reply->deleteLater();
 	});
@@ -183,7 +195,8 @@ void RemoteClipperClient::reportResult(const remote::RemoteCommandResult &value,
 		completion({{}, {0, "INVALID_RESULT", "Remote result cannot be sent", false, token.empty()}});
 		return;
 	}
-	QJsonObject body{{QStringLiteral("status"), value.success ? QStringLiteral("completed") : QStringLiteral("failed")}};
+	QJsonObject body{
+		{QStringLiteral("status"), value.success ? QStringLiteral("completed") : QStringLiteral("failed")}};
 	if (value.success) {
 		body.insert(QStringLiteral("clip_id"), QString::fromStdString(value.clipId));
 		body.insert(QStringLiteral("file_name"), QString::fromStdString(value.fileName));
@@ -194,10 +207,10 @@ void RemoteClipperClient::reportResult(const remote::RemoteCommandResult &value,
 		body.insert(QStringLiteral("error_code"), QString::fromStdString(value.errorCode));
 		body.insert(QStringLiteral("error_message"), QString::fromStdString(value.errorMessage));
 	}
-	const auto path = QStringLiteral("/api/plugin/remote/commands/%1/result")
-			  .arg(QString::fromStdString(value.commandUuid));
-	auto *reply = manager_->post(makeRequest(endpoint(path), token),
-				     QJsonDocument(body).toJson(QJsonDocument::Compact));
+	const auto path =
+		QStringLiteral("/api/plugin/remote/commands/%1/result").arg(QString::fromStdString(value.commandUuid));
+	auto *reply =
+		manager_->post(makeRequest(endpoint(path), token), QJsonDocument(body).toJson(QJsonDocument::Compact));
 	QObject::connect(reply, &QNetworkReply::finished, reply, [reply, completion = std::move(completion)]() mutable {
 		const auto bytes = reply->readAll();
 		QJsonParseError parseError;
@@ -213,15 +226,13 @@ void RemoteClipperClient::reportResult(const remote::RemoteCommandResult &value,
 	});
 }
 
-void RemoteClipperClient::markProcessing(const std::string &uuid, const std::string &token,
-					 ResultCompletion completion)
+void RemoteClipperClient::markProcessing(const std::string &uuid, const std::string &token, ResultCompletion completion)
 {
 	if (!configured() || token.empty() || !remote::isValidCommandUuid(uuid)) {
 		completion({{}, {0, "INVALID_COMMAND", "Remote command cannot be acknowledged", false, token.empty()}});
 		return;
 	}
-	const auto path = QStringLiteral("/api/plugin/remote/commands/%1/processing")
-			  .arg(QString::fromStdString(uuid));
+	const auto path = QStringLiteral("/api/plugin/remote/commands/%1/processing").arg(QString::fromStdString(uuid));
 	auto *reply = manager_->post(makeRequest(endpoint(path), token), QByteArrayLiteral("{}"));
 	QObject::connect(reply, &QNetworkReply::finished, reply, [reply, completion = std::move(completion)]() mutable {
 		const auto bytes = reply->readAll();

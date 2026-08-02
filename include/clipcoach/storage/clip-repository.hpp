@@ -27,8 +27,7 @@ public:
 	[[nodiscard]] StorageStatus updateScore(const std::string &id, int score);
 	[[nodiscard]] StorageStatus markExported(const std::string &id);
 	[[nodiscard]] StorageStatus setExportStatus(const std::string &id, ExportStatus status);
-	[[nodiscard]] StorageStatus updateThumbnail(
-		const std::string &id, const std::filesystem::path &thumbnailPath);
+	[[nodiscard]] StorageStatus updateThumbnail(const std::string &id, const std::filesystem::path &thumbnailPath);
 	[[nodiscard]] StorageStatus updateAiResult(const AiPersistedClipResult &result);
 
 private:

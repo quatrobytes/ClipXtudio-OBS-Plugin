@@ -8,8 +8,7 @@
 
 namespace clipcoach::ui {
 
-ToggleRow::ToggleRow(const QString &title, const QString &description, bool checked, QWidget *parent)
-	: QWidget(parent)
+ToggleRow::ToggleRow(const QString &title, const QString &description, bool checked, QWidget *parent) : QWidget(parent)
 {
 	setObjectName(QStringLiteral("ToggleRow"));
 	setAttribute(Qt::WA_StyledBackground, true);

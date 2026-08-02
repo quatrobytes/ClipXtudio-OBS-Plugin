@@ -182,12 +182,8 @@ int main()
 	api.nextRefresh.response = serverResponse("valid");
 	bool startupRefreshCompleted = false;
 	bool captionRefreshCompleted = false;
-	manager.refresh([&startupRefreshCompleted](const LicenseSnapshot &) {
-		startupRefreshCompleted = true;
-	});
-	manager.refresh([&captionRefreshCompleted](const LicenseSnapshot &) {
-		captionRefreshCompleted = true;
-	});
+	manager.refresh([&startupRefreshCompleted](const LicenseSnapshot &) { startupRefreshCompleted = true; });
+	manager.refresh([&captionRefreshCompleted](const LicenseSnapshot &) { captionRefreshCompleted = true; });
 	clipcoach::test::expect(api.refreshCalls == 1,
 				"concurrent startup and caption synchronization must share one API request");
 	clipcoach::test::expect(!startupRefreshCompleted && !captionRefreshCompleted,

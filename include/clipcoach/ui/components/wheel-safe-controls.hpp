@@ -12,45 +12,28 @@ namespace clipcoach::ui {
 // drag, arrow buttons and the keyboard.
 class WheelSafeSlider final : public QSlider {
 public:
-	explicit WheelSafeSlider(Qt::Orientation orientation,
-				 QWidget *parent = nullptr)
-		: QSlider(orientation, parent)
+	explicit WheelSafeSlider(Qt::Orientation orientation, QWidget *parent = nullptr) : QSlider(orientation, parent)
 	{
 	}
 
 protected:
-	void wheelEvent(QWheelEvent *event) override
-	{
-		event->ignore();
-	}
+	void wheelEvent(QWheelEvent *event) override { event->ignore(); }
 };
 
 class WheelSafeSpinBox final : public QSpinBox {
 public:
-	explicit WheelSafeSpinBox(QWidget *parent = nullptr)
-		: QSpinBox(parent)
-	{
-	}
+	explicit WheelSafeSpinBox(QWidget *parent = nullptr) : QSpinBox(parent) {}
 
 protected:
-	void wheelEvent(QWheelEvent *event) override
-	{
-		event->ignore();
-	}
+	void wheelEvent(QWheelEvent *event) override { event->ignore(); }
 };
 
 class WheelSafeComboBox final : public QComboBox {
 public:
-	explicit WheelSafeComboBox(QWidget *parent = nullptr)
-		: QComboBox(parent)
-	{
-	}
+	explicit WheelSafeComboBox(QWidget *parent = nullptr) : QComboBox(parent) {}
 
 protected:
-	void wheelEvent(QWheelEvent *event) override
-	{
-		event->ignore();
-	}
+	void wheelEvent(QWheelEvent *event) override { event->ignore(); }
 };
 
 } // namespace clipcoach::ui

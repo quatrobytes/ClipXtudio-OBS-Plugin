@@ -33,8 +33,7 @@ int main()
 					!manager.settings().notificationsEnabled &&
 					manager.settings().openDockAtStartup &&
 					manager.settings().voiceTriggerLanguage == "auto" &&
-					manager.settings().voiceSpeechMode ==
-						clipcoach::SpeechProcessingMode::Local &&
+					manager.settings().voiceSpeechMode == clipcoach::SpeechProcessingMode::Local &&
 					!manager.settings().voiceCloudConsent,
 				"migration must preserve legacy values and supply v2 defaults");
 

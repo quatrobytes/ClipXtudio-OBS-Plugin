@@ -235,8 +235,8 @@ std::string serialize(const Settings &settings)
 	       << "  \"start_with_obs\": " << (settings.startWithObs ? "true" : "false") << ",\n"
 	       << "  \"open_dock_at_startup\": " << (settings.openDockAtStartup ? "true" : "false") << ",\n"
 	       << "  \"initial_setup_completed\": " << (settings.initialSetupCompleted ? "true" : "false") << ",\n"
-	       << "  \"initial_setup_completed_version\": \""
-	       << escapeJsonString(settings.initialSetupCompletedVersion) << "\",\n"
+	       << "  \"initial_setup_completed_version\": \"" << escapeJsonString(settings.initialSetupCompletedVersion)
+	       << "\",\n"
 	       << "  \"auto_start_replay_buffer\": " << (settings.autoStartReplayBuffer ? "true" : "false") << ",\n"
 	       << "  \"remote_commands_enabled\": " << (settings.remoteCommandsEnabled ? "true" : "false") << ",\n"
 	       << "  \"default_duration_seconds\": " << settings.defaultDurationSeconds << ",\n"
@@ -503,12 +503,10 @@ bool deserialize(const std::string &document, Settings &settings, std::string *e
 				requireString("ai_language", settings.aiLanguage);
 	if (!aiComplete)
 		return fail(error, "settings file is missing a schema v6 AI field");
-	if (*schemaVersion == 6 &&
-	    settings.voiceTriggerPhrasesCsv.find("saca clip") == std::string::npos) {
+	if (*schemaVersion == 6 && settings.voiceTriggerPhrasesCsv.find("saca clip") == std::string::npos) {
 		settings.voiceTriggerPhrasesCsv += ",saca clip,save clip,save that";
 	}
-	if (*schemaVersion >= 8 &&
-	    !requireString("voice_audio_source_name", settings.voiceAudioSourceName))
+	if (*schemaVersion >= 8 && !requireString("voice_audio_source_name", settings.voiceAudioSourceName))
 		return fail(error, "settings file is missing the schema v8 OBS audio source field");
 	if (*schemaVersion < 9) {
 		// Schema v9 replaces the legacy OS-language speech backend with bundled
@@ -516,19 +514,16 @@ bool deserialize(const std::string &document, Settings &settings, std::string *e
 		// can still explicitly select Spanish or English afterward.
 		settings.voiceTriggerLanguage = "auto";
 	}
-	if (*schemaVersion >= 10 &&
-	    (!requireString("vertical_scene_name", settings.verticalSceneName) ||
-	     !requireString("vertical_source_name", settings.verticalSourceName) ||
-	     !requireInt("vertical_zoom_percent", settings.verticalZoomPercent) ||
-	     !requireInt("vertical_pan_x_percent", settings.verticalPanXPercent) ||
-	     !requireInt("vertical_pan_y_percent", settings.verticalPanYPercent))) {
+	if (*schemaVersion >= 10 && (!requireString("vertical_scene_name", settings.verticalSceneName) ||
+				     !requireString("vertical_source_name", settings.verticalSourceName) ||
+				     !requireInt("vertical_zoom_percent", settings.verticalZoomPercent) ||
+				     !requireInt("vertical_pan_x_percent", settings.verticalPanXPercent) ||
+				     !requireInt("vertical_pan_y_percent", settings.verticalPanYPercent))) {
 		return fail(error, "settings file is missing the schema v10 vertical OBS selection");
 	}
-	if (*schemaVersion >= 12 &&
-	    !requireBool("initial_setup_completed", settings.initialSetupCompleted))
+	if (*schemaVersion >= 12 && !requireBool("initial_setup_completed", settings.initialSetupCompleted))
 		return fail(error, "settings file is missing the schema v12 initial setup state");
-	if (*schemaVersion >= 13 &&
-	    !requireBool("remote_commands_enabled", settings.remoteCommandsEnabled))
+	if (*schemaVersion >= 13 && !requireBool("remote_commands_enabled", settings.remoteCommandsEnabled))
 		return fail(error, "settings file is missing the schema v13 Remote Clipper state");
 	if (*schemaVersion >= 14 &&
 	    !requireString("initial_setup_completed_version", settings.initialSetupCompletedVersion))
@@ -662,8 +657,7 @@ bool SettingsManager::save(const Settings &settings, std::string *error)
 	return true;
 }
 
-bool SettingsManager::exportProfile(const std::filesystem::path &profilePath,
-				    std::string *error) const
+bool SettingsManager::exportProfile(const std::filesystem::path &profilePath, std::string *error) const
 {
 	clearError(error);
 	if (profilePath.empty())
@@ -672,8 +666,7 @@ bool SettingsManager::exportProfile(const std::filesystem::path &profilePath,
 	return profile.save(settings_, error);
 }
 
-bool SettingsManager::importProfile(const std::filesystem::path &profilePath,
-				    std::string *error)
+bool SettingsManager::importProfile(const std::filesystem::path &profilePath, std::string *error)
 {
 	clearError(error);
 	if (profilePath.empty())

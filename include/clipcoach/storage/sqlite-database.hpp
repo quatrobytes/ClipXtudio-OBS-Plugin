@@ -24,8 +24,7 @@ public:
 	[[nodiscard]] bool isOpen() const noexcept;
 	[[nodiscard]] int schemaVersion() const noexcept;
 	[[nodiscard]] bool hasTable(const std::string &tableName) const;
-	[[nodiscard]] bool hasColumn(const std::string &tableName,
-				     const std::string &columnName) const;
+	[[nodiscard]] bool hasColumn(const std::string &tableName, const std::string &columnName) const;
 	[[nodiscard]] const std::filesystem::path &path() const noexcept;
 	[[nodiscard]] sqlite3 *handle() const noexcept;
 

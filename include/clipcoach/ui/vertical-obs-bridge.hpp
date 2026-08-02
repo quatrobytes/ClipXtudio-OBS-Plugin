@@ -36,21 +36,16 @@ struct VerticalObsBridge {
 	using NameProvider = std::function<std::vector<std::string>()>;
 	using SourceProvider = std::function<std::vector<std::string>(const std::string &)>;
 	using PreviewFactory = std::function<QWidget *(QWidget *)>;
-	using PreviewUpdater =
-		std::function<void(QWidget *, const std::string &, const VerticalCanvasSettings &)>;
+	using PreviewUpdater = std::function<void(QWidget *, const std::string &, const VerticalCanvasSettings &)>;
 	using FramingChanged = std::function<void(int, int, int)>;
-	using PreviewInteractionBinder =
-		std::function<void(QWidget *, FramingChanged)>;
+	using PreviewInteractionBinder = std::function<void(QWidget *, FramingChanged)>;
 	using SceneCreator = std::function<bool(const std::string &, const std::string &,
-					       const VerticalCanvasSettings &, std::string *)>;
-	using ReplayEncoderProvider =
-		std::function<std::vector<ReplayEncoderOption>()>;
+						const VerticalCanvasSettings &, std::string *)>;
+	using ReplayEncoderProvider = std::function<std::vector<ReplayEncoderOption>()>;
 	using ReplayProfileProvider = std::function<ReplayProfileSettings()>;
-	using ReplayProfileApplier =
-		std::function<ReplayProfileApplyResult(const std::string &, bool)>;
+	using ReplayProfileApplier = std::function<ReplayProfileApplyResult(const std::string &, bool)>;
 	using ObsRestartRequester = std::function<bool(std::string *)>;
-	using UpdateInstaller =
-		std::function<bool(const std::string &, std::string *)>;
+	using UpdateInstaller = std::function<bool(const std::string &, std::string *)>;
 
 	NameProvider scenes;
 	std::function<std::string()> activeScene;

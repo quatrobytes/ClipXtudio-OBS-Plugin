@@ -15,8 +15,7 @@ constexpr const char *kLogPrefix = "[ClipXtudio]";
 }
 
 ObsReplayManager::ObsReplayManager()
-	: state_(obs_frontend_replay_buffer_active() ? ReplayState::Active
-						    : ReplayState::Inactive)
+	: state_(obs_frontend_replay_buffer_active() ? ReplayState::Active : ReplayState::Inactive)
 {
 	obs_frontend_add_event_callback(frontendEventCallback, this);
 }
@@ -43,9 +42,7 @@ int ObsReplayManager::bufferedDurationSeconds() const noexcept
 	obs_video_info video{};
 	if (!obs_get_video_info(&video) || video.fps_num == 0)
 		return 0;
-	return static_cast<int>(
-		(static_cast<std::uint64_t>(frames) * video.fps_den) /
-		video.fps_num);
+	return static_cast<int>((static_cast<std::uint64_t>(frames) * video.fps_den) / video.fps_num);
 }
 
 ReplayOperationResult ObsReplayManager::start()
@@ -80,8 +77,7 @@ ReplayOperationResult ObsReplayManager::save()
 {
 	if (!obs_frontend_replay_buffer_active()) {
 		setState(ReplayState::Error);
-		blog(LOG_WARNING, "%s Replay save rejected because the buffer is inactive",
-		     kLogPrefix);
+		blog(LOG_WARNING, "%s Replay save rejected because the buffer is inactive", kLogPrefix);
 		return {false, "Replay Buffer is not active"};
 	}
 
@@ -129,8 +125,7 @@ void ObsReplayManager::handleFrontendEvent(enum obs_frontend_event event)
 				bfree(rawPath);
 			}
 			setState(ReplayState::Error);
-			blog(LOG_ERROR, "%s OBS emitted a replay saved event without a file path",
-			     kLogPrefix);
+			blog(LOG_ERROR, "%s OBS emitted a replay saved event without a file path", kLogPrefix);
 			return;
 		}
 

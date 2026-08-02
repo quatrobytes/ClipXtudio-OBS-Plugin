@@ -27,10 +27,9 @@ int main()
 	     {Feature::UnlimitedDurations, Feature::VerticalCanvas, Feature::HorizontalAndVertical,
 	      Feature::VoiceTrigger, Feature::AudioSpike, Feature::ChatPulse, Feature::SceneTrigger,
 	      Feature::AdvancedClipScore, Feature::AiTitles, Feature::AiCaptions, Feature::AutoSubtitles,
-	      Feature::BatchExport, Feature::FullHistory, Feature::PremiumVerticalTemplates,
-	      Feature::SessionRecap, Feature::AiHookFinder}) {
-		clipcoach::test::expect(gates.isAllowed(feature),
-				      "active Pro must unlock every Pro feature");
+	      Feature::BatchExport, Feature::FullHistory, Feature::PremiumVerticalTemplates, Feature::SessionRecap,
+	      Feature::AiHookFinder}) {
+		clipcoach::test::expect(gates.isAllowed(feature), "active Pro must unlock every Pro feature");
 	}
 
 	gates.setEntitlementState(EntitlementState::ProOfflineGrace);

@@ -6,16 +6,14 @@
 
 namespace clipcoach::ui {
 
-EmptyState::EmptyState(const QString &title, const QString &description, QWidget *parent)
-	: QFrame(parent)
+EmptyState::EmptyState(const QString &title, const QString &description, QWidget *parent) : QFrame(parent)
 {
 	setObjectName(QStringLiteral("EmptyState"));
 	setFrameShape(QFrame::NoFrame);
 	setMinimumHeight(150);
 
 	auto *layout = new QVBoxLayout(this);
-	layout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl,
-				   tokens::kSpaceXl);
+	layout->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl, tokens::kSpaceXl);
 	layout->setSpacing(tokens::kSpaceSm);
 	layout->setAlignment(Qt::AlignCenter);
 

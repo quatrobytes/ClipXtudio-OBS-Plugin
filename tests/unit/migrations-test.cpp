@@ -78,15 +78,14 @@ int main()
 	clipcoach::test::expect(database.hasColumn("clips", "app_version"), "migration 2 must add app version");
 	clipcoach::test::expect(database.hasTable("exports"), "migration 3 must add exports");
 	clipcoach::test::expect(database.hasColumn("clips", "trigger_label"),
-			       "migration 5 must add the matched trigger label");
+				"migration 5 must add the matched trigger label");
 	clipcoach::test::expect(database.hasColumn("clips", "requested_by"),
-			       "migration 7 must add the remote requester attribution");
+				"migration 7 must add the remote requester attribution");
 	clipcoach::storage::ClipRepository migratedClips(database);
 	const auto repaired = migratedClips.findById("legacy-pending");
-	clipcoach::test::expect(
-		repaired.success && repaired.value.has_value() &&
-			repaired.value->exportStatus == clipcoach::ExportStatus::Exported,
-		"migration 6 must repair historical source clips falsely left pending");
+	clipcoach::test::expect(repaired.success && repaired.value.has_value() &&
+					repaired.value->exportStatus == clipcoach::ExportStatus::Exported,
+				"migration 6 must repair historical source clips falsely left pending");
 
 	clipcoach::storage::SessionRepository sessions(database);
 	clipcoach::storage::ClipRepository clips(database);
@@ -94,13 +93,12 @@ int main()
 				"session insert must work after migration");
 	auto sample = clipcoach::test::sampleClip();
 	sample.requestedBy = "editor@example.com";
-	clipcoach::test::expect(clips.insert(sample).success,
-				"full clip insert must work after migration");
+	clipcoach::test::expect(clips.insert(sample).success, "full clip insert must work after migration");
 	const auto restored = clips.findById(sample.id);
 	clipcoach::test::expect(restored.success && restored.value.has_value() &&
-				       restored.value->triggerLabel == "saca clip" &&
-				       restored.value->requestedBy == "editor@example.com",
-			       "trigger label and requester must survive SQLite persistence");
+					restored.value->triggerLabel == "saca clip" &&
+					restored.value->requestedBy == "editor@example.com",
+				"trigger label and requester must survive SQLite persistence");
 
 	return clipcoach::test::pass("migrations-test");
 }

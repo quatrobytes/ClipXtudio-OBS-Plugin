@@ -37,8 +37,7 @@ struct ClipCardViewData {
 
 class ClipCard final : public QFrame {
 public:
-	explicit ClipCard(const QString &title, const QString &metadata, int score = -1,
-			  QWidget *parent = nullptr);
+	explicit ClipCard(const QString &title, const QString &metadata, int score = -1, QWidget *parent = nullptr);
 	explicit ClipCard(ClipCardViewData data, QWidget *parent = nullptr);
 	~ClipCard() override;
 

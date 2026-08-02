@@ -52,20 +52,16 @@ AiAssistantResult parse(QNetworkReply *reply)
 	const auto serverCode = errorObject.value(QStringLiteral("code")).toString();
 	const auto serverMessage = errorObject.value(QStringLiteral("message")).toString();
 	if (status == 402 || status == 429) {
-		return fail(
-			AiError::UsageLimit,
-			serverCode.isEmpty() ? std::string{"AI_USAGE_LIMIT"} : serverCode.toStdString(),
-			serverMessage.isEmpty()
-				? std::string{"Monthly AI credits exhausted"}
-				: serverMessage.toStdString());
+		return fail(AiError::UsageLimit,
+			    serverCode.isEmpty() ? std::string{"AI_USAGE_LIMIT"} : serverCode.toStdString(),
+			    serverMessage.isEmpty() ? std::string{"Monthly AI credits exhausted"}
+						    : serverMessage.toStdString());
 	}
 	if (status == 401 || status == 403) {
-		return fail(
-			AiError::ProRequired,
-			serverCode.isEmpty() ? std::string{"PRO_REQUIRED"} : serverCode.toStdString(),
-			serverMessage.isEmpty()
-				? std::string{"An active ClipXtudio Pro license is required"}
-				: serverMessage.toStdString());
+		return fail(AiError::ProRequired,
+			    serverCode.isEmpty() ? std::string{"PRO_REQUIRED"} : serverCode.toStdString(),
+			    serverMessage.isEmpty() ? std::string{"An active ClipXtudio Pro license is required"}
+						    : serverMessage.toStdString());
 	}
 	if (reply->error() != QNetworkReply::NoError || status < 200 || status >= 300) {
 		return fail(

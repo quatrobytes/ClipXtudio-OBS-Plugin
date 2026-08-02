@@ -21,8 +21,7 @@ public:
 		{
 			std::lock_guard<std::mutex> lock(mutex);
 			orientations.push_back(job.orientation);
-			verticalDimensions.emplace_back(
-				job.request.verticalWidth, job.request.verticalHeight);
+			verticalDimensions.emplace_back(job.request.verticalWidth, job.request.verticalHeight);
 		}
 		progress(25);
 		if (fail) {
@@ -129,10 +128,8 @@ int main()
 	       "8K vertical export must pass validation and reach the backend");
 	{
 		std::lock_guard<std::mutex> lock(backendProbe->mutex);
-		expect(std::find(backendProbe->verticalDimensions.begin(),
-				 backendProbe->verticalDimensions.end(),
-				 std::pair<int, int>{4320, 7680}) !=
-			       backendProbe->verticalDimensions.end(),
+		expect(std::find(backendProbe->verticalDimensions.begin(), backendProbe->verticalDimensions.end(),
+				 std::pair<int, int>{4320, 7680}) != backendProbe->verticalDimensions.end(),
 		       "export backend must receive the persisted 4320x7680 target");
 	}
 	auto single = manager.enqueue(request(directory, "clip-1"));

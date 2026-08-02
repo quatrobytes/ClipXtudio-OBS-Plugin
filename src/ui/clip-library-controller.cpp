@@ -42,11 +42,10 @@ void ClipLibraryController::reload()
 	}
 	publish(true);
 	QPointer<ClipLibraryController> guard(this);
-	const auto querySession =
-		fullHistory_ && featureGates_ != nullptr &&
-				featureGates_->isAllowed(Feature::FullHistory)
-			? std::string{}
-			: sessionId_;
+	const auto querySession = fullHistory_ && featureGates_ != nullptr &&
+						  featureGates_->isAllowed(Feature::FullHistory)
+					  ? std::string{}
+					  : sessionId_;
 	libraryService_->loadSnapshotAsync(querySession, 1000, [guard, generation](auto result) mutable {
 		if (guard.isNull()) {
 			return;
@@ -73,9 +72,7 @@ void ClipLibraryController::reload()
 
 void ClipLibraryController::setFullHistory(bool enabled)
 {
-	const bool allowed =
-		featureGates_ != nullptr &&
-		featureGates_->isAllowed(Feature::FullHistory);
+	const bool allowed = featureGates_ != nullptr && featureGates_->isAllowed(Feature::FullHistory);
 	const bool next = enabled && allowed;
 	if (fullHistory_ == next)
 		return;
@@ -157,40 +154,34 @@ void ClipLibraryController::deleteClips(std::vector<std::string> clipIds, Delete
 
 	QPointer<ClipLibraryController> guard(this);
 	const auto idsForCallback = clipIds;
-	libraryService_->deleteClips(
-		std::move(clipIds),
-		[guard, clipIds = idsForCallback, callback = std::move(callback)](
-				 auto status) mutable {
-			if (guard.isNull())
-				return;
-			QMetaObject::invokeMethod(
-				guard,
-				[guard, clipIds = std::move(clipIds), status = std::move(status),
-				 callback = std::move(callback)]() mutable {
-					if (guard.isNull())
-						return;
-					if (status.success) {
-						guard->loadedClips_.erase(
-							std::remove_if(
-								guard->loadedClips_.begin(),
-								guard->loadedClips_.end(),
-								[&clipIds](const ClipMetadata &clip) {
-									return std::find(clipIds.begin(),
-											 clipIds.end(),
-											 clip.id) !=
-									       clipIds.end();
-								}),
-							guard->loadedClips_.end());
-						guard->viewModel_.setClips(guard->loadedClips_);
-						guard->publish();
-					} else {
-						guard->reload();
-					}
-					if (callback)
-						callback(std::move(status));
-				},
-				Qt::QueuedConnection);
-		});
+	libraryService_->deleteClips(std::move(clipIds), [guard, clipIds = idsForCallback,
+							  callback = std::move(callback)](auto status) mutable {
+		if (guard.isNull())
+			return;
+		QMetaObject::invokeMethod(
+			guard,
+			[guard, clipIds = std::move(clipIds), status = std::move(status),
+			 callback = std::move(callback)]() mutable {
+				if (guard.isNull())
+					return;
+				if (status.success) {
+					guard->loadedClips_.erase(
+						std::remove_if(guard->loadedClips_.begin(), guard->loadedClips_.end(),
+							       [&clipIds](const ClipMetadata &clip) {
+								       return std::find(clipIds.begin(), clipIds.end(),
+											clip.id) != clipIds.end();
+							       }),
+						guard->loadedClips_.end());
+					guard->viewModel_.setClips(guard->loadedClips_);
+					guard->publish();
+				} else {
+					guard->reload();
+				}
+				if (callback)
+					callback(std::move(status));
+			},
+			Qt::QueuedConnection);
+	});
 }
 
 ClipActionResult ClipLibraryController::preview(const std::string &clipId)

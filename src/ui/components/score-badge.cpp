@@ -31,8 +31,7 @@ void ScoreBadge::setLabel(const QString &label)
 
 void ScoreBadge::updateText()
 {
-	setText(label_.isEmpty() ? QString::number(score_)
-				 : QStringLiteral("%1: %2").arg(label_).arg(score_));
+	setText(label_.isEmpty() ? QString::number(score_) : QStringLiteral("%1: %2").arg(label_).arg(score_));
 	setAccessibleName(text());
 }
 

@@ -42,8 +42,7 @@ class StatusCard;
 class ClipsTab final : public QWidget {
 public:
 	using TranslationFunction = std::function<QString(const char *)>;
-	using CaptionBusyCallback =
-		std::function<void(bool, const CaptionGenerationProgress &)>;
+	using CaptionBusyCallback = std::function<void(bool, const CaptionGenerationProgress &)>;
 	using CaptionReadyCallback = std::function<void(const QString &, const QString &)>;
 	using CaptionProgressReadyCallback = std::function<void(const CaptionGenerationProgress &)>;
 	using CaptionFailedCallback = std::function<void(const QString &)>;
@@ -72,10 +71,8 @@ private:
 	void addClipCard(const ClipMetadata &clip);
 	void clearCards();
 	void showActionResult(const ClipActionResult &result, const char *errorKey);
-	void requestCaption(const ClipMetadata &clip, class ClipCard *card,
-			    CaptionReadyCallback ready = {},
-			    CaptionProgressReadyCallback progressReady = {},
-			    CaptionFailedCallback failed = {});
+	void requestCaption(const ClipMetadata &clip, class ClipCard *card, CaptionReadyCallback ready = {},
+			    CaptionProgressReadyCallback progressReady = {}, CaptionFailedCallback failed = {});
 	void showCaptionDialog(const QString &caption, const QString &clipTitle,
 			       const QString &youtubeShortsCaption = {});
 	void confirmAndDelete(std::vector<std::string> clipIds, const QString &clipTitle = {});

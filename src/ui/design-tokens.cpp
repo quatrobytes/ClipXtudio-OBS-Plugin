@@ -1277,24 +1277,20 @@ void configureCompactUpdateDialog(QMessageBox *dialog, int textWidth)
 	if (dialog == nullptr)
 		return;
 
-	if (auto *messageLabel =
-		    dialog->findChild<QLabel *>(QStringLiteral("qt_msgbox_label"))) {
+	if (auto *messageLabel = dialog->findChild<QLabel *>(QStringLiteral("qt_msgbox_label"))) {
 		messageLabel->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 		messageLabel->setWordWrap(true);
 		messageLabel->setMinimumWidth(qMin(textWidth, 300));
 		messageLabel->setMaximumWidth(textWidth);
 	}
-	if (auto *iconLabel = dialog->findChild<QLabel *>(
-		    QStringLiteral("qt_msgboxex_icon_label"))) {
+	if (auto *iconLabel = dialog->findChild<QLabel *>(QStringLiteral("qt_msgboxex_icon_label"))) {
 		iconLabel->setFixedWidth(32);
 		iconLabel->setAlignment(Qt::AlignCenter);
 	}
 	for (auto *button : dialog->findChildren<QPushButton *>()) {
-		const auto textWidth = button->fontMetrics().horizontalAdvance(
-			button->text());
+		const auto textWidth = button->fontMetrics().horizontalAdvance(button->text());
 		button->setMinimumWidth(qMax(132, textWidth + 36));
-		button->setSizePolicy(QSizePolicy::MinimumExpanding,
-				      QSizePolicy::Fixed);
+		button->setSizePolicy(QSizePolicy::MinimumExpanding, QSizePolicy::Fixed);
 	}
 }
 
@@ -1308,30 +1304,26 @@ void configureRemoteAuthenticationDialog(QMessageBox *dialog)
 	dialog->setMinimumSize(700, 250);
 	dialog->resize(700, 250);
 
-	if (auto *messageLabel =
-		    dialog->findChild<QLabel *>(QStringLiteral("qt_msgbox_label"))) {
+	if (auto *messageLabel = dialog->findChild<QLabel *>(QStringLiteral("qt_msgbox_label"))) {
 		messageLabel->setAlignment(Qt::AlignLeft | Qt::AlignTop);
 		messageLabel->setWordWrap(true);
 		messageLabel->setMinimumSize(520, 76);
 		messageLabel->setMaximumWidth(520);
 		messageLabel->setContentsMargins(0, 10, 0, 8);
 	}
-	if (auto *iconLabel = dialog->findChild<QLabel *>(
-		    QStringLiteral("qt_msgboxex_icon_label"))) {
+	if (auto *iconLabel = dialog->findChild<QLabel *>(QStringLiteral("qt_msgboxex_icon_label"))) {
 		iconLabel->setFixedWidth(36);
 		iconLabel->setAlignment(Qt::AlignHCenter | Qt::AlignTop);
 		iconLabel->setContentsMargins(0, 10, 0, 0);
 	}
 
-	auto *okButton = qobject_cast<QPushButton *>(
-		dialog->button(QMessageBox::Ok));
+	auto *okButton = qobject_cast<QPushButton *>(dialog->button(QMessageBox::Ok));
 	for (auto *button : dialog->findChildren<QPushButton *>()) {
 		int targetWidth = 80;
 		if (button == okButton) {
 			button->setProperty("compactDialogAction", true);
 		} else {
-			const int requiredWidth =
-				button->fontMetrics().horizontalAdvance(button->text()) + 40;
+			const int requiredWidth = button->fontMetrics().horizontalAdvance(button->text()) + 40;
 			targetWidth = qMax(220, requiredWidth);
 		}
 		button->style()->unpolish(button);

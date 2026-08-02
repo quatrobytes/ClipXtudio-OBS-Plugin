@@ -36,12 +36,7 @@ if(WIN32)
   endif()
 endif()
 
-file(
-  GLOB_RECURSE forbidden_user_data
-  "${RESOURCE_DIR}/*.db"
-  "${RESOURCE_DIR}/settings.json"
-  "${RESOURCE_DIR}/clips/*"
-)
+file(GLOB_RECURSE forbidden_user_data "${RESOURCE_DIR}/*.db" "${RESOURCE_DIR}/settings.json" "${RESOURCE_DIR}/clips/*")
 if(forbidden_user_data)
   message(FATAL_ERROR "Package contains user data: ${forbidden_user_data}")
 endif()

@@ -46,18 +46,15 @@ public:
 
 	SettingsTab(TranslationFunction translator, SettingsManager *manager, QWidget *parent = nullptr,
 		    integrations::ChatIntegrationManager *chatManager = nullptr,
-		    licensing::LicenseManager *licenseManager = nullptr,
-		    VerticalObsBridge replayObsBridge = {});
+		    licensing::LicenseManager *licenseManager = nullptr, VerticalObsBridge replayObsBridge = {});
 
 	void setAppliedCallback(AppliedCallback callback);
 	void setRemoteAuthenticationRequestedCallback(RemoteAuthenticationRequestedCallback callback);
 	void setRemoteClipperOpenRequestedCallback(RemoteClipperOpenRequestedCallback callback);
 	void setProfileImportedCallback(ProfileImportedCallback callback);
 	void setSetupRequestedCallback(SetupRequestedCallback callback);
-	[[nodiscard]] bool exportProfileTo(const std::filesystem::path &path,
-					   std::string *error = nullptr) const;
-	[[nodiscard]] bool importProfileFrom(const std::filesystem::path &path,
-					     std::string *error = nullptr);
+	[[nodiscard]] bool exportProfileTo(const std::filesystem::path &path, std::string *error = nullptr) const;
+	[[nodiscard]] bool importProfileFrom(const std::filesystem::path &path, std::string *error = nullptr);
 	void setRemoteAuthenticationBusy(bool busy);
 	void refreshLicenseState();
 	void setRemoteClipperStatus(const remote::RemoteClipperStatus &status);

@@ -37,10 +37,7 @@ public:
 	virtual void shutdown() noexcept {}
 	[[nodiscard]] virtual VoiceRuntimeStatus status() const = 0;
 	virtual void setStatusCallback(StatusCallback callback) = 0;
-	[[nodiscard]] virtual std::vector<std::string> availableAudioSources() const
-	{
-		return {};
-	}
+	[[nodiscard]] virtual std::vector<std::string> availableAudioSources() const { return {}; }
 };
 
 } // namespace clipcoach

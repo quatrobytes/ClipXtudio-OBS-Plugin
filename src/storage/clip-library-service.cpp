@@ -20,8 +20,7 @@ namespace {
 
 std::string exportedVariantId(const ExportJob &job)
 {
-	return job.request.clipId + "-variant-vertical-" +
-	       ExportManager::cleanBaseName(job.outputPath.stem().string());
+	return job.request.clipId + "-variant-vertical-" + ExportManager::cleanBaseName(job.outputPath.stem().string());
 }
 
 int exportedDurationSeconds(const ExportJob &job)
@@ -47,8 +46,7 @@ StorageStatus removeLocalFile(const std::filesystem::path &path)
 	if (error) {
 		if (error == std::errc::no_such_file_or_directory)
 			return StorageStatus::ok();
-		return StorageStatus::fail("could not inspect local file " + path.u8string() + ": " +
-					   error.message());
+		return StorageStatus::fail("could not inspect local file " + path.u8string() + ": " + error.message());
 	}
 	if (!std::filesystem::exists(status)) {
 		return StorageStatus::ok();
@@ -57,8 +55,7 @@ StorageStatus removeLocalFile(const std::filesystem::path &path)
 		return StorageStatus::fail("refusing to delete a non-file path: " + path.u8string());
 	}
 	if (!std::filesystem::remove(path, error) || error) {
-		return StorageStatus::fail("could not delete local file " + path.u8string() + ": " +
-					   error.message());
+		return StorageStatus::fail("could not delete local file " + path.u8string() + ": " + error.message());
 	}
 	return StorageStatus::ok();
 }
@@ -218,23 +215,16 @@ void ClipLibraryService::storeClip(ClipMetadata clip, StatusCallback callback)
 	}
 }
 
-void ClipLibraryService::updateThumbnail(
-	std::string clipId, std::filesystem::path thumbnailPath,
-	StatusCallback callback)
+void ClipLibraryService::updateThumbnail(std::string clipId, std::filesystem::path thumbnailPath,
+					 StatusCallback callback)
 {
-	const auto queued = impl_->enqueue(
-		[clipId = std::move(clipId),
-		 thumbnailPath = std::move(thumbnailPath),
-		 callback = std::move(callback),
-		 impl = impl_.get()](SqliteDatabase &database) mutable {
+	const auto queued =
+		impl_->enqueue([clipId = std::move(clipId), thumbnailPath = std::move(thumbnailPath),
+				callback = std::move(callback), impl = impl_.get()](SqliteDatabase &database) mutable {
 			ClipRepository repository(database);
-			auto status =
-				repository.updateThumbnail(clipId, thumbnailPath);
+			auto status = repository.updateThumbnail(clipId, thumbnailPath);
 			if (!status.success)
-				impl->log(
-					true,
-					"ClipRepository thumbnail update failed: " +
-						status.error);
+				impl->log(true, "ClipRepository thumbnail update failed: " + status.error);
 			if (callback)
 				callback(std::move(status));
 		});
@@ -301,51 +291,46 @@ void ClipLibraryService::deleteClips(std::vector<std::string> clipIds, StatusCal
 		}
 		return;
 	}
-	const auto queued = impl_->enqueue(
-		[clipIds = std::move(clipIds), callback = std::move(callback),
-		 impl = impl_.get()](SqliteDatabase &database) mutable {
-			ClipRepository repository(database);
-			std::set<std::filesystem::path> removedPaths;
-			for (const auto &clipId : clipIds) {
-				const auto found = repository.findById(clipId);
-				if (!found.success || !found.value.has_value()) {
-					auto status = StorageStatus::fail(
-						found.success ? "clip was not found" : found.error);
-					impl->log(true, "Clip deletion failed: " + status.error);
-					if (callback)
-						callback(std::move(status));
-					return;
-				}
+	const auto queued = impl_->enqueue([clipIds = std::move(clipIds), callback = std::move(callback),
+					    impl = impl_.get()](SqliteDatabase &database) mutable {
+		ClipRepository repository(database);
+		std::set<std::filesystem::path> removedPaths;
+		for (const auto &clipId : clipIds) {
+			const auto found = repository.findById(clipId);
+			if (!found.success || !found.value.has_value()) {
+				auto status = StorageStatus::fail(found.success ? "clip was not found" : found.error);
+				impl->log(true, "Clip deletion failed: " + status.error);
+				if (callback)
+					callback(std::move(status));
+				return;
+			}
 
-				const auto &clip = *found.value;
-				for (const auto &path : {clip.filePath, clip.thumbnailPath,
-							clip.transcriptPath, clip.subtitlePath}) {
-					if (path.empty() || !removedPaths.insert(path).second)
-						continue;
-					const auto fileStatus = removeLocalFile(path);
-					if (!fileStatus.success) {
-						impl->log(true, "Clip deletion failed: " +
-									 fileStatus.error);
-						if (callback)
-							callback(fileStatus);
-						return;
-					}
-				}
-
-				const auto status = repository.remove(clipId);
-				if (!status.success) {
-					impl->log(true, "ClipRepository delete failed: " +
-								 status.error);
+			const auto &clip = *found.value;
+			for (const auto &path :
+			     {clip.filePath, clip.thumbnailPath, clip.transcriptPath, clip.subtitlePath}) {
+				if (path.empty() || !removedPaths.insert(path).second)
+					continue;
+				const auto fileStatus = removeLocalFile(path);
+				if (!fileStatus.success) {
+					impl->log(true, "Clip deletion failed: " + fileStatus.error);
 					if (callback)
-						callback(status);
+						callback(fileStatus);
 					return;
 				}
 			}
-			impl->log(false, "Deleted " + std::to_string(clipIds.size()) +
-						 " clip(s) and their local files");
-			if (callback)
-				callback(StorageStatus::ok());
-		});
+
+			const auto status = repository.remove(clipId);
+			if (!status.success) {
+				impl->log(true, "ClipRepository delete failed: " + status.error);
+				if (callback)
+					callback(status);
+				return;
+			}
+		}
+		impl->log(false, "Deleted " + std::to_string(clipIds.size()) + " clip(s) and their local files");
+		if (callback)
+			callback(StorageStatus::ok());
+	});
 	if (!queued && callback) {
 		callback(StorageStatus::fail("clip library is shutting down"));
 	}

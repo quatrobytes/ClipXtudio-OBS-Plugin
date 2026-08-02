@@ -18,16 +18,13 @@ public:
 	using Completion = std::function<void(ClipTranscriptionResult)>;
 	using Progress = std::function<void(int)>;
 
-	ClipCaptionTranscriber(std::filesystem::path ffmpegExecutable,
-			      std::filesystem::path whisperModel);
+	ClipCaptionTranscriber(std::filesystem::path ffmpegExecutable, std::filesystem::path whisperModel);
 	~ClipCaptionTranscriber();
 
 	ClipCaptionTranscriber(const ClipCaptionTranscriber &) = delete;
-	ClipCaptionTranscriber &
-	operator=(const ClipCaptionTranscriber &) = delete;
+	ClipCaptionTranscriber &operator=(const ClipCaptionTranscriber &) = delete;
 
-	void transcribe(std::filesystem::path mediaPath,
-			std::string language, Progress progress,
+	void transcribe(std::filesystem::path mediaPath, std::string language, Progress progress,
 			Completion completion);
 
 private:

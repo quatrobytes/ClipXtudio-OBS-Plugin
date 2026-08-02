@@ -14,8 +14,7 @@ SettingsSection::SettingsSection(const QString &title, QWidget *parent) : QFrame
 	setFrameShape(QFrame::NoFrame);
 
 	contentLayout_ = new QVBoxLayout(this);
-	contentLayout_->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceMd, tokens::kSpaceXl,
-					  tokens::kSpaceMd);
+	contentLayout_->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceMd, tokens::kSpaceXl, tokens::kSpaceMd);
 	contentLayout_->setSpacing(tokens::kSpaceSm);
 
 	auto *heading = new QHBoxLayout();
@@ -37,9 +36,8 @@ QVBoxLayout *SettingsSection::contentLayout() const noexcept
 
 void SettingsSection::setHelpText(const QString &helpText)
 {
-	helpButton_->setObjectName(objectName().isEmpty()
-					  ? QStringLiteral("sectionInfoButton")
-					  : objectName() + QStringLiteral("InfoButton"));
+	helpButton_->setObjectName(objectName().isEmpty() ? QStringLiteral("sectionInfoButton")
+							  : objectName() + QStringLiteral("InfoButton"));
 	helpButton_->setHelpText(helpText);
 }
 

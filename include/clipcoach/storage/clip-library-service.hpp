@@ -38,9 +38,7 @@ public:
 	void endSession(std::string sessionId, std::chrono::system_clock::time_point endedAt,
 			StatusCallback callback = {});
 	void storeClip(ClipMetadata clip, StatusCallback callback = {});
-	void updateThumbnail(std::string clipId,
-			     std::filesystem::path thumbnailPath,
-			     StatusCallback callback = {});
+	void updateThumbnail(std::string clipId, std::filesystem::path thumbnailPath, StatusCallback callback = {});
 	void storeAiResult(AiPersistedClipResult result, StatusCallback callback = {});
 	void storeSessionAiSummary(std::string sessionId, std::string summary, AiLanguage language,
 				   StatusCallback callback = {});

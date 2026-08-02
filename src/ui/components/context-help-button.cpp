@@ -13,8 +13,7 @@
 
 namespace clipcoach::ui {
 
-ContextHelpButton::ContextHelpButton(const QString &helpText, QWidget *parent)
-	: QToolButton(parent)
+ContextHelpButton::ContextHelpButton(const QString &helpText, QWidget *parent) : QToolButton(parent)
 {
 	setObjectName(QStringLiteral("ContextHelpButton"));
 	setProperty("uiRole", QStringLiteral("contextHelp"));
@@ -51,8 +50,7 @@ void ContextHelpButton::setHelpText(const QString &helpText)
 	setAccessibleDescription(helpText_);
 	setVisible(!helpText_.isEmpty());
 	if (popup_ != nullptr) {
-		if (auto *label = popup_->findChild<QLabel *>(
-			    QStringLiteral("ContextHelpPopupText")))
+		if (auto *label = popup_->findChild<QLabel *>(QStringLiteral("ContextHelpPopupText")))
 			label->setText(helpText_);
 	}
 	if (helpText_.isEmpty())
@@ -86,8 +84,7 @@ bool ContextHelpButton::eventFilter(QObject *watched, QEvent *event)
 		const auto *mouseEvent = static_cast<QMouseEvent *>(event);
 		const QPoint point = mouseEvent->globalPosition().toPoint();
 		const QRect buttonRect(mapToGlobal(QPoint(0, 0)), size());
-		const QRect popupRect(popup_->mapToGlobal(QPoint(0, 0)),
-				      popup_->size());
+		const QRect popupRect(popup_->mapToGlobal(QPoint(0, 0)), popup_->size());
 		if (!buttonRect.contains(point) && !popupRect.contains(point))
 			hideHelpPopup();
 	} else if (event->type() == QEvent::KeyPress) {
@@ -124,16 +121,14 @@ void ContextHelpButton::showHelpPopup()
 
 	popup_->adjustSize();
 	QPoint position = mapToGlobal(QPoint(0, height() + 6));
-	if (const auto *screen = QGuiApplication::screenAt(
-		    mapToGlobal(rect().center()))) {
+	if (const auto *screen = QGuiApplication::screenAt(mapToGlobal(rect().center()))) {
 		const QRect available = screen->availableGeometry();
 		if (position.x() + popup_->width() > available.right())
 			position.setX(available.right() - popup_->width());
 		if (position.x() < available.left())
 			position.setX(available.left());
 		if (position.y() + popup_->height() > available.bottom())
-			position.setY(mapToGlobal(
-				QPoint(0, -popup_->height() - 6)).y());
+			position.setY(mapToGlobal(QPoint(0, -popup_->height() - 6)).y());
 	}
 	popup_->move(position);
 	popup_->show();

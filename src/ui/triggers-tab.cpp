@@ -93,15 +93,13 @@ void clearLayout(QVBoxLayout *layout)
 	}
 }
 
-QWidget *fieldRow(const QString &title, const QString &description,
-		  QWidget *editor, QWidget *parent)
+QWidget *fieldRow(const QString &title, const QString &description, QWidget *editor, QWidget *parent)
 {
 	auto *row = new QWidget(parent);
 	row->setObjectName(QStringLiteral("triggerFieldRow"));
 	row->setProperty("triggerRole", QStringLiteral("field"));
 	auto *layout = new QHBoxLayout(row);
-	layout->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm,
-				   tokens::kSpaceSm, tokens::kSpaceSm);
+	layout->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm);
 	layout->setSpacing(tokens::kSpaceMd);
 
 	auto *copy = new QHBoxLayout();
@@ -112,8 +110,7 @@ QWidget *fieldRow(const QString &title, const QString &description,
 	copy->addWidget(label);
 	if (!description.isEmpty()) {
 		auto *help = new ContextHelpButton(description, row);
-		help->setObjectName(editor->objectName() +
-				    QStringLiteral("InfoButton"));
+		help->setObjectName(editor->objectName() + QStringLiteral("InfoButton"));
 		copy->addWidget(help, 0, Qt::AlignVCenter);
 		editor->setToolTip(description);
 	}
@@ -128,10 +125,8 @@ QWidget *fieldRow(const QString &title, const QString &description,
 
 } // namespace
 
-TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
-			 SettingsManager *settingsManager, QWidget *parent,
-			 VoiceTriggerController *voiceController,
-			 SceneProvider sceneProvider)
+TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine, SettingsManager *settingsManager,
+			 QWidget *parent, VoiceTriggerController *voiceController, SceneProvider sceneProvider)
 	: QWidget(parent),
 	  translator_(std::move(translator)),
 	  engine_(engine),
@@ -145,8 +140,7 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 
 	auto *content = new QWidget(this);
 	auto *layout = new QVBoxLayout(content);
-	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin,
-				   tokens::kPageMargin, tokens::kPageMargin);
+	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin);
 	layout->setSpacing(tokens::kSectionGap);
 	layout->setAlignment(Qt::AlignTop);
 
@@ -155,17 +149,14 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	pageHeader->setProperty("triggerRole", QStringLiteral("pageHeader"));
 	pageHeader->setProperty("pageRole", QStringLiteral("header"));
 	auto *pageHeaderLayout = new QHBoxLayout(pageHeader);
-	pageHeaderLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd,
-					     tokens::kSpaceLg, tokens::kSpaceMd);
+	pageHeaderLayout->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceMd);
 	pageHeaderLayout->setSpacing(tokens::kSpaceMd);
 	auto *headerIcon = new QLabel(pageHeader);
 	headerIcon->setObjectName(QStringLiteral("triggersPageIcon"));
 	headerIcon->setProperty("pageRole", QStringLiteral("icon"));
 	headerIcon->setAlignment(Qt::AlignCenter);
-	headerIcon->setPixmap(style()->standardIcon(QStyle::SP_BrowserReload)
-				      .pixmap(22, 22));
-	headerIcon->setFixedSize(tokens::kPageHeaderIconSize,
-				 tokens::kPageHeaderIconSize);
+	headerIcon->setPixmap(style()->standardIcon(QStyle::SP_BrowserReload).pixmap(22, 22));
+	headerIcon->setFixedSize(tokens::kPageHeaderIconSize, tokens::kPageHeaderIconSize);
 	auto *headingCopy = new QVBoxLayout();
 	headingCopy->setContentsMargins(0, 0, 0, 0);
 	headingCopy->setSpacing(tokens::kSpaceXs);
@@ -199,46 +190,36 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	rightLayout->setSpacing(tokens::kSpaceMd);
 	rightLayout->setAlignment(Qt::AlignTop);
 
-	auto *triggerSection =
-		new SettingsSection(text(strings::kTriggersSignals), content);
+	auto *triggerSection = new SettingsSection(text(strings::kTriggersSignals), content);
 	triggerSection->setObjectName(QStringLiteral("triggerSignalsSection"));
 	triggerSection->setProperty("triggerRole", QStringLiteral("card"));
-	manual_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerManual),
-		text(strings::kTriggerManualDescription),
-		QStringLiteral("triggerManualToggle"), true, false);
-	voice_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerVoice),
-		text(strings::kTriggerVoiceDescription),
-		QStringLiteral("triggerVoiceToggle"), false, true);
-	audioSpike_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerAudio),
-		text(strings::kTriggerAudioDescription),
-		QStringLiteral("triggerAudioSpikeToggle"), false, true);
-	chatPulse_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerChatPulse),
-		text(strings::kTriggerChatPulseDescription),
-		QStringLiteral("triggerChatPulseToggle"), false, true);
-	scene_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerScene),
-		text(strings::kTriggerSceneDescription),
-		QStringLiteral("triggerSceneToggle"), false, true);
-	keyword_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerKeyword),
-		text(strings::kTriggerKeywordDescription),
-		QStringLiteral("triggerKeywordToggle"), false, true);
-	aiHook_ = addTriggerToggle(
-		triggerSection->contentLayout(), text(strings::kTriggerAiHook),
-		text(strings::kTriggerAiHookDescription),
-		QStringLiteral("triggerAiHookToggle"), false, true);
+	manual_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerManual),
+				   text(strings::kTriggerManualDescription), QStringLiteral("triggerManualToggle"),
+				   true, false);
+	voice_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerVoice),
+				  text(strings::kTriggerVoiceDescription), QStringLiteral("triggerVoiceToggle"), false,
+				  true);
+	audioSpike_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerAudio),
+				       text(strings::kTriggerAudioDescription),
+				       QStringLiteral("triggerAudioSpikeToggle"), false, true);
+	chatPulse_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerChatPulse),
+				      text(strings::kTriggerChatPulseDescription),
+				      QStringLiteral("triggerChatPulseToggle"), false, true);
+	scene_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerScene),
+				  text(strings::kTriggerSceneDescription), QStringLiteral("triggerSceneToggle"), false,
+				  true);
+	keyword_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerKeyword),
+				    text(strings::kTriggerKeywordDescription), QStringLiteral("triggerKeywordToggle"),
+				    false, true);
+	aiHook_ = addTriggerToggle(triggerSection->contentLayout(), text(strings::kTriggerAiHook),
+				   text(strings::kTriggerAiHookDescription), QStringLiteral("triggerAiHookToggle"),
+				   false, true);
 	leftLayout->addWidget(triggerSection);
 
-	auto *configuration =
-		new SettingsSection(text(strings::kTriggersConfiguration), content);
+	auto *configuration = new SettingsSection(text(strings::kTriggersConfiguration), content);
 	configuration->setObjectName(QStringLiteral("triggerConfigurationSection"));
 	configuration->setProperty("triggerRole", QStringLiteral("card"));
-	configuration->setHelpText(
-		text(strings::kTriggerConfigurationDescription));
+	configuration->setHelpText(text(strings::kTriggerConfigurationDescription));
 	preRoll_ = new WheelSafeSpinBox(configuration);
 	preRoll_->setObjectName(QStringLiteral("triggerPreRoll"));
 	preRoll_->setRange(0, 120);
@@ -257,16 +238,11 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	cooldown_->setSuffix(QStringLiteral(" s"));
 	action_ = new WheelSafeComboBox(configuration);
 	action_->setObjectName(QStringLiteral("triggerAction"));
-	action_->addItem(text(strings::kTriggerActionSave),
-			 static_cast<int>(TriggerAction::SaveClip));
-	action_->addItem(text(strings::kTriggerActionMark),
-			 static_cast<int>(TriggerAction::MarkMoment));
-	action_->addItem(text(strings::kTriggerActionSaveVertical),
-			 static_cast<int>(TriggerAction::SaveVerticalClip));
-	action_->addItem(text(strings::kTriggerActionSaveBoth),
-			 static_cast<int>(TriggerAction::SaveBoth));
-	action_->addItem(text(strings::kTriggerActionRecommended),
-			 static_cast<int>(TriggerAction::AddToRecommended));
+	action_->addItem(text(strings::kTriggerActionSave), static_cast<int>(TriggerAction::SaveClip));
+	action_->addItem(text(strings::kTriggerActionMark), static_cast<int>(TriggerAction::MarkMoment));
+	action_->addItem(text(strings::kTriggerActionSaveVertical), static_cast<int>(TriggerAction::SaveVerticalClip));
+	action_->addItem(text(strings::kTriggerActionSaveBoth), static_cast<int>(TriggerAction::SaveBoth));
+	action_->addItem(text(strings::kTriggerActionRecommended), static_cast<int>(TriggerAction::AddToRecommended));
 	keywords_ = new QLineEdit(configuration);
 	keywords_->setObjectName(QStringLiteral("triggerKeywords"));
 	keywords_->setPlaceholderText(text(strings::kTriggerKeywordsHint));
@@ -275,22 +251,17 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	scenes_->setMinimumHeight(112);
 	scenes_->setMaximumHeight(150);
 	scenes_->setSelectionMode(QAbstractItemView::NoSelection);
+	configuration->contentLayout()->addWidget(
+		fieldRow(text(strings::kSettingsPreRoll), text(strings::kTriggerPreRollHelp), preRoll_, configuration));
 	configuration->contentLayout()->addWidget(fieldRow(
-		text(strings::kSettingsPreRoll), text(strings::kTriggerPreRollHelp),
-		preRoll_, configuration));
+		text(strings::kSettingsPostRoll), text(strings::kTriggerPostRollHelp), postRoll_, configuration));
+	configuration->contentLayout()->addWidget(fieldRow(text(strings::kTriggerSensitivity),
+							   text(strings::kTriggerSensitivityHelp), sensitivity_,
+							   configuration));
 	configuration->contentLayout()->addWidget(fieldRow(
-		text(strings::kSettingsPostRoll), text(strings::kTriggerPostRollHelp),
-		postRoll_, configuration));
-	configuration->contentLayout()->addWidget(fieldRow(
-		text(strings::kTriggerSensitivity),
-		text(strings::kTriggerSensitivityHelp), sensitivity_,
-		configuration));
-	configuration->contentLayout()->addWidget(fieldRow(
-		text(strings::kTriggerCooldown), text(strings::kTriggerCooldownHelp),
-		cooldown_, configuration));
-	configuration->contentLayout()->addWidget(fieldRow(
-		text(strings::kTriggerAction), text(strings::kTriggerActionHelp),
-		action_, configuration));
+		text(strings::kTriggerCooldown), text(strings::kTriggerCooldownHelp), cooldown_, configuration));
+	configuration->contentLayout()->addWidget(
+		fieldRow(text(strings::kTriggerAction), text(strings::kTriggerActionHelp), action_, configuration));
 	saveError_ = new QLabel(configuration);
 	saveError_->setObjectName(QStringLiteral("triggerSaveError"));
 	saveError_->setProperty("class", QStringLiteral("error"));
@@ -299,8 +270,7 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	configuration->contentLayout()->addWidget(saveError_);
 	rightLayout->addWidget(configuration);
 
-	auto *sceneSection =
-		new SettingsSection(text(strings::kTriggerScene), content);
+	auto *sceneSection = new SettingsSection(text(strings::kTriggerScene), content);
 	sceneSection->setObjectName(QStringLiteral("triggerScenesSection"));
 	sceneSection->setProperty("triggerRole", QStringLiteral("card"));
 	sceneSection->setHelpText(text(strings::kTriggerSceneHelp));
@@ -311,8 +281,7 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	auto *keywordLabel = new QLabel(text(strings::kTriggerKeyword), sceneSection);
 	keywordLabel->setObjectName(QStringLiteral("triggerKeywordFieldTitle"));
 	keywordHeading->addWidget(keywordLabel);
-	auto *keywordHelp = new ContextHelpButton(
-		text(strings::kTriggerKeywordDescription), sceneSection);
+	auto *keywordHelp = new ContextHelpButton(text(strings::kTriggerKeywordDescription), sceneSection);
 	keywordHelp->setObjectName(QStringLiteral("triggerKeywordsInfoButton"));
 	keywordHeading->addWidget(keywordHelp, 0, Qt::AlignVCenter);
 	keywordHeading->addStretch(1);
@@ -320,8 +289,7 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	sceneSection->contentLayout()->addWidget(keywords_);
 	leftLayout->addWidget(sceneSection);
 
-	auto *voiceSection =
-		new SettingsSection(text(strings::kVoicePhrases), content);
+	auto *voiceSection = new SettingsSection(text(strings::kVoicePhrases), content);
 	voiceSection->setObjectName(QStringLiteral("triggerVoiceSection"));
 	voiceSection->setProperty("triggerRole", QStringLiteral("card"));
 	voiceSection->setHelpText(text(strings::kVoicePhrasesDescription));
@@ -333,29 +301,20 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	phraseEditor->setObjectName(QStringLiteral("voicePhraseEditor"));
 	phraseEditor->setProperty("voiceRole", QStringLiteral("group"));
 	auto *phraseColumn = new QVBoxLayout(phraseEditor);
-	phraseColumn->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd,
-					tokens::kSpaceMd, tokens::kSpaceMd);
+	phraseColumn->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	phraseColumn->setSpacing(tokens::kSpaceSm);
 	voicePhrases_ = new QListWidget(voiceSection);
 	voicePhrases_->setObjectName(QStringLiteral("voicePhraseList"));
 	voicePhrases_->setMinimumHeight(188);
-	voicePhrases_->setSelectionMode(
-		QAbstractItemView::SingleSelection);
+	voicePhrases_->setSelectionMode(QAbstractItemView::SingleSelection);
 	voicePhraseInput_ = new QLineEdit(voiceSection);
-	voicePhraseInput_->setObjectName(
-		QStringLiteral("voicePhraseInput"));
-	voicePhraseInput_->setPlaceholderText(
-		text(strings::kVoicePhraseInputHint));
+	voicePhraseInput_->setObjectName(QStringLiteral("voicePhraseInput"));
+	voicePhraseInput_->setPlaceholderText(text(strings::kVoicePhraseInputHint));
 	voicePhraseInput_->setFixedHeight(tokens::kLargeControlHeight);
-	addVoicePhrase_ = new QPushButton(text(strings::kVoicePhraseAdd),
-					 voiceSection);
-	addVoicePhrase_->setObjectName(
-		QStringLiteral("addVoicePhraseButton"));
-	removeVoicePhrase_ =
-		new QPushButton(text(strings::kVoicePhraseRemove),
-				voiceSection);
-	removeVoicePhrase_->setObjectName(
-		QStringLiteral("removeVoicePhraseButton"));
+	addVoicePhrase_ = new QPushButton(text(strings::kVoicePhraseAdd), voiceSection);
+	addVoicePhrase_->setObjectName(QStringLiteral("addVoicePhraseButton"));
+	removeVoicePhrase_ = new QPushButton(text(strings::kVoicePhraseRemove), voiceSection);
+	removeVoicePhrase_->setObjectName(QStringLiteral("removeVoicePhraseButton"));
 	addVoicePhrase_->setProperty("controlRole", QStringLiteral("primary"));
 	removeVoicePhrase_->setProperty("controlRole", QStringLiteral("secondary"));
 	addVoicePhrase_->setFixedHeight(tokens::kLargeControlHeight);
@@ -375,20 +334,16 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	voiceControls->setObjectName(QStringLiteral("voiceRecognitionControls"));
 	voiceControls->setProperty("voiceRole", QStringLiteral("group"));
 	auto *voiceControlsLayout = new QVBoxLayout(voiceControls);
-	voiceControlsLayout->setContentsMargins(
-		tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd,
-		tokens::kSpaceMd);
+	voiceControlsLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	voiceControlsLayout->setSpacing(tokens::kSpaceMd);
 	auto *voiceForm = new QFormLayout();
 	voiceForm->setContentsMargins(0, 0, 0, 0);
 	voiceForm->setHorizontalSpacing(tokens::kSpaceLg);
 	voiceForm->setVerticalSpacing(tokens::kSpaceMd);
-	voiceForm->setFieldGrowthPolicy(
-		QFormLayout::AllNonFixedFieldsGrow);
+	voiceForm->setFieldGrowthPolicy(QFormLayout::AllNonFixedFieldsGrow);
 	voiceForm->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	voiceLanguage_ = new WheelSafeComboBox(voiceSection);
-	voiceLanguage_->setObjectName(
-		QStringLiteral("voiceLanguage"));
+	voiceLanguage_->setObjectName(QStringLiteral("voiceLanguage"));
 	voiceLanguage_->addItem(text(strings::kVoiceLanguageAuto), "auto");
 	voiceLanguage_->addItem(text(strings::kVoiceLanguageSpanish), "es");
 	voiceLanguage_->addItem(text(strings::kVoiceLanguageEnglish), "en");
@@ -397,19 +352,14 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	voiceAudioSource_->addItem(text(strings::kVoiceAudioSourceAuto), QString{});
 	if (voiceController_ != nullptr) {
 		for (const auto &source : voiceController_->availableAudioSources())
-			voiceAudioSource_->addItem(QString::fromStdString(source),
-						 QString::fromStdString(source));
+			voiceAudioSource_->addItem(QString::fromStdString(source), QString::fromStdString(source));
 	}
 	voiceSpeechMode_ = new WheelSafeComboBox(voiceSection);
-	voiceSpeechMode_->setObjectName(
-		QStringLiteral("voiceSpeechMode"));
-	voiceSpeechMode_->addItem(
-		text(strings::kVoiceModeLocal),
-		static_cast<int>(SpeechProcessingMode::Local));
+	voiceSpeechMode_->setObjectName(QStringLiteral("voiceSpeechMode"));
+	voiceSpeechMode_->addItem(text(strings::kVoiceModeLocal), static_cast<int>(SpeechProcessingMode::Local));
 	voiceForm->addRow(text(strings::kVoiceAudioSource), voiceAudioSource_);
 	voiceForm->addRow(text(strings::kVoiceLanguage), voiceLanguage_);
-	voiceForm->addRow(text(strings::kVoiceProcessingMode),
-			  voiceSpeechMode_);
+	voiceForm->addRow(text(strings::kVoiceProcessingMode), voiceSpeechMode_);
 	voiceControlsLayout->addLayout(voiceForm);
 	voiceStatus_ = new QLabel(text(strings::kVoiceStatusDisabled), voiceControls);
 	voiceStatus_->setObjectName(QStringLiteral("voiceRuntimeStatus"));
@@ -422,31 +372,22 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	voiceBody_->addWidget(voiceControls, 7);
 	voiceSection->contentLayout()->addLayout(voiceBody_);
 
-	const auto voiceControlsEnabled =
-		engine_ != nullptr && engine_->proUnlocked();
+	const auto voiceControlsEnabled = engine_ != nullptr && engine_->proUnlocked();
 	for (auto *widget :
-	     std::vector<QWidget *>{voicePhrases_, voicePhraseInput_,
-				    addVoicePhrase_, removeVoicePhrase_,
-				    voiceAudioSource_, voiceLanguage_,
-				    voiceSpeechMode_})
+	     std::vector<QWidget *>{voicePhrases_, voicePhraseInput_, addVoicePhrase_, removeVoicePhrase_,
+				    voiceAudioSource_, voiceLanguage_, voiceSpeechMode_})
 		widget->setEnabled(voiceControlsEnabled);
-	auto *events =
-		new SettingsSection(text(strings::kTriggersRecentEvents), content);
+	auto *events = new SettingsSection(text(strings::kTriggersRecentEvents), content);
 	events->setObjectName(QStringLiteral("triggerRecentEventsSection"));
 	events->setProperty("triggerRole", QStringLiteral("card"));
 	events->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Minimum);
 	events->setMinimumHeight(112);
 	eventsLayout_ = events->contentLayout();
-	eventsLayout_->setContentsMargins(
-		tokens::kSpaceXl, tokens::kSpaceLg,
-		tokens::kSpaceXl, tokens::kSpaceLg);
+	eventsLayout_->setContentsMargins(tokens::kSpaceXl, tokens::kSpaceLg, tokens::kSpaceXl, tokens::kSpaceLg);
 	eventsLayout_->setSpacing(tokens::kSpaceMd);
 	if (engine_ == nullptr || !engine_->proUnlocked()) {
-		upgradeBanner_ = new UpgradeBanner(
-			text(strings::kUpgradeTitle),
-			text(strings::kUpgradeDescription),
-			text(strings::kUpgradeAction), text(strings::kPro),
-			content);
+		upgradeBanner_ = new UpgradeBanner(text(strings::kUpgradeTitle), text(strings::kUpgradeDescription),
+						   text(strings::kUpgradeAction), text(strings::kPro), content);
 		rightLayout->addWidget(upgradeBanner_);
 	}
 	leftLayout->addStretch(1);
@@ -479,30 +420,20 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 		});
 		updateVoiceStatus(voiceController_->status());
 	}
-	for (auto *control :
-	     {manual_, voice_, audioSpike_, chatPulse_, scene_, keyword_,
-	      aiHook_})
-		connect(control, &QCheckBox::toggled, this,
-			[this] { applyAndSave(); });
+	for (auto *control : {manual_, voice_, audioSpike_, chatPulse_, scene_, keyword_, aiHook_})
+		connect(control, &QCheckBox::toggled, this, [this] { applyAndSave(); });
 	for (auto *control : {preRoll_, postRoll_, sensitivity_, cooldown_})
-		connect(control, &QSpinBox::editingFinished, this,
-			[this] { applyAndSave(); });
-	connect(preRoll_, &QSpinBox::valueChanged, this,
-		[this] { updateTimingSummary(); });
-	connect(postRoll_, &QSpinBox::valueChanged, this,
-		[this] { updateTimingSummary(); });
-	connect(action_, &QComboBox::currentIndexChanged, this,
-		[this] { applyAndSave(); });
-	connect(keywords_, &QLineEdit::editingFinished, this,
-		[this] { applyAndSave(); });
-	connect(scenes_, &QListWidget::itemChanged, this,
-		[this](QListWidgetItem *) { applyAndSave(); });
+		connect(control, &QSpinBox::editingFinished, this, [this] { applyAndSave(); });
+	connect(preRoll_, &QSpinBox::valueChanged, this, [this] { updateTimingSummary(); });
+	connect(postRoll_, &QSpinBox::valueChanged, this, [this] { updateTimingSummary(); });
+	connect(action_, &QComboBox::currentIndexChanged, this, [this] { applyAndSave(); });
+	connect(keywords_, &QLineEdit::editingFinished, this, [this] { applyAndSave(); });
+	connect(scenes_, &QListWidget::itemChanged, this, [this](QListWidgetItem *) { applyAndSave(); });
 	connect(addVoicePhrase_, &QPushButton::clicked, this, [this] {
 		const auto phrase = voicePhraseInput_->text().trimmed();
 		if (phrase.isEmpty() || phrase.contains(','))
 			return;
-		const auto duplicate = voicePhrases_->findItems(
-			phrase, Qt::MatchFixedString);
+		const auto duplicate = voicePhrases_->findItems(phrase, Qt::MatchFixedString);
 		if (!duplicate.empty())
 			return;
 		voicePhrases_->addItem(phrase);
@@ -512,27 +443,21 @@ TriggersTab::TriggersTab(TranslationFunction translator, TriggerEngine *engine,
 	connect(removeVoicePhrase_, &QPushButton::clicked, this, [this] {
 		if (voicePhrases_->count() <= 1)
 			return;
-		delete voicePhrases_->takeItem(
-			voicePhrases_->currentRow());
+		delete voicePhrases_->takeItem(voicePhrases_->currentRow());
 		applyAndSave();
 	});
-	connect(voiceLanguage_, &QComboBox::currentIndexChanged, this,
-		[this] { applyAndSave(); });
-	connect(voiceAudioSource_, &QComboBox::currentIndexChanged, this,
-		[this] { applyAndSave(); });
-	connect(voiceSpeechMode_, &QComboBox::currentIndexChanged, this,
-		[this] { applyAndSave(); });
+	connect(voiceLanguage_, &QComboBox::currentIndexChanged, this, [this] { applyAndSave(); });
+	connect(voiceAudioSource_, &QComboBox::currentIndexChanged, this, [this] { applyAndSave(); });
+	connect(voiceSpeechMode_, &QComboBox::currentIndexChanged, this, [this] { applyAndSave(); });
 
 	auto *timer = new QTimer(this);
 	timer->setInterval(100);
-	connect(timer, &QTimer::timeout, this,
-		[this] { refreshRecentEvents(); });
+	connect(timer, &QTimer::timeout, this, [this] { refreshRecentEvents(); });
 	timer->start();
 	if (sceneProvider_) {
 		auto *sceneTimer = new QTimer(this);
 		sceneTimer->setInterval(2000);
-		connect(sceneTimer, &QTimer::timeout, this,
-			[this] { refreshSceneOptions(); });
+		connect(sceneTimer, &QTimer::timeout, this, [this] { refreshSceneOptions(); });
 		sceneTimer->start();
 	}
 	refreshRecentEvents();
@@ -542,14 +467,10 @@ void TriggersTab::resizeEvent(QResizeEvent *event)
 {
 	QWidget::resizeEvent(event);
 	if (mainColumns_ != nullptr) {
-		mainColumns_->setDirection(width() < 900
-						   ? QBoxLayout::TopToBottom
-						   : QBoxLayout::LeftToRight);
+		mainColumns_->setDirection(width() < 900 ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
 	}
 	if (voiceBody_ != nullptr) {
-		voiceBody_->setDirection(width() < 820
-					 ? QBoxLayout::TopToBottom
-					 : QBoxLayout::LeftToRight);
+		voiceBody_->setDirection(width() < 820 ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
 	}
 }
 
@@ -584,9 +505,8 @@ QString TriggersTab::text(const char *key) const
 	return translator_ ? translator_(key) : QString::fromUtf8(key);
 }
 
-QCheckBox *TriggersTab::addTriggerToggle(
-	QVBoxLayout *layout, const QString &title, const QString &description,
-	const QString &objectName, bool checked, bool pro)
+QCheckBox *TriggersTab::addTriggerToggle(QVBoxLayout *layout, const QString &title, const QString &description,
+					 const QString &objectName, bool checked, bool pro)
 {
 	QString glyph = QStringLiteral("◆");
 	if (objectName.contains(QStringLiteral("Manual")))
@@ -603,16 +523,12 @@ QCheckBox *TriggersTab::addTriggerToggle(
 		glyph = QStringLiteral("#");
 	else if (objectName.contains(QStringLiteral("Ai")))
 		glyph = QStringLiteral("✦");
-	auto *row = new ToggleRow(glyph + QStringLiteral("  ") + title,
-				  description, checked, this);
-	row->setHelpButtonObjectName(objectName +
-				     QStringLiteral("InfoButton"));
+	auto *row = new ToggleRow(glyph + QStringLiteral("  ") + title, description, checked, this);
+	row->setHelpButtonObjectName(objectName + QStringLiteral("InfoButton"));
 	row->setProperty("triggerRole", QStringLiteral("signal"));
-	if (auto *signalLayout = qobject_cast<QHBoxLayout *>(row->layout());
-	    signalLayout != nullptr) {
-		signalLayout->setContentsMargins(
-			tokens::kCardPaddingHorizontal, tokens::kSpaceSm,
-			tokens::kCardPaddingHorizontal, tokens::kSpaceSm);
+	if (auto *signalLayout = qobject_cast<QHBoxLayout *>(row->layout()); signalLayout != nullptr) {
+		signalLayout->setContentsMargins(tokens::kCardPaddingHorizontal, tokens::kSpaceSm,
+						 tokens::kCardPaddingHorizontal, tokens::kSpaceSm);
 	}
 	row->setMinimumHeight(44);
 	row->setMaximumHeight(56);
@@ -629,9 +545,7 @@ QCheckBox *TriggersTab::addTriggerToggle(
 
 void TriggersTab::load()
 {
-	const auto settings = settingsManager_ != nullptr
-				      ? settingsManager_->settings()
-				      : Settings::defaults();
+	const auto settings = settingsManager_ != nullptr ? settingsManager_->settings() : Settings::defaults();
 	const QSignalBlocker manualBlock(manual_);
 	const QSignalBlocker voiceBlock(voice_);
 	const QSignalBlocker audioBlock(audioSpike_);
@@ -651,23 +565,17 @@ void TriggersTab::load()
 	const QSignalBlocker voiceModeBlock(voiceSpeechMode_);
 	manual_->setChecked(settings.triggerManualEnabled);
 	voice_->setChecked(voice_->isEnabled() && settings.triggerVoiceEnabled);
-	audioSpike_->setChecked(audioSpike_->isEnabled() &&
-			       settings.triggerAudioSpikeEnabled);
-	chatPulse_->setChecked(chatPulse_->isEnabled() &&
-			      settings.triggerChatPulseEnabled);
+	audioSpike_->setChecked(audioSpike_->isEnabled() && settings.triggerAudioSpikeEnabled);
+	chatPulse_->setChecked(chatPulse_->isEnabled() && settings.triggerChatPulseEnabled);
 	scene_->setChecked(scene_->isEnabled() && settings.triggerSceneEnabled);
-	keyword_->setChecked(keyword_->isEnabled() &&
-			    settings.triggerKeywordEnabled);
-	aiHook_->setChecked(aiHook_->isEnabled() &&
-			   settings.triggerAiHookEnabled);
+	keyword_->setChecked(keyword_->isEnabled() && settings.triggerKeywordEnabled);
+	aiHook_->setChecked(aiHook_->isEnabled() && settings.triggerAiHookEnabled);
 	preRoll_->setValue(settings.preRollSeconds);
 	postRoll_->setValue(settings.postRollSeconds);
 	sensitivity_->setValue(settings.triggerSensitivity);
 	cooldown_->setValue(settings.triggerCooldownSeconds);
-	action_->setCurrentIndex(std::max(
-		0, action_->findData(static_cast<int>(settings.triggerAction))));
-	keywords_->setText(
-		QString::fromStdString(settings.triggerKeywordsCsv));
+	action_->setCurrentIndex(std::max(0, action_->findData(static_cast<int>(settings.triggerAction))));
+	keywords_->setText(QString::fromStdString(settings.triggerKeywordsCsv));
 	const auto configuredScenes = splitCsv(settings.triggerScenesCsv);
 	for (const auto &configuredScene : configuredScenes) {
 		const auto value = QString::fromStdString(configuredScene);
@@ -681,19 +589,14 @@ void TriggersTab::load()
 		item->setCheckState(Qt::Checked);
 	}
 	voicePhrases_->clear();
-	for (const auto &phrase :
-	     splitCsv(settings.voiceTriggerPhrasesCsv))
+	for (const auto &phrase : splitCsv(settings.voiceTriggerPhrasesCsv))
 		voicePhrases_->addItem(QString::fromStdString(phrase));
-	voiceLanguage_->setCurrentIndex(std::max(
-		0, voiceLanguage_->findData(
-			   QString::fromStdString(
-				   settings.voiceTriggerLanguage))));
-	auto sourceIndex = voiceAudioSource_->findData(
-		QString::fromStdString(settings.voiceAudioSourceName));
+	voiceLanguage_->setCurrentIndex(
+		std::max(0, voiceLanguage_->findData(QString::fromStdString(settings.voiceTriggerLanguage))));
+	auto sourceIndex = voiceAudioSource_->findData(QString::fromStdString(settings.voiceAudioSourceName));
 	if (sourceIndex < 0 && !settings.voiceAudioSourceName.empty()) {
-		voiceAudioSource_->addItem(
-			QString::fromStdString(settings.voiceAudioSourceName),
-			QString::fromStdString(settings.voiceAudioSourceName));
+		voiceAudioSource_->addItem(QString::fromStdString(settings.voiceAudioSourceName),
+					   QString::fromStdString(settings.voiceAudioSourceName));
 		sourceIndex = voiceAudioSource_->count() - 1;
 	}
 	voiceAudioSource_->setCurrentIndex(std::max(0, sourceIndex));
@@ -720,16 +623,12 @@ void TriggersTab::applyAndSave()
 	settings.postRollSeconds = postRoll_->value();
 	settings.triggerSensitivity = sensitivity_->value();
 	settings.triggerCooldownSeconds = cooldown_->value();
-	settings.triggerAction = static_cast<TriggerAction>(
-		action_->currentData().toInt());
+	settings.triggerAction = static_cast<TriggerAction>(action_->currentData().toInt());
 	settings.triggerKeywordsCsv = keywords_->text().toStdString();
 	settings.triggerScenesCsv = joinCsv(checkedScenes(scenes_));
-	settings.voiceTriggerPhrasesCsv =
-		joinVoicePhrases(voicePhrases_);
-	settings.voiceTriggerLanguage =
-		voiceLanguage_->currentData().toString().toStdString();
-	settings.voiceAudioSourceName =
-		voiceAudioSource_->currentData().toString().toStdString();
+	settings.voiceTriggerPhrasesCsv = joinVoicePhrases(voicePhrases_);
+	settings.voiceTriggerLanguage = voiceLanguage_->currentData().toString().toStdString();
+	settings.voiceAudioSourceName = voiceAudioSource_->currentData().toString().toStdString();
 	// This build ships a complete local OBS-audio recognizer only. Do not
 	// expose or persist a cloud mode until a real authenticated transport is
 	// available.
@@ -745,8 +644,7 @@ void TriggersTab::applyAndSave()
 	saveError_->hide();
 	applyEngineConfiguration();
 	if (timingChangedCallback_)
-		timingChangedCallback_(settings.preRollSeconds +
-				       settings.postRollSeconds);
+		timingChangedCallback_(settings.preRollSeconds + settings.postRollSeconds);
 }
 
 void TriggersTab::applyEngineConfiguration()
@@ -759,8 +657,7 @@ void TriggersTab::applyEngineConfiguration()
 		config.preRollSeconds = preRoll_->value();
 		config.postRollSeconds = postRoll_->value();
 		config.sensitivity = sensitivity_->value();
-		config.action = static_cast<TriggerAction>(
-			action_->currentData().toInt());
+		config.action = static_cast<TriggerAction>(action_->currentData().toInt());
 		config.keywords = splitCsv(keywords_->text().toStdString());
 		config.scenes = checkedScenes(scenes_);
 		config.cooldown = std::chrono::seconds(cooldown_->value());
@@ -792,10 +689,9 @@ void TriggersTab::refreshSceneOptions()
 		auto *item = new QListWidgetItem(value, scenes_);
 		item->setData(Qt::UserRole, value);
 		item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
-		item->setCheckState(
-			std::find(selected.begin(), selected.end(), scene) != selected.end()
-				? Qt::Checked
-				: Qt::Unchecked);
+		item->setCheckState(std::find(selected.begin(), selected.end(), scene) != selected.end()
+					    ? Qt::Checked
+					    : Qt::Unchecked);
 	}
 }
 
@@ -803,11 +699,10 @@ void TriggersTab::updateTimingSummary()
 {
 	if (timingSummary_ == nullptr)
 		return;
-	timingSummary_->setText(
-		text(strings::kTriggerTimingSummary)
-			.arg(preRoll_->value())
-			.arg(postRoll_->value())
-			.arg(preRoll_->value() + postRoll_->value()));
+	timingSummary_->setText(text(strings::kTriggerTimingSummary)
+					.arg(preRoll_->value())
+					.arg(postRoll_->value())
+					.arg(preRoll_->value() + postRoll_->value()));
 }
 
 void TriggersTab::updateVoiceStatus(const VoiceRuntimeStatus &status)
@@ -844,12 +739,10 @@ void TriggersTab::updateVoiceStatus(const VoiceRuntimeStatus &status)
 	}
 	QString message = text(key);
 	if (!status.sourceName.empty())
-		message += QStringLiteral(" · ") +
-			   QString::fromStdString(status.sourceName);
+		message += QStringLiteral(" · ") + QString::fromStdString(status.sourceName);
 	if (!status.lastTranscript.empty())
 		message += QStringLiteral("\n") +
-			   text(strings::kVoiceStatusLastHeard)
-				   .arg(QString::fromStdString(status.lastTranscript));
+			   text(strings::kVoiceStatusLastHeard).arg(QString::fromStdString(status.lastTranscript));
 	voiceStatus_->setText(message);
 	voiceStatus_->setToolTip(QString::fromStdString(status.message));
 	voiceStatus_->setProperty("notificationTone", tone);
@@ -860,12 +753,9 @@ void TriggersTab::updateVoiceStatus(const VoiceRuntimeStatus &status)
 void TriggersTab::refreshRecentEvents()
 {
 	clearLayout(eventsLayout_);
-	const auto events =
-		engine_ != nullptr ? engine_->recentEvents(20)
-				   : std::vector<TriggerEvent>{};
+	const auto events = engine_ != nullptr ? engine_->recentEvents(20) : std::vector<TriggerEvent>{};
 	if (events.empty()) {
-		auto *empty =
-			new QLabel(text(strings::kTriggersNoEvents), this);
+		auto *empty = new QLabel(text(strings::kTriggersNoEvents), this);
 		empty->setObjectName(QStringLiteral("triggerEventsEmpty"));
 		empty->setProperty("class", QStringLiteral("supporting"));
 		eventsLayout_->addWidget(empty);
@@ -873,16 +763,13 @@ void TriggersTab::refreshRecentEvents()
 	}
 	for (const auto &event : events) {
 		const auto time = QDateTime::fromMSecsSinceEpoch(
-			std::chrono::duration_cast<std::chrono::milliseconds>(
-				event.occurredAt.time_since_epoch())
+			std::chrono::duration_cast<std::chrono::milliseconds>(event.occurredAt.time_since_epoch())
 				.count());
-		auto *label = new QLabel(
-			text(strings::kTriggerEventFormat)
-				.arg(QString::fromUtf8(
-					triggerTypeName(event.primaryType)))
-				.arg(event.score)
-				.arg(time.toString(QStringLiteral("HH:mm:ss"))),
-			this);
+		auto *label = new QLabel(text(strings::kTriggerEventFormat)
+						 .arg(QString::fromUtf8(triggerTypeName(event.primaryType)))
+						 .arg(event.score)
+						 .arg(time.toString(QStringLiteral("HH:mm:ss"))),
+					 this);
 		label->setObjectName(QStringLiteral("triggerEventItem"));
 		label->setProperty("triggerRole", QStringLiteral("event"));
 		label->setWordWrap(true);

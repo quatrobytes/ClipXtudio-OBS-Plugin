@@ -28,9 +28,7 @@ std::string trim(std::string value)
 std::string upper(std::string value)
 {
 	std::transform(value.begin(), value.end(), value.begin(),
-		       [](unsigned char character) {
-			       return static_cast<char>(std::toupper(character));
-		       });
+		       [](unsigned char character) { return static_cast<char>(std::toupper(character)); });
 	return value;
 }
 
@@ -41,49 +39,55 @@ obs_key_t keyFromText(const std::string &text)
 		return OBS_KEY_NONE;
 
 	const auto normalized = upper(cleaned);
-	if (normalized.size() == 1 && normalized[0] >= 'A' &&
-	    normalized[0] <= 'Z') {
-		return static_cast<obs_key_t>(
-			OBS_KEY_A + (normalized[0] - 'A'));
+	if (normalized.size() == 1 && normalized[0] >= 'A' && normalized[0] <= 'Z') {
+		return static_cast<obs_key_t>(OBS_KEY_A + (normalized[0] - 'A'));
 	}
-	if (normalized.size() == 1 && normalized[0] >= '0' &&
-	    normalized[0] <= '9') {
-		return static_cast<obs_key_t>(
-			OBS_KEY_0 + (normalized[0] - '0'));
+	if (normalized.size() == 1 && normalized[0] >= '0' && normalized[0] <= '9') {
+		return static_cast<obs_key_t>(OBS_KEY_0 + (normalized[0] - '0'));
 	}
 	if (normalized.size() >= 2 && normalized[0] == 'F') {
 		try {
 			const auto number = std::stoi(normalized.substr(1));
 			if (number >= 1 && number <= 35) {
-				return static_cast<obs_key_t>(
-					OBS_KEY_F1 + (number - 1));
+				return static_cast<obs_key_t>(OBS_KEY_F1 + (number - 1));
 			}
 		} catch (...) {
 			// Fall through to OBS' name parser.
 		}
 	}
 	const std::pair<std::string_view, obs_key_t> aliases[] = {
-		{"ESC", OBS_KEY_ESCAPE},       {"ESCAPE", OBS_KEY_ESCAPE},
-		{"ENTER", OBS_KEY_ENTER},      {"RETURN", OBS_KEY_RETURN},
-		{"SPACE", OBS_KEY_SPACE},      {"TAB", OBS_KEY_TAB},
+		{"ESC", OBS_KEY_ESCAPE},
+		{"ESCAPE", OBS_KEY_ESCAPE},
+		{"ENTER", OBS_KEY_ENTER},
+		{"RETURN", OBS_KEY_RETURN},
+		{"SPACE", OBS_KEY_SPACE},
+		{"TAB", OBS_KEY_TAB},
 		{"BACKSPACE", OBS_KEY_BACKSPACE},
-		{"DELETE", OBS_KEY_DELETE},    {"INSERT", OBS_KEY_INSERT},
-		{"HOME", OBS_KEY_HOME},        {"END", OBS_KEY_END},
-		{"PAGEUP", OBS_KEY_PAGEUP},    {"PAGEDOWN", OBS_KEY_PAGEDOWN},
-		{"LEFT", OBS_KEY_LEFT},        {"RIGHT", OBS_KEY_RIGHT},
-		{"UP", OBS_KEY_UP},            {"DOWN", OBS_KEY_DOWN},
-		{"PLUS", OBS_KEY_PLUS},        {"+", OBS_KEY_PLUS},
-		{"MINUS", OBS_KEY_MINUS},      {"-", OBS_KEY_MINUS},
-		{"COMMA", OBS_KEY_COMMA},      {",", OBS_KEY_COMMA},
-		{"PERIOD", OBS_KEY_PERIOD},    {".", OBS_KEY_PERIOD},
+		{"DELETE", OBS_KEY_DELETE},
+		{"INSERT", OBS_KEY_INSERT},
+		{"HOME", OBS_KEY_HOME},
+		{"END", OBS_KEY_END},
+		{"PAGEUP", OBS_KEY_PAGEUP},
+		{"PAGEDOWN", OBS_KEY_PAGEDOWN},
+		{"LEFT", OBS_KEY_LEFT},
+		{"RIGHT", OBS_KEY_RIGHT},
+		{"UP", OBS_KEY_UP},
+		{"DOWN", OBS_KEY_DOWN},
+		{"PLUS", OBS_KEY_PLUS},
+		{"+", OBS_KEY_PLUS},
+		{"MINUS", OBS_KEY_MINUS},
+		{"-", OBS_KEY_MINUS},
+		{"COMMA", OBS_KEY_COMMA},
+		{",", OBS_KEY_COMMA},
+		{"PERIOD", OBS_KEY_PERIOD},
+		{".", OBS_KEY_PERIOD},
 	};
 	for (const auto &[name, key] : aliases) {
 		if (normalized == name)
 			return key;
 	}
 
-	for (const auto &candidate :
-	     {cleaned, normalized, std::string("OBS_KEY_") + normalized}) {
+	for (const auto &candidate : {cleaned, normalized, std::string("OBS_KEY_") + normalized}) {
 		const auto key = obs_key_from_name(candidate.c_str());
 		if (key != OBS_KEY_NONE)
 			return key;
@@ -91,8 +95,7 @@ obs_key_t keyFromText(const std::string &text)
 	return OBS_KEY_NONE;
 }
 
-bool parseCombination(const std::string &text,
-		      obs_key_combination_t &combination)
+bool parseCombination(const std::string &text, obs_key_combination_t &combination)
 {
 	combination = {};
 	const auto cleaned = trim(text);
@@ -111,9 +114,8 @@ bool parseCombination(const std::string &text,
 			combination.modifiers |= INTERACT_SHIFT_KEY;
 		} else if (normalized == "ALT") {
 			combination.modifiers |= INTERACT_ALT_KEY;
-		} else if (normalized == "META" || normalized == "CMD" ||
-			   normalized == "COMMAND" || normalized == "WIN" ||
-			   normalized == "WINDOWS") {
+		} else if (normalized == "META" || normalized == "CMD" || normalized == "COMMAND" ||
+			   normalized == "WIN" || normalized == "WINDOWS") {
 			combination.modifiers |= INTERACT_COMMAND_KEY;
 		} else {
 			keyText = part;
@@ -138,13 +140,11 @@ ObsHotkeyAdapter::~ObsHotkeyAdapter()
 {
 	stopPersistence();
 	while (!entries_.empty()) {
-		unregisterHotkey(
-			static_cast<HotkeyHandle>(entries_.back()->id));
+		unregisterHotkey(static_cast<HotkeyHandle>(entries_.back()->id));
 	}
 }
 
-HotkeyRegistration ObsHotkeyAdapter::registerHotkey(
-	std::string name, std::string description, Callback callback)
+HotkeyRegistration ObsHotkeyAdapter::registerHotkey(std::string name, std::string description, Callback callback)
 {
 	if (name.empty() || !callback) {
 		return {false, 0, "hotkey registration metadata is invalid"};
@@ -153,12 +153,9 @@ HotkeyRegistration ObsHotkeyAdapter::registerHotkey(
 	entry->owner = this;
 	entry->name = std::move(name);
 	entry->callback = std::move(callback);
-	entry->id = obs_hotkey_register_frontend(
-		entry->name.c_str(), description.c_str(), hotkeyCallback,
-		entry.get());
+	entry->id = obs_hotkey_register_frontend(entry->name.c_str(), description.c_str(), hotkeyCallback, entry.get());
 	if (entry->id == OBS_INVALID_HOTKEY_ID) {
-		blog(LOG_ERROR, "%s Could not register hotkey %s", kLogPrefix,
-		     entry->name.c_str());
+		blog(LOG_ERROR, "%s Could not register hotkey %s", kLogPrefix, entry->name.c_str());
 		return {false, 0, "OBS rejected frontend hotkey registration"};
 	}
 	const auto handle = static_cast<HotkeyHandle>(entry->id);
@@ -168,11 +165,9 @@ HotkeyRegistration ObsHotkeyAdapter::registerHotkey(
 
 void ObsHotkeyAdapter::unregisterHotkey(HotkeyHandle handle) noexcept
 {
-	const auto found = std::find_if(
-		entries_.begin(), entries_.end(),
-		[handle](const auto &entry) {
-			return static_cast<HotkeyHandle>(entry->id) == handle;
-		});
+	const auto found = std::find_if(entries_.begin(), entries_.end(), [handle](const auto &entry) {
+		return static_cast<HotkeyHandle>(entry->id) == handle;
+	});
 	if (found == entries_.end()) {
 		return;
 	}
@@ -218,21 +213,17 @@ bool ObsHotkeyAdapter::applySettings(const Settings &settings)
 
 	bool success = true;
 	for (const auto &[name, bindingText] : configured) {
-		const auto found = std::find_if(
-			entries_.begin(), entries_.end(),
-			[name](const auto &entry) { return entry->name == name; });
+		const auto found = std::find_if(entries_.begin(), entries_.end(),
+						[name](const auto &entry) { return entry->name == name; });
 		if (found == entries_.end()) {
-			blog(LOG_WARNING, "%s Hotkey %s is not registered",
-			     kLogPrefix, name);
+			blog(LOG_WARNING, "%s Hotkey %s is not registered", kLogPrefix, name);
 			success = false;
 			continue;
 		}
 
 		obs_key_combination_t combination{};
 		if (!parseCombination(*bindingText, combination)) {
-			blog(LOG_WARNING,
-			     "%s Ignored invalid shortcut for %s", kLogPrefix,
-			     name);
+			blog(LOG_WARNING, "%s Ignored invalid shortcut for %s", kLogPrefix, name);
 			success = false;
 			continue;
 		}
@@ -247,8 +238,7 @@ bool ObsHotkeyAdapter::applySettings(const Settings &settings)
 	return success;
 }
 
-void ObsHotkeyAdapter::hotkeyCallback(void *data, obs_hotkey_id,
-				      obs_hotkey_t *, bool pressed)
+void ObsHotkeyAdapter::hotkeyCallback(void *data, obs_hotkey_id, obs_hotkey_t *, bool pressed)
 {
 	auto *entry = static_cast<Entry *>(data);
 	if (entry != nullptr && entry->owner != nullptr && entry->callback) {
@@ -256,8 +246,7 @@ void ObsHotkeyAdapter::hotkeyCallback(void *data, obs_hotkey_id,
 	}
 }
 
-void ObsHotkeyAdapter::frontendSaveCallback(obs_data_t *saveData, bool saving,
-					    void *privateData)
+void ObsHotkeyAdapter::frontendSaveCallback(obs_data_t *saveData, bool saving, void *privateData)
 {
 	auto *adapter = static_cast<ObsHotkeyAdapter *>(privateData);
 	if (adapter == nullptr || saveData == nullptr) {
@@ -276,8 +265,7 @@ void ObsHotkeyAdapter::save(obs_data_t *saveData)
 	for (const auto &entry : entries_) {
 		obs_data_array_t *bindings = obs_hotkey_save(entry->id);
 		if (bindings != nullptr) {
-			obs_data_set_array(hotkeys, entry->name.c_str(),
-					   bindings);
+			obs_data_set_array(hotkeys, entry->name.c_str(), bindings);
 			obs_data_array_release(bindings);
 		}
 	}
@@ -292,8 +280,7 @@ void ObsHotkeyAdapter::load(obs_data_t *saveData)
 		return;
 	}
 	for (const auto &entry : entries_) {
-		obs_data_array_t *bindings =
-			obs_data_get_array(hotkeys, entry->name.c_str());
+		obs_data_array_t *bindings = obs_data_get_array(hotkeys, entry->name.c_str());
 		if (bindings != nullptr) {
 			obs_hotkey_load(entry->id, bindings);
 			obs_data_array_release(bindings);

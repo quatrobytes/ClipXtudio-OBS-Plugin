@@ -4,6 +4,7 @@
 /artifacts/
 /.deps/
 /.tools/
+/.ci-format-tools/
 /.vs/
 /.vscode/
 /CMakeUserPresets.json

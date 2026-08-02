@@ -27,8 +27,7 @@
 #include <algorithm>
 
 namespace clipcoach::ui {
-VerticalTab::VerticalTab(TranslationFunction translator,
-			 VerticalCanvasManager *manager, VerticalObsBridge obsBridge,
+VerticalTab::VerticalTab(TranslationFunction translator, VerticalCanvasManager *manager, VerticalObsBridge obsBridge,
 			 QWidget *parent)
 	: QWidget(parent),
 	  translator_(std::move(translator)),
@@ -64,8 +63,7 @@ void VerticalTab::build()
 	content->setMinimumWidth(0);
 	content->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 	auto *layout = new QVBoxLayout(content);
-	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin,
-				   tokens::kPageMargin, tokens::kPageMargin);
+	layout->setContentsMargins(tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin, tokens::kPageMargin);
 	layout->setSpacing(tokens::kSectionGap);
 	layout->setAlignment(Qt::AlignTop);
 
@@ -73,10 +71,8 @@ void VerticalTab::build()
 	pageHeader_->setObjectName(QStringLiteral("verticalPageHeader"));
 	pageHeader_->setProperty("verticalRole", QStringLiteral("header"));
 	pageHeader_->setProperty("pageRole", QStringLiteral("header"));
-	headerLayout_ =
-		new QBoxLayout(QBoxLayout::LeftToRight, pageHeader_);
-	headerLayout_->setContentsMargins(0, tokens::kSpaceSm, 0,
-					 tokens::kSpaceSm);
+	headerLayout_ = new QBoxLayout(QBoxLayout::LeftToRight, pageHeader_);
+	headerLayout_->setContentsMargins(0, tokens::kSpaceSm, 0, tokens::kSpaceSm);
 	headerLayout_->setSpacing(tokens::kSpaceXl);
 	auto *headerIdentity = new QWidget(pageHeader_);
 	headerIdentity->setObjectName(QStringLiteral("verticalHeaderIdentity"));
@@ -101,41 +97,32 @@ void VerticalTab::build()
 	identityLayout->addLayout(headerCopy, 1);
 
 	auto *headerActionBlock = new QWidget(pageHeader_);
-	headerActionBlock->setObjectName(
-		QStringLiteral("verticalHeaderActionBlock"));
+	headerActionBlock->setObjectName(QStringLiteral("verticalHeaderActionBlock"));
 	auto *headerActionBlockLayout = new QVBoxLayout(headerActionBlock);
 	headerActionBlockLayout->setContentsMargins(0, 0, 0, 0);
 	headerActionBlockLayout->setSpacing(tokens::kSpaceSm);
 	headerActionsLayout_ = new QBoxLayout(QBoxLayout::LeftToRight);
 	headerActionsLayout_->setContentsMargins(0, 0, 0, 0);
 	headerActionsLayout_->setSpacing(tokens::kSpaceMd);
-	startReplayButton_ =
-		new PrimaryButton(text(strings::kVerticalStartReplay), pageHeader_);
-	startReplayButton_->setObjectName(
-		QStringLiteral("verticalStartReplayButton"));
+	startReplayButton_ = new PrimaryButton(text(strings::kVerticalStartReplay), pageHeader_);
+	startReplayButton_->setObjectName(QStringLiteral("verticalStartReplayButton"));
 	startReplayButton_->setIcon(style()->standardIcon(QStyle::SP_MediaPlay));
 	startReplayButton_->setFixedWidth(194);
 	startReplayButton_->setFixedHeight(kHeaderActionHeight);
 	saveClipButton_ = new QPushButton(text(strings::kVerticalSaveClip), pageHeader_);
 	saveClipButton_->setObjectName(QStringLiteral("verticalSaveClipButton"));
 	saveClipButton_->setProperty("controlRole", QStringLiteral("secondary"));
-	saveClipButton_->setIcon(
-		style()->standardIcon(QStyle::SP_DialogSaveButton));
+	saveClipButton_->setIcon(style()->standardIcon(QStyle::SP_DialogSaveButton));
 	saveClipButton_->setFixedWidth(142);
 	saveClipButton_->setFixedHeight(kHeaderActionHeight);
-	createSceneButton_ =
-		new QPushButton(text(strings::kVerticalCreateScene), pageHeader_);
-	createSceneButton_->setObjectName(
-		QStringLiteral("verticalCreateSceneButton"));
+	createSceneButton_ = new QPushButton(text(strings::kVerticalCreateScene), pageHeader_);
+	createSceneButton_->setObjectName(QStringLiteral("verticalCreateSceneButton"));
 	createSceneButton_->setProperty("controlRole", QStringLiteral("secondary"));
-	createSceneButton_->setIcon(
-		style()->standardIcon(QStyle::SP_FileDialogNewFolder));
+	createSceneButton_->setIcon(style()->standardIcon(QStyle::SP_FileDialogNewFolder));
 	createSceneButton_->setFixedWidth(184);
 	createSceneButton_->setFixedHeight(kHeaderActionHeight);
-	verticalStateBadge_ =
-		new QLabel(text(strings::kVerticalInactiveState), pageHeader_);
-	verticalStateBadge_->setObjectName(
-		QStringLiteral("verticalActiveBadge"));
+	verticalStateBadge_ = new QLabel(text(strings::kVerticalInactiveState), pageHeader_);
+	verticalStateBadge_->setObjectName(QStringLiteral("verticalActiveBadge"));
 	verticalStateBadge_->setAlignment(Qt::AlignCenter);
 	verticalStateBadge_->setFixedWidth(132);
 	verticalStateBadge_->setFixedHeight(kHeaderActionHeight);
@@ -153,13 +140,11 @@ void VerticalTab::build()
 	auto *savedIcon = new QLabel(QString(QChar(0x2713)), saveStateRow);
 	savedIcon->setObjectName(QStringLiteral("verticalSavedIcon"));
 	savedIcon->setAlignment(Qt::AlignCenter);
-	auto *autoSaved =
-		new QLabel(text(strings::kVerticalAutoSaved), saveStateRow);
+	auto *autoSaved = new QLabel(text(strings::kVerticalAutoSaved), saveStateRow);
 	autoSaved->setObjectName(QStringLiteral("verticalAutoSavedLabel"));
 	auto *separator = new QLabel(QStringLiteral("|"), saveStateRow);
 	separator->setObjectName(QStringLiteral("verticalSavedSeparator"));
-	auto *savedNow =
-		new QLabel(text(strings::kVerticalSavedNow), saveStateRow);
+	auto *savedNow = new QLabel(text(strings::kVerticalSavedNow), saveStateRow);
 	savedNow->setObjectName(QStringLiteral("verticalSavedNowLabel"));
 	saveStateLayout->addWidget(savedIcon);
 	saveStateLayout->addWidget(autoSaved);
@@ -169,8 +154,7 @@ void VerticalTab::build()
 	headerActionBlockLayout->addLayout(headerActionsLayout_);
 	headerActionBlockLayout->addWidget(saveStateRow);
 	headerLayout_->addWidget(headerIdentity, 1, Qt::AlignVCenter);
-	headerLayout_->addWidget(headerActionBlock, 0,
-				 Qt::AlignRight | Qt::AlignVCenter);
+	headerLayout_->addWidget(headerActionBlock, 0, Qt::AlignRight | Qt::AlignVCenter);
 	layout->addWidget(pageHeader_);
 	widthHint_ = new QLabel(text(strings::kVerticalWidthHint), content);
 	widthHint_->setObjectName(QStringLiteral("verticalWidthHint"));
@@ -202,12 +186,9 @@ void VerticalTab::build()
 	compactActionBar_ = new QFrame(previewColumn_);
 	compactActionBar_->setObjectName(QStringLiteral("verticalCompactActionBar"));
 	auto *compactActions = new QHBoxLayout(compactActionBar_);
-	compactActions->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm,
-					  tokens::kSpaceSm, tokens::kSpaceSm);
+	compactActions->setContentsMargins(tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm, tokens::kSpaceSm);
 	compactActions->setSpacing(tokens::kSpaceSm);
-	const auto compactButton = [this](const QString &name,
-					 QStyle::StandardPixmap icon,
-					 const QString &toolTip) {
+	const auto compactButton = [this](const QString &name, QStyle::StandardPixmap icon, const QString &toolTip) {
 		auto *button = new QPushButton(compactActionBar_);
 		button->setObjectName(name);
 		button->setProperty("controlRole", QStringLiteral("compactIcon"));
@@ -217,15 +198,12 @@ void VerticalTab::build()
 		button->setFixedSize(40, 40);
 		return button;
 	};
-	compactReplayButton_ = compactButton(
-		QStringLiteral("verticalCompactReplayButton"), QStyle::SP_MediaPlay,
-		text(strings::kVerticalStartReplay));
-	compactSaveButton_ = compactButton(
-		QStringLiteral("verticalCompactSaveButton"),
-		QStyle::SP_DialogSaveButton, text(strings::kVerticalSaveClip));
-	compactCreateSceneButton_ = compactButton(
-		QStringLiteral("verticalCompactCreateSceneButton"),
-		QStyle::SP_FileDialogNewFolder, text(strings::kVerticalCreateScene));
+	compactReplayButton_ = compactButton(QStringLiteral("verticalCompactReplayButton"), QStyle::SP_MediaPlay,
+					     text(strings::kVerticalStartReplay));
+	compactSaveButton_ = compactButton(QStringLiteral("verticalCompactSaveButton"), QStyle::SP_DialogSaveButton,
+					   text(strings::kVerticalSaveClip));
+	compactCreateSceneButton_ = compactButton(QStringLiteral("verticalCompactCreateSceneButton"),
+						  QStyle::SP_FileDialogNewFolder, text(strings::kVerticalCreateScene));
 	compactActions->addWidget(compactReplayButton_);
 	compactActions->addWidget(compactSaveButton_);
 	compactActions->addWidget(compactCreateSceneButton_);
@@ -246,35 +224,28 @@ void VerticalTab::build()
 	previewCard->setObjectName(QStringLiteral("verticalPreviewCard"));
 	previewCard->setProperty("verticalRole", QStringLiteral("card"));
 	auto *previewCardLayout = new QVBoxLayout(previewCard);
-	previewCardLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd,
-					     tokens::kSpaceMd, tokens::kSpaceMd);
+	previewCardLayout->setContentsMargins(tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd, tokens::kSpaceMd);
 	previewCardLayout->setSpacing(tokens::kSpaceSm);
 	auto *previewHeading = new QHBoxLayout();
-	auto *previewTitle =
-		new QLabel(text(strings::kVerticalPreviewTitle), previewCard);
+	auto *previewTitle = new QLabel(text(strings::kVerticalPreviewTitle), previewCard);
 	previewTitle->setObjectName(QStringLiteral("verticalPreviewTitle"));
-	auto *previewRatio =
-		new QLabel(text(strings::kVerticalPreviewRatio), previewCard);
+	auto *previewRatio = new QLabel(text(strings::kVerticalPreviewRatio), previewCard);
 	previewRatio->setObjectName(QStringLiteral("verticalPreviewRatio"));
 	previewRatio->setAlignment(Qt::AlignCenter);
 	previewHeading->addWidget(previewTitle);
 	previewHeading->addStretch(1);
 	previewOnlyButton_ = new QPushButton(previewCard);
-	previewOnlyButton_->setObjectName(
-		QStringLiteral("verticalPreviewOnlyButton"));
-	previewOnlyButton_->setProperty("controlRole",
-					QStringLiteral("compactIcon"));
+	previewOnlyButton_->setObjectName(QStringLiteral("verticalPreviewOnlyButton"));
+	previewOnlyButton_->setProperty("controlRole", QStringLiteral("compactIcon"));
 	previewOnlyButton_->setCheckable(true);
-	previewOnlyButton_->setIcon(
-		style()->standardIcon(QStyle::SP_TitleBarMaxButton));
+	previewOnlyButton_->setIcon(style()->standardIcon(QStyle::SP_TitleBarMaxButton));
 	previewOnlyButton_->setToolTip(text(strings::kVerticalPreviewOnly));
 	previewOnlyButton_->setAccessibleName(text(strings::kVerticalPreviewOnly));
 	previewOnlyButton_->setFixedSize(34, 30);
 	previewHeading->addWidget(previewOnlyButton_);
 	previewHeading->addWidget(previewRatio);
 	previewCardLayout->addLayout(previewHeading);
-	previewCardLayout->addWidget(preview_, 0,
-				     Qt::AlignTop | Qt::AlignHCenter);
+	previewCardLayout->addWidget(preview_, 0, Qt::AlignTop | Qt::AlignHCenter);
 	previewColumnLayout->addWidget(previewCard);
 	previewColumnLayout->addWidget(compactActionBar_);
 
@@ -285,12 +256,9 @@ void VerticalTab::build()
 	controls->setMinimumWidth(0);
 	// Keep the localized extended explanation available to accessibility/tests
 	// without repeating the legacy technical paragraph in the visual hierarchy.
-	auto *settingsDescription =
-		new QLabel(text(strings::kVerticalSettingsDescription), controls);
-	settingsDescription->setObjectName(
-		QStringLiteral("verticalSettingsDescription"));
-	settingsDescription->setAccessibleName(
-		text(strings::kVerticalSettingsDescription));
+	auto *settingsDescription = new QLabel(text(strings::kVerticalSettingsDescription), controls);
+	settingsDescription->setObjectName(QStringLiteral("verticalSettingsDescription"));
+	settingsDescription->setAccessibleName(text(strings::kVerticalSettingsDescription));
 	settingsDescription->hide();
 	controls->contentLayout()->addWidget(settingsDescription);
 
@@ -302,15 +270,13 @@ void VerticalTab::build()
 	form->setRowWrapPolicy(QFormLayout::WrapLongRows);
 	form->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 
-	const auto addFormSection = [form, controls](const QString &titleText,
-						     const QString &descriptionText,
+	const auto addFormSection = [form, controls](const QString &titleText, const QString &descriptionText,
 						     const QString &objectName) {
 		auto *section = new QWidget(controls);
 		section->setObjectName(objectName);
 		section->setProperty("verticalRole", QStringLiteral("formSection"));
 		auto *sectionLayout = new QVBoxLayout(section);
-		sectionLayout->setContentsMargins(0, tokens::kSpaceSm, 0,
-						 tokens::kSpaceXs);
+		sectionLayout->setContentsMargins(0, tokens::kSpaceSm, 0, tokens::kSpaceXs);
 		sectionLayout->setSpacing(tokens::kSpaceXs);
 		auto *heading = new QLabel(titleText, section);
 		heading->setProperty("verticalRole", QStringLiteral("sectionTitle"));
@@ -322,61 +288,45 @@ void VerticalTab::build()
 		form->addRow(section);
 	};
 
-	addFormSection(text(strings::kVerticalCompositionTitle),
-		       text(strings::kVerticalCompositionDescription),
+	addFormSection(text(strings::kVerticalCompositionTitle), text(strings::kVerticalCompositionDescription),
 		       QStringLiteral("verticalCompositionHeading"));
 	sceneCombo_ = new WheelSafeComboBox(controls);
 	sceneCombo_->setObjectName(QStringLiteral("verticalObsSceneCombo"));
-	sceneCombo_->setSizeAdjustPolicy(
-		QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	sceneCombo_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	sceneCombo_->setMinimumContentsLength(12);
 	form->addRow(text(strings::kVerticalObsScene), sceneCombo_);
 	form->labelForField(sceneCombo_)->setObjectName(QStringLiteral("SettingsFieldLabel"));
 
 	sourceCombo_ = new WheelSafeComboBox(controls);
 	sourceCombo_->setObjectName(QStringLiteral("verticalObsSourceCombo"));
-	sourceCombo_->setSizeAdjustPolicy(
-		QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	sourceCombo_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	sourceCombo_->setMinimumContentsLength(12);
 	form->addRow(text(strings::kVerticalObsSource), sourceCombo_);
 	form->labelForField(sourceCombo_)->setObjectName(QStringLiteral("SettingsFieldLabel"));
 
 	outputMode_ = new WheelSafeComboBox(controls);
 	outputMode_->setObjectName(QStringLiteral("verticalOutputModeCombo"));
-	outputMode_->setSizeAdjustPolicy(
-		QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	outputMode_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	outputMode_->setMinimumContentsLength(12);
-	outputMode_->addItems({text(strings::kSettingsHorizontal),
-			       text(strings::kSettingsVertical),
-			       text(strings::kSettingsBoth)});
+	outputMode_->addItems(
+		{text(strings::kSettingsHorizontal), text(strings::kSettingsVertical), text(strings::kSettingsBoth)});
 	form->addRow(text(strings::kVerticalOutputMode), outputMode_);
-	form->labelForField(outputMode_)
-		->setObjectName(QStringLiteral("SettingsFieldLabel"));
+	form->labelForField(outputMode_)->setObjectName(QStringLiteral("SettingsFieldLabel"));
 
-	addFormSection(text(strings::kVerticalCanvasTitle),
-		       text(strings::kVerticalCanvasDescription),
+	addFormSection(text(strings::kVerticalCanvasTitle), text(strings::kVerticalCanvasDescription),
 		       QStringLiteral("verticalCanvasHeading"));
 	resolution_ = new WheelSafeComboBox(controls);
-	resolution_->setObjectName(
-		QStringLiteral("verticalCanvasResolutionCombo"));
-	resolution_->setSizeAdjustPolicy(
-		QComboBox::AdjustToMinimumContentsLengthWithIcon);
+	resolution_->setObjectName(QStringLiteral("verticalCanvasResolutionCombo"));
+	resolution_->setSizeAdjustPolicy(QComboBox::AdjustToMinimumContentsLengthWithIcon);
 	resolution_->setMinimumContentsLength(12);
-	resolution_->addItem(QStringLiteral("1080p · 1080 × 1920"),
-			    static_cast<int>(VerticalResolution::Portrait1080));
-	resolution_->addItem(QStringLiteral("2K · 1440 × 2560"),
-			    static_cast<int>(VerticalResolution::Portrait1440));
-	resolution_->addItem(QStringLiteral("4K · 2160 × 3840"),
-			    static_cast<int>(VerticalResolution::Portrait2160));
-	resolution_->addItem(QStringLiteral("8K · 4320 × 7680"),
-			    static_cast<int>(VerticalResolution::Portrait4320));
-	resolution_->addItem(QStringLiteral("720p · 720 × 1280"),
-			    static_cast<int>(VerticalResolution::Portrait720));
-	resolution_->addItem(text(strings::kVerticalCustom),
-			    static_cast<int>(VerticalResolution::Custom));
+	resolution_->addItem(QStringLiteral("1080p · 1080 × 1920"), static_cast<int>(VerticalResolution::Portrait1080));
+	resolution_->addItem(QStringLiteral("2K · 1440 × 2560"), static_cast<int>(VerticalResolution::Portrait1440));
+	resolution_->addItem(QStringLiteral("4K · 2160 × 3840"), static_cast<int>(VerticalResolution::Portrait2160));
+	resolution_->addItem(QStringLiteral("8K · 4320 × 7680"), static_cast<int>(VerticalResolution::Portrait4320));
+	resolution_->addItem(QStringLiteral("720p · 720 × 1280"), static_cast<int>(VerticalResolution::Portrait720));
+	resolution_->addItem(text(strings::kVerticalCustom), static_cast<int>(VerticalResolution::Custom));
 	form->addRow(text(strings::kVerticalResolution), resolution_);
-	form->labelForField(resolution_)
-		->setObjectName(QStringLiteral("SettingsFieldLabel"));
+	form->labelForField(resolution_)->setObjectName(QStringLiteral("SettingsFieldLabel"));
 
 	auto *custom = new QWidget(controls);
 	auto *customLayout = new QHBoxLayout(custom);
@@ -393,8 +343,7 @@ void VerticalTab::build()
 	customLayout->addWidget(new QLabel(QStringLiteral("×"), custom));
 	customLayout->addWidget(customHeight_);
 	form->addRow(text(strings::kVerticalCustomSize), custom);
-	form->labelForField(custom)
-		->setObjectName(QStringLiteral("SettingsFieldLabel"));
+	form->labelForField(custom)->setObjectName(QStringLiteral("SettingsFieldLabel"));
 
 	zoom_ = new WheelSafeSpinBox(controls);
 	zoom_->setObjectName(QStringLiteral("verticalZoom"));
@@ -403,8 +352,7 @@ void VerticalTab::build()
 	zoom_->setToolTip(text(strings::kVerticalControlsHelp));
 	form->addRow(text(strings::kVerticalZoom), zoom_);
 
-	addFormSection(text(strings::kVerticalPositionTitle),
-		       text(strings::kVerticalPositionDescription),
+	addFormSection(text(strings::kVerticalPositionTitle), text(strings::kVerticalPositionDescription),
 		       QStringLiteral("verticalPositionHeading"));
 	panX_ = new WheelSafeSpinBox(controls);
 	panX_->setObjectName(QStringLiteral("verticalPanX"));
@@ -433,14 +381,12 @@ void VerticalTab::build()
 	controlsColumnLayout->setContentsMargins(0, 0, 0, 0);
 	controlsColumnLayout->setSpacing(tokens::kSpaceMd);
 
-	const auto createCard = [controlsColumn](const QString &titleText,
-						 const QString &objectName) {
+	const auto createCard = [controlsColumn](const QString &titleText, const QString &objectName) {
 		auto *card = new QFrame(controlsColumn);
 		card->setObjectName(objectName);
 		card->setProperty("verticalRole", QStringLiteral("controlCard"));
 		auto *cardRoot = new QVBoxLayout(card);
-		cardRoot->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd,
-					    tokens::kSpaceLg, tokens::kSpaceMd);
+		cardRoot->setContentsMargins(tokens::kSpaceLg, tokens::kSpaceMd, tokens::kSpaceLg, tokens::kSpaceMd);
 		cardRoot->setSpacing(tokens::kSpaceMd);
 		auto *titleLabel = new QLabel(titleText, card);
 		titleLabel->setProperty("verticalRole", QStringLiteral("sectionTitle"));
@@ -450,8 +396,7 @@ void VerticalTab::build()
 	const auto cardRoot = [](QFrame *card) {
 		return qobject_cast<QVBoxLayout *>(card->layout());
 	};
-	const auto field = [](const QString &labelText, QWidget *control,
-			      QWidget *parent) {
+	const auto field = [](const QString &labelText, QWidget *control, QWidget *parent) {
 		auto *holder = new QWidget(parent);
 		auto *holderLayout = new QVBoxLayout(holder);
 		holderLayout->setContentsMargins(0, 0, 0, 0);
@@ -463,38 +408,31 @@ void VerticalTab::build()
 		return holder;
 	};
 
-	auto *compositionCard = createCard(
-		QStringLiteral("◈  ") + text(strings::kVerticalCompositionTitle),
-		QStringLiteral("verticalCompositionCard"));
+	auto *compositionCard = createCard(QStringLiteral("◈  ") + text(strings::kVerticalCompositionTitle),
+					   QStringLiteral("verticalCompositionCard"));
 	auto *compositionGrid = new QGridLayout();
 	compositionGrid->setContentsMargins(0, 0, 0, 0);
 	compositionGrid->setHorizontalSpacing(tokens::kSpaceLg);
 	compositionGrid->setVerticalSpacing(tokens::kSpaceMd);
 	compositionGrid->setColumnStretch(0, 1);
 	compositionGrid->setColumnStretch(1, 1);
-	compositionGrid->addWidget(field(text(strings::kVerticalObsScene),
-					 sceneCombo_, compositionCard), 0, 0);
-	compositionGrid->addWidget(field(text(strings::kVerticalObsSource),
-					 sourceCombo_, compositionCard), 0, 1);
-	compositionGrid->addWidget(field(text(strings::kVerticalOutputMode),
-					 outputMode_, compositionCard), 1, 0);
+	compositionGrid->addWidget(field(text(strings::kVerticalObsScene), sceneCombo_, compositionCard), 0, 0);
+	compositionGrid->addWidget(field(text(strings::kVerticalObsSource), sourceCombo_, compositionCard), 0, 1);
+	compositionGrid->addWidget(field(text(strings::kVerticalOutputMode), outputMode_, compositionCard), 1, 0);
 	cardRoot(compositionCard)->addLayout(compositionGrid);
 	compositionSection_ = compositionCard;
 	previewColumnLayout->addWidget(compositionCard);
 
-	auto *canvasCard = createCard(
-		QStringLiteral("▱  ") + text(strings::kVerticalCanvasTitle),
-		QStringLiteral("verticalCanvasCard"));
+	auto *canvasCard = createCard(QStringLiteral("▱  ") + text(strings::kVerticalCanvasTitle),
+				      QStringLiteral("verticalCanvasCard"));
 	auto *canvasGrid = new QGridLayout();
 	canvasGrid->setContentsMargins(0, 0, 0, 0);
 	canvasGrid->setHorizontalSpacing(tokens::kSpaceLg);
 	canvasGrid->setVerticalSpacing(tokens::kSpaceMd);
 	canvasGrid->setColumnStretch(0, 1);
 	canvasGrid->setColumnStretch(1, 1);
-	canvasGrid->addWidget(field(text(strings::kVerticalResolution), resolution_,
-				    canvasCard), 0, 0);
-	canvasGrid->addWidget(field(text(strings::kVerticalCustomSize), custom,
-				    canvasCard), 0, 1);
+	canvasGrid->addWidget(field(text(strings::kVerticalResolution), resolution_, canvasCard), 0, 0);
+	canvasGrid->addWidget(field(text(strings::kVerticalCustomSize), custom, canvasCard), 0, 1);
 	cardRoot(canvasCard)->addLayout(canvasGrid);
 	auto *zoomRow = new QWidget(canvasCard);
 	auto *zoomRowLayout = new QHBoxLayout(zoomRow);
@@ -511,13 +449,10 @@ void VerticalTab::build()
 	zoomRowLayout->addWidget(zoom_);
 	cardRoot(canvasCard)->addWidget(zoomRow);
 
-	auto *positionCard = createCard(
-		QStringLiteral("✥  ") + text(strings::kVerticalPositionTitle),
-		QStringLiteral("verticalPositionCard"));
-	const auto addPositionRow = [this, positionCard, cardRoot](
-					    const QString &labelText,
-					    QSlider **slider, QSpinBox *spin,
-					    const QString &objectName) {
+	auto *positionCard = createCard(QStringLiteral("✥  ") + text(strings::kVerticalPositionTitle),
+					QStringLiteral("verticalPositionCard"));
+	const auto addPositionRow = [this, positionCard, cardRoot](const QString &labelText, QSlider **slider,
+								   QSpinBox *spin, const QString &objectName) {
 		auto *row = new QWidget(positionCard);
 		auto *rowLayout = new QHBoxLayout(row);
 		rowLayout->setContentsMargins(0, 0, 0, 0);
@@ -534,10 +469,8 @@ void VerticalTab::build()
 		rowLayout->addWidget(spin);
 		cardRoot(positionCard)->addWidget(row);
 	};
-	addPositionRow(text(strings::kVerticalPanX), &panXSlider_, panX_,
-		       QStringLiteral("verticalPanXSlider"));
-	addPositionRow(text(strings::kVerticalPanY), &panYSlider_, panY_,
-		       QStringLiteral("verticalPanYSlider"));
+	addPositionRow(text(strings::kVerticalPanX), &panXSlider_, panX_, QStringLiteral("verticalPanXSlider"));
+	addPositionRow(text(strings::kVerticalPanY), &panYSlider_, panY_, QStringLiteral("verticalPanYSlider"));
 
 	auto *framingContainer = new QWidget(controlsColumn);
 	framingContainer->setObjectName(QStringLiteral("verticalFramingControls"));
@@ -587,21 +520,18 @@ void VerticalTab::updateResponsiveLayout()
 	if (controlsSection_ != nullptr)
 		controlsSection_->setVisible(!previewOnly_);
 	if (framingLayout_ != nullptr)
-		framingLayout_->setDirection(compact ? QBoxLayout::TopToBottom
-						     : QBoxLayout::LeftToRight);
+		framingLayout_->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
 	if (widthHint_ != nullptr)
 		widthHint_->hide();
 
-	bodyLayout_->setDirection(compact ? QBoxLayout::TopToBottom
-					 : QBoxLayout::LeftToRight);
+	bodyLayout_->setDirection(compact ? QBoxLayout::TopToBottom : QBoxLayout::LeftToRight);
 	bodyLayout_->setStretch(0, compact ? 0 : 4);
 	bodyLayout_->setStretch(1, compact ? 0 : 7);
 
 	if (preview_ != nullptr) {
-		const int rawWidth = previewOnly_
-			? std::clamp(width() - 96, 315, 540)
-			: compact ? std::clamp(width() - 80, 234, 315)
-				: std::clamp(static_cast<int>(width() * 0.22), 252, 306);
+		const int rawWidth = previewOnly_ ? std::clamp(width() - 96, 315, 540)
+				     : compact    ? std::clamp(width() - 80, 234, 315)
+						  : std::clamp(static_cast<int>(width() * 0.22), 252, 306);
 		const int desiredWidth = std::max(234, (rawWidth / 9) * 9);
 		preview_->setFixedSize(desiredWidth, (desiredWidth / 9) * 16);
 	}
@@ -616,11 +546,9 @@ void VerticalTab::setPreviewOnly(bool enabled)
 			const QSignalBlocker blocker(previewOnlyButton_);
 			previewOnlyButton_->setChecked(enabled);
 		}
-		previewOnlyButton_->setIcon(style()->standardIcon(
-			enabled ? QStyle::SP_TitleBarNormalButton
-				: QStyle::SP_TitleBarMaxButton));
-		const auto label = text(enabled ? strings::kVerticalPreviewRestore
-					       : strings::kVerticalPreviewOnly);
+		previewOnlyButton_->setIcon(style()->standardIcon(enabled ? QStyle::SP_TitleBarNormalButton
+									  : QStyle::SP_TitleBarMaxButton));
+		const auto label = text(enabled ? strings::kVerticalPreviewRestore : strings::kVerticalPreviewOnly);
 		previewOnlyButton_->setToolTip(label);
 		previewOnlyButton_->setAccessibleName(label);
 	}
@@ -633,8 +561,8 @@ void VerticalTab::syncCompactActions()
 {
 	if (compactReplayButton_ != nullptr && startReplayButton_ != nullptr) {
 		compactReplayButton_->setEnabled(startReplayButton_->isEnabled());
-		compactReplayButton_->setIcon(style()->standardIcon(
-			replayActive_ ? QStyle::SP_MediaStop : QStyle::SP_MediaPlay));
+		compactReplayButton_->setIcon(
+			style()->standardIcon(replayActive_ ? QStyle::SP_MediaStop : QStyle::SP_MediaPlay));
 	}
 	if (compactSaveButton_ != nullptr && saveClipButton_ != nullptr)
 		compactSaveButton_->setEnabled(saveClipButton_->isEnabled());
@@ -652,66 +580,57 @@ void VerticalTab::bind()
 		if (saveClipCallback_)
 			saveClipCallback_();
 	});
-	connect(compactReplayButton_, &QPushButton::clicked,
-		startReplayButton_, &QPushButton::click);
-	connect(compactSaveButton_, &QPushButton::clicked,
-		saveClipButton_, &QPushButton::click);
-	connect(compactCreateSceneButton_, &QPushButton::clicked,
-		createSceneButton_, &QPushButton::click);
-	connect(previewOnlyButton_, &QPushButton::toggled,
-		this, &VerticalTab::setPreviewOnly);
+	connect(compactReplayButton_, &QPushButton::clicked, startReplayButton_, &QPushButton::click);
+	connect(compactSaveButton_, &QPushButton::clicked, saveClipButton_, &QPushButton::click);
+	connect(compactCreateSceneButton_, &QPushButton::clicked, createSceneButton_, &QPushButton::click);
+	connect(previewOnlyButton_, &QPushButton::toggled, this, &VerticalTab::setPreviewOnly);
 	if (obsBridge_.bindPreviewInteraction && preview_ != nullptr) {
-		obsBridge_.bindPreviewInteraction(
-			preview_, [this](int zoom, int panX, int panY) {
-				if (manager_ == nullptr)
-					return;
-				std::string error;
-				if (!manager_->setFraming(zoom, panX, panY, &error)) {
-					showError(error);
-					return;
-				}
-				const QSignalBlocker blockZoom(zoom_);
-				const QSignalBlocker blockPanX(panX_);
-				const QSignalBlocker blockPanY(panY_);
-				zoom_->setValue(zoom);
-				panX_->setValue(panX);
-				panY_->setValue(panY);
-				if (zoomSlider_ != nullptr)
-					zoomSlider_->setValue(zoom);
-				if (panXSlider_ != nullptr)
-					panXSlider_->setValue(panX);
-				if (panYSlider_ != nullptr)
-					panYSlider_->setValue(panY);
-				updateLivePreview();
-			});
+		obsBridge_.bindPreviewInteraction(preview_, [this](int zoom, int panX, int panY) {
+			if (manager_ == nullptr)
+				return;
+			std::string error;
+			if (!manager_->setFraming(zoom, panX, panY, &error)) {
+				showError(error);
+				return;
+			}
+			const QSignalBlocker blockZoom(zoom_);
+			const QSignalBlocker blockPanX(panX_);
+			const QSignalBlocker blockPanY(panY_);
+			zoom_->setValue(zoom);
+			panX_->setValue(panX);
+			panY_->setValue(panY);
+			if (zoomSlider_ != nullptr)
+				zoomSlider_->setValue(zoom);
+			if (panXSlider_ != nullptr)
+				panXSlider_->setValue(panX);
+			if (panYSlider_ != nullptr)
+				panYSlider_->setValue(panY);
+			updateLivePreview();
+		});
 	}
-	connect(sceneCombo_, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[this](int) {
-			if (refreshing_)
-				return;
-			refreshObsSources();
-			if (manager_ != nullptr) {
-				std::string error;
-				if (!manager_->setObsSelection(
-					    sceneCombo_->currentData().toString().toStdString(),
-					    sourceCombo_->currentData().toString().toStdString(), &error))
-					showError(error);
-			}
-			updateLivePreview();
-		});
-	connect(sourceCombo_, qOverload<int>(&QComboBox::currentIndexChanged), this,
-		[this](int) {
-			if (refreshing_)
-				return;
-			if (manager_ != nullptr) {
-				std::string error;
-				if (!manager_->setObsSelection(
-					    sceneCombo_->currentData().toString().toStdString(),
-					    sourceCombo_->currentData().toString().toStdString(), &error))
-					showError(error);
-			}
-			updateLivePreview();
-		});
+	connect(sceneCombo_, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+		if (refreshing_)
+			return;
+		refreshObsSources();
+		if (manager_ != nullptr) {
+			std::string error;
+			if (!manager_->setObsSelection(sceneCombo_->currentData().toString().toStdString(),
+						       sourceCombo_->currentData().toString().toStdString(), &error))
+				showError(error);
+		}
+		updateLivePreview();
+	});
+	connect(sourceCombo_, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+		if (refreshing_)
+			return;
+		if (manager_ != nullptr) {
+			std::string error;
+			if (!manager_->setObsSelection(sceneCombo_->currentData().toString().toStdString(),
+						       sourceCombo_->currentData().toString().toStdString(), &error))
+				showError(error);
+		}
+		updateLivePreview();
+	});
 	connect(createSceneButton_, &QPushButton::clicked, this, [this] {
 		if (!obsBridge_.createVerticalScene)
 			return;
@@ -738,60 +657,47 @@ void VerticalTab::bind()
 		updateLivePreview();
 	};
 	if (zoomSlider_ != nullptr) {
-		connect(zoomSlider_, &QSlider::valueChanged, zoom_,
-			&QSpinBox::setValue);
-		connect(zoom_, qOverload<int>(&QSpinBox::valueChanged), zoomSlider_,
-			&QSlider::setValue);
+		connect(zoomSlider_, &QSlider::valueChanged, zoom_, &QSpinBox::setValue);
+		connect(zoom_, qOverload<int>(&QSpinBox::valueChanged), zoomSlider_, &QSlider::setValue);
 	}
 	if (panXSlider_ != nullptr) {
-		connect(panXSlider_, &QSlider::valueChanged, panX_,
-			&QSpinBox::setValue);
-		connect(panX_, qOverload<int>(&QSpinBox::valueChanged), panXSlider_,
-			&QSlider::setValue);
+		connect(panXSlider_, &QSlider::valueChanged, panX_, &QSpinBox::setValue);
+		connect(panX_, qOverload<int>(&QSpinBox::valueChanged), panXSlider_, &QSlider::setValue);
 	}
 	if (panYSlider_ != nullptr) {
-		connect(panYSlider_, &QSlider::valueChanged, panY_,
-			&QSpinBox::setValue);
-		connect(panY_, qOverload<int>(&QSpinBox::valueChanged), panYSlider_,
-			&QSlider::setValue);
+		connect(panYSlider_, &QSlider::valueChanged, panY_, &QSpinBox::setValue);
+		connect(panY_, qOverload<int>(&QSpinBox::valueChanged), panYSlider_, &QSlider::setValue);
 	}
 	connect(zoom_, qOverload<int>(&QSpinBox::valueChanged), this, framingChanged);
 	connect(panX_, qOverload<int>(&QSpinBox::valueChanged), this, framingChanged);
 	connect(panY_, qOverload<int>(&QSpinBox::valueChanged), this, framingChanged);
-	connect(outputMode_, qOverload<int>(&QComboBox::currentIndexChanged),
-		this, [this](int index) {
-			if (refreshing_ || manager_ == nullptr) {
-				return;
-			}
-			std::string error;
-			if (!manager_->setOutputMode(
-				    static_cast<CaptureOutputMode>(index), &error)) {
-				showError(error);
-			}
-			refresh();
-		});
-	connect(resolution_, qOverload<int>(&QComboBox::currentIndexChanged),
-		this, [this](int) {
-			if (!refreshing_) {
-				applyResolution();
-			}
-		});
-	connect(customWidth_, qOverload<int>(&QSpinBox::valueChanged), this,
-		[this](int) {
-			if (!refreshing_ &&
-			    resolution_->currentData().toInt() ==
-				    static_cast<int>(VerticalResolution::Custom)) {
-				applyResolution();
-			}
-		});
-	connect(customHeight_, qOverload<int>(&QSpinBox::valueChanged), this,
-		[this](int) {
-			if (!refreshing_ &&
-			    resolution_->currentData().toInt() ==
-				    static_cast<int>(VerticalResolution::Custom)) {
-				applyResolution();
-			}
-		});
+	connect(outputMode_, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int index) {
+		if (refreshing_ || manager_ == nullptr) {
+			return;
+		}
+		std::string error;
+		if (!manager_->setOutputMode(static_cast<CaptureOutputMode>(index), &error)) {
+			showError(error);
+		}
+		refresh();
+	});
+	connect(resolution_, qOverload<int>(&QComboBox::currentIndexChanged), this, [this](int) {
+		if (!refreshing_) {
+			applyResolution();
+		}
+	});
+	connect(customWidth_, qOverload<int>(&QSpinBox::valueChanged), this, [this](int) {
+		if (!refreshing_ &&
+		    resolution_->currentData().toInt() == static_cast<int>(VerticalResolution::Custom)) {
+			applyResolution();
+		}
+	});
+	connect(customHeight_, qOverload<int>(&QSpinBox::valueChanged), this, [this](int) {
+		if (!refreshing_ &&
+		    resolution_->currentData().toInt() == static_cast<int>(VerticalResolution::Custom)) {
+			applyResolution();
+		}
+	});
 }
 
 void VerticalTab::applyResolution()
@@ -800,10 +706,8 @@ void VerticalTab::applyResolution()
 		return;
 	}
 	std::string error;
-	const auto preset = static_cast<VerticalResolution>(
-		resolution_->currentData().toInt());
-	if (!manager_->setResolution(preset, customWidth_->value(),
-				     customHeight_->value(), &error)) {
+	const auto preset = static_cast<VerticalResolution>(resolution_->currentData().toInt());
+	if (!manager_->setResolution(preset, customWidth_->value(), customHeight_->value(), &error)) {
 		showError(error);
 		return;
 	}
@@ -824,13 +728,11 @@ void VerticalTab::refresh()
 		controlsSection_->setEnabled(true);
 	refreshing_ = true;
 	refreshObsScenes();
-	const auto sceneIndex =
-		sceneCombo_->findData(QString::fromStdString(manager_->selectedSceneName()));
+	const auto sceneIndex = sceneCombo_->findData(QString::fromStdString(manager_->selectedSceneName()));
 	if (sceneIndex >= 0)
 		sceneCombo_->setCurrentIndex(sceneIndex);
 	refreshObsSources();
-	const auto sourceIndex =
-		sourceCombo_->findData(QString::fromStdString(manager_->selectedSourceName()));
+	const auto sourceIndex = sourceCombo_->findData(QString::fromStdString(manager_->selectedSourceName()));
 	if (sourceIndex >= 0)
 		sourceCombo_->setCurrentIndex(sourceIndex);
 	const auto state = manager_->settings();
@@ -838,8 +740,7 @@ void VerticalTab::refresh()
 	panX_->setValue(state.panXPercent);
 	panY_->setValue(state.panYPercent);
 	outputMode_->setCurrentIndex(static_cast<int>(state.outputMode));
-	const auto resolutionIndex =
-		resolution_->findData(static_cast<int>(state.resolution));
+	const auto resolutionIndex = resolution_->findData(static_cast<int>(state.resolution));
 	resolution_->setCurrentIndex(resolutionIndex < 0 ? 0 : resolutionIndex);
 	customWidth_->setValue(state.width);
 	customHeight_->setValue(state.height);
@@ -848,9 +749,8 @@ void VerticalTab::refresh()
 	if (fallbackPreview_ != nullptr)
 		fallbackPreview_->setCanvasSettings(state);
 	updateLivePreview();
-	message_->setText(
-		manager_->proUnlocked() ? text(strings::kVerticalProActive)
-				       : text(strings::kVerticalFreeMode));
+	message_->setText(manager_->proUnlocked() ? text(strings::kVerticalProActive)
+						  : text(strings::kVerticalFreeMode));
 	if (verticalStateBadge_ != nullptr) {
 		verticalStateBadge_->setText(text(strings::kVerticalActiveState));
 		verticalStateBadge_->setProperty("verticalActive", true);
@@ -879,8 +779,7 @@ void VerticalTab::setCanvasChangedCallback(CanvasChangedCallback callback)
 	notifyCanvasChanged();
 }
 
-void VerticalTab::setCaptureActions(ActionCallback startReplay,
-				    ActionCallback saveClip)
+void VerticalTab::setCaptureActions(ActionCallback startReplay, ActionCallback saveClip)
 {
 	startReplayCallback_ = std::move(startReplay);
 	saveClipCallback_ = std::move(saveClip);
@@ -892,14 +791,10 @@ void VerticalTab::setReplayState(bool active, bool transition)
 	replayActive_ = active;
 	replayTransition_ = transition;
 	if (startReplayButton_ != nullptr) {
-		startReplayButton_->setEnabled(
-			static_cast<bool>(startReplayCallback_) && !active &&
-			!transition);
+		startReplayButton_->setEnabled(static_cast<bool>(startReplayCallback_) && !active && !transition);
 	}
 	if (saveClipButton_ != nullptr) {
-		saveClipButton_->setEnabled(
-			static_cast<bool>(saveClipCallback_) && active &&
-			!transition);
+		saveClipButton_->setEnabled(static_cast<bool>(saveClipCallback_) && active && !transition);
 	}
 	syncCompactActions();
 	// The badge describes the configured vertical canvas, not the Replay
@@ -932,7 +827,8 @@ void VerticalTab::refreshObsScenes()
 	}
 	if (index < 0 && obsBridge_.sourcesForScene) {
 		for (int candidate = 1; candidate < sceneCombo_->count(); ++candidate) {
-			if (!obsBridge_.sourcesForScene(sceneCombo_->itemData(candidate).toString().toStdString()).empty()) {
+			if (!obsBridge_.sourcesForScene(sceneCombo_->itemData(candidate).toString().toStdString())
+				     .empty()) {
 				index = candidate;
 				break;
 			}
@@ -968,8 +864,7 @@ void VerticalTab::updateLivePreview()
 		return;
 	const auto source = sourceCombo_->currentData().toString();
 	const auto scene = sceneCombo_->currentData().toString();
-	obsBridge_.updatePreview(preview_, (source.isEmpty() ? scene : source).toStdString(),
-				 manager_->settings());
+	obsBridge_.updatePreview(preview_, (source.isEmpty() ? scene : source).toStdString(), manager_->settings());
 }
 
 void VerticalTab::showError(const std::string &error)

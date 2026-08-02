@@ -45,9 +45,7 @@ bool containsInsensitive(const std::string &value, const char *needle)
 {
 	std::string lowered = value;
 	std::transform(lowered.begin(), lowered.end(), lowered.begin(),
-		       [](unsigned char character) {
-			       return static_cast<char>(std::tolower(character));
-		       });
+		       [](unsigned char character) { return static_cast<char>(std::tolower(character)); });
 	return lowered.find(needle) != std::string::npos;
 }
 
@@ -67,32 +65,24 @@ bool equalsInsensitive(const char *value, const char *expected)
 
 bool isMontillaKickOverlay(obs_source_t *source)
 {
-	return source != nullptr &&
-	       equalsInsensitive(obs_source_get_name(source), "MontillaRX Kick");
+	return source != nullptr && equalsInsensitive(obs_source_get_name(source), "MontillaRX Kick");
 }
 
 VerticalElementType verticalElementTypeForSource(obs_source_t *source)
 {
 	const char *rawName = source == nullptr ? nullptr : obs_source_get_name(source);
-	const char *rawId =
-		source == nullptr ? nullptr : obs_source_get_unversioned_id(source);
-	const std::string identity =
-		(rawName == nullptr ? std::string{} : std::string(rawName)) + " " +
-		(rawId == nullptr ? std::string{} : std::string(rawId));
-	if (containsInsensitive(identity, "camera") ||
-	    containsInsensitive(identity, "webcam") ||
-	    containsInsensitive(identity, "facecam") ||
-	    containsInsensitive(identity, "camara") ||
-	    containsInsensitive(identity, "dshow_input") ||
-	    containsInsensitive(identity, "av_capture_input") ||
+	const char *rawId = source == nullptr ? nullptr : obs_source_get_unversioned_id(source);
+	const std::string identity = (rawName == nullptr ? std::string{} : std::string(rawName)) + " " +
+				     (rawId == nullptr ? std::string{} : std::string(rawId));
+	if (containsInsensitive(identity, "camera") || containsInsensitive(identity, "webcam") ||
+	    containsInsensitive(identity, "facecam") || containsInsensitive(identity, "camara") ||
+	    containsInsensitive(identity, "dshow_input") || containsInsensitive(identity, "av_capture_input") ||
 	    containsInsensitive(identity, "v4l2_input"))
 		return VerticalElementType::Camera;
-	if (containsInsensitive(identity, "subtitle") ||
-	    containsInsensitive(identity, "caption") ||
+	if (containsInsensitive(identity, "subtitle") || containsInsensitive(identity, "caption") ||
 	    containsInsensitive(identity, "subtitulo"))
 		return VerticalElementType::Subtitles;
-	if (containsInsensitive(identity, "title") ||
-	    containsInsensitive(identity, "titulo") ||
+	if (containsInsensitive(identity, "title") || containsInsensitive(identity, "titulo") ||
 	    containsInsensitive(identity, "text"))
 		return VerticalElementType::Title;
 	if (containsInsensitive(identity, "logo"))
@@ -102,8 +92,7 @@ VerticalElementType verticalElementTypeForSource(obs_source_t *source)
 	return VerticalElementType::Gameplay;
 }
 
-void applyVerticalItemSettings(obs_sceneitem_t *item,
-			       const VerticalCanvasSettings &settings)
+void applyVerticalItemSettings(obs_sceneitem_t *item, const VerticalCanvasSettings &settings)
 {
 	if (item == nullptr)
 		return;
@@ -111,11 +100,9 @@ void applyVerticalItemSettings(obs_sceneitem_t *item,
 	const auto &element = settings.element(verticalElementTypeForSource(source));
 	obs_sceneitem_set_visible(item, element.enabled);
 
-	vec2 position{static_cast<float>(element.x * settings.width),
-		      static_cast<float>(element.y * settings.height)};
-	vec2 bounds{
-		std::max(1.0F, static_cast<float>(element.width * settings.width)),
-		std::max(1.0F, static_cast<float>(element.height * settings.height))};
+	vec2 position{static_cast<float>(element.x * settings.width), static_cast<float>(element.y * settings.height)};
+	vec2 bounds{std::max(1.0F, static_cast<float>(element.width * settings.width)),
+		    std::max(1.0F, static_cast<float>(element.height * settings.height))};
 	obs_sceneitem_set_alignment(item, OBS_ALIGN_LEFT | OBS_ALIGN_TOP);
 	obs_sceneitem_set_pos(item, &position);
 	obs_sceneitem_set_bounds_type(item, OBS_BOUNDS_SCALE_OUTER);
@@ -124,8 +111,7 @@ void applyVerticalItemSettings(obs_sceneitem_t *item,
 	obs_sceneitem_set_order_position(item, element.zOrder);
 }
 
-void applyFullHeightCentered(obs_sceneitem_t *item,
-			     const VerticalCanvasSettings &settings)
+void applyFullHeightCentered(obs_sceneitem_t *item, const VerticalCanvasSettings &settings)
 {
 	if (item == nullptr)
 		return;
@@ -138,29 +124,22 @@ void applyFullHeightCentered(obs_sceneitem_t *item,
 	obs_sceneitem_set_crop(item, &crop);
 	if (sourceWidth == 0 || sourceHeight == 0) {
 		vec2 position{};
-		vec2 bounds{static_cast<float>(settings.width),
-			    static_cast<float>(settings.height)};
+		vec2 bounds{static_cast<float>(settings.width), static_cast<float>(settings.height)};
 		obs_sceneitem_set_pos(item, &position);
 		obs_sceneitem_set_bounds_type(item, OBS_BOUNDS_SCALE_INNER);
 		obs_sceneitem_set_bounds_alignment(item, OBS_ALIGN_CENTER);
 		obs_sceneitem_set_bounds(item, &bounds);
 		return;
 	}
-	const auto scale = static_cast<float>(settings.height) /
-			   static_cast<float>(sourceHeight);
+	const auto scale = static_cast<float>(settings.height) / static_cast<float>(sourceHeight);
 	vec2 itemScale{scale, scale};
-	vec2 position{
-		(static_cast<float>(settings.width) -
-		 static_cast<float>(sourceWidth) * scale) /
-			2.0F,
-		0.0F};
+	vec2 position{(static_cast<float>(settings.width) - static_cast<float>(sourceWidth) * scale) / 2.0F, 0.0F};
 	obs_sceneitem_set_bounds_type(item, OBS_BOUNDS_NONE);
 	obs_sceneitem_set_scale(item, &itemScale);
 	obs_sceneitem_set_pos(item, &position);
 }
 
-void applyBottomAlignedOverlay(obs_sceneitem_t *item,
-			       const VerticalCanvasSettings &settings)
+void applyBottomAlignedOverlay(obs_sceneitem_t *item, const VerticalCanvasSettings &settings)
 {
 	if (item == nullptr)
 		return;
@@ -169,13 +148,10 @@ void applyBottomAlignedOverlay(obs_sceneitem_t *item,
 	const auto sourceHeight = source == nullptr ? 0U : obs_source_get_height(source);
 	if (sourceWidth == 0 || sourceHeight == 0)
 		return;
-	const auto scale = static_cast<float>(settings.width) /
-			   static_cast<float>(sourceWidth);
+	const auto scale = static_cast<float>(settings.width) / static_cast<float>(sourceWidth);
 	const auto renderedHeight = static_cast<float>(sourceHeight) * scale;
 	vec2 itemScale{scale, scale};
-	vec2 position{0.0F, std::max(0.0F,
-					 static_cast<float>(settings.height) -
-					 renderedHeight)};
+	vec2 position{0.0F, std::max(0.0F, static_cast<float>(settings.height) - renderedHeight)};
 	obs_sceneitem_crop crop{};
 	obs_sceneitem_set_crop(item, &crop);
 	obs_sceneitem_set_alignment(item, OBS_ALIGN_LEFT | OBS_ALIGN_TOP);
@@ -185,8 +161,7 @@ void applyBottomAlignedOverlay(obs_sceneitem_t *item,
 	obs_sceneitem_set_pos(item, &position);
 }
 
-void applyVerticalCompositionItem(obs_sceneitem_t *item,
-				  const VerticalCanvasSettings &settings)
+void applyVerticalCompositionItem(obs_sceneitem_t *item, const VerticalCanvasSettings &settings)
 {
 	if (item == nullptr)
 		return;
@@ -217,16 +192,12 @@ bool applyVerticalSceneItem(obs_scene_t *, obs_sceneitem_t *item, void *context)
 
 bool isHardwareEncoder(const std::string &id)
 {
-	return containsInsensitive(id, "nvenc") ||
-	       containsInsensitive(id, "qsv") ||
-	       containsInsensitive(id, "amf") ||
-	       containsInsensitive(id, "apple") ||
-	       containsInsensitive(id, "videotoolbox") ||
+	return containsInsensitive(id, "nvenc") || containsInsensitive(id, "qsv") || containsInsensitive(id, "amf") ||
+	       containsInsensitive(id, "apple") || containsInsensitive(id, "videotoolbox") ||
 	       containsInsensitive(id, "vaapi");
 }
 
-std::string safeConfigString(config_t *config, const char *section,
-			     const char *name)
+std::string safeConfigString(config_t *config, const char *section, const char *name)
 {
 	const char *value = config_get_string(config, section, name);
 	return value == nullptr ? std::string{} : std::string(value);
@@ -243,8 +214,7 @@ constexpr SimpleEncoderMapping kSimpleEncoderMappings[] = {
 	{"ffmpeg_nvenc", "nvenc", "NVIDIA NVENC H.264"},
 	{"obs_qsv11_v2", "qsv", "Intel Quick Sync H.264"},
 	{"h264_texture_amf", "amd", "AMD AMF H.264"},
-	{"com.apple.videotoolbox.videoencoder.ave.avc", "apple_h264",
-	 "Apple VideoToolbox H.264"},
+	{"com.apple.videotoolbox.videoencoder.ave.avc", "apple_h264", "Apple VideoToolbox H.264"},
 	{"obs_x264", "x264", "Software x264"},
 };
 
@@ -258,13 +228,10 @@ std::vector<std::string> availableVideoEncoderIds()
 		if (id == nullptr || obs_get_encoder_type(id) != OBS_ENCODER_VIDEO)
 			continue;
 		const auto caps = obs_get_encoder_caps(id);
-		if ((caps & OBS_ENCODER_CAP_DEPRECATED) != 0 ||
-		    (caps & OBS_ENCODER_CAP_INTERNAL) != 0)
+		if ((caps & OBS_ENCODER_CAP_DEPRECATED) != 0 || (caps & OBS_ENCODER_CAP_INTERNAL) != 0)
 			continue;
 		const char *codec = obs_get_encoder_codec(id);
-		if (codec == nullptr ||
-		    (std::strcmp(codec, "h264") != 0 &&
-		     std::strcmp(codec, "avc") != 0))
+		if (codec == nullptr || (std::strcmp(codec, "h264") != 0 && std::strcmp(codec, "avc") != 0))
 			continue;
 		result.emplace_back(id);
 	}
@@ -287,48 +254,34 @@ std::vector<ui::ReplayEncoderOption> replayEncoderOptions()
 	std::vector<ui::ReplayEncoderOption> result;
 	if (mode == "Simple") {
 		for (const auto &mapping : kSimpleEncoderMappings) {
-			if (std::find(available.begin(), available.end(), mapping.obsId) ==
-			    available.end())
+			if (std::find(available.begin(), available.end(), mapping.obsId) == available.end())
 				continue;
-			const auto duplicate = std::find_if(
-				result.begin(), result.end(),
-				[&mapping](const auto &option) {
-					return option.id == mapping.profileId;
-				});
+			const auto duplicate =
+				std::find_if(result.begin(), result.end(),
+					     [&mapping](const auto &option) { return option.id == mapping.profileId; });
 			if (duplicate == result.end()) {
-				result.push_back({mapping.profileId, mapping.label,
-						  isHardwareEncoder(mapping.obsId)});
+				result.push_back({mapping.profileId, mapping.label, isHardwareEncoder(mapping.obsId)});
 			}
 		}
-		if (std::find(available.begin(), available.end(), "obs_x264") !=
-		    available.end()) {
-			result.push_back(
-				{"x264_lowcpu", "Software x264 (low CPU preset)", false});
+		if (std::find(available.begin(), available.end(), "obs_x264") != available.end()) {
+			result.push_back({"x264_lowcpu", "Software x264 (low CPU preset)", false});
 		}
 	} else {
-		const auto streamEncoder =
-			safeConfigString(config, "AdvOut", "Encoder");
+		const auto streamEncoder = safeConfigString(config, "AdvOut", "Encoder");
 		if (!streamEncoder.empty()) {
-			const char *display =
-				obs_encoder_get_display_name(streamEncoder.c_str());
-			result.push_back(
-				{"none",
-				 std::string("Use streaming encoder: ") +
-					 (display != nullptr ? display
-							     : streamEncoder),
-				 isHardwareEncoder(streamEncoder)});
+			const char *display = obs_encoder_get_display_name(streamEncoder.c_str());
+			result.push_back({"none",
+					  std::string("Use streaming encoder: ") +
+						  (display != nullptr ? display : streamEncoder),
+					  isHardwareEncoder(streamEncoder)});
 		}
 		for (const auto &id : available) {
 			const char *display = obs_encoder_get_display_name(id.c_str());
-			result.push_back(
-				{id, display != nullptr ? display : id,
-				 isHardwareEncoder(id)});
+			result.push_back({id, display != nullptr ? display : id, isHardwareEncoder(id)});
 		}
 	}
 	std::stable_sort(result.begin(), result.end(),
-			 [](const auto &left, const auto &right) {
-				 return left.hardware > right.hardware;
-			 });
+			 [](const auto &left, const auto &right) { return left.hardware > right.hardware; });
 	return result;
 }
 
@@ -339,20 +292,15 @@ ui::ReplayProfileSettings replayProfileSettings()
 	if (config == nullptr)
 		return result;
 	result.outputMode = profileOutputMode(config);
-	const char *section =
-		result.outputMode == "Advanced" ? "AdvOut" : "SimpleOutput";
+	const char *section = result.outputMode == "Advanced" ? "AdvOut" : "SimpleOutput";
 	const auto quality = safeConfigString(config, "SimpleOutput", "RecQuality");
-	const bool simpleShared =
-		result.outputMode == "Simple" && quality == "Stream";
+	const bool simpleShared = result.outputMode == "Simple" && quality == "Stream";
 	result.encoderId =
 		result.outputMode == "Advanced"
 			? safeConfigString(config, "AdvOut", "RecEncoder")
-			: safeConfigString(config, "SimpleOutput",
-					   simpleShared ? "StreamEncoder"
-							: "RecEncoder");
+			: safeConfigString(config, "SimpleOutput", simpleShared ? "StreamEncoder" : "RecEncoder");
 	if (result.outputMode == "Advanced" && result.encoderId == "none")
-		result.hardwareEncoder = isHardwareEncoder(
-			safeConfigString(config, "AdvOut", "Encoder"));
+		result.hardwareEncoder = isHardwareEncoder(safeConfigString(config, "AdvOut", "Encoder"));
 	else
 		result.hardwareEncoder = isHardwareEncoder(result.encoderId);
 	for (const auto &option : replayEncoderOptions()) {
@@ -363,69 +311,52 @@ ui::ReplayProfileSettings replayProfileSettings()
 		}
 	}
 	if (result.encoderDisplayName.empty())
-		result.encoderDisplayName =
-			result.encoderId.empty() ? "Unknown encoder" : result.encoderId;
+		result.encoderDisplayName = result.encoderId.empty() ? "Unknown encoder" : result.encoderId;
 	result.replayBufferEnabled = config_get_bool(config, section, "RecRB");
 	return result;
 }
 
-ui::ReplayProfileApplyResult applyReplayProfile(const std::string &encoderId,
-						 bool enabled)
+ui::ReplayProfileApplyResult applyReplayProfile(const std::string &encoderId, bool enabled)
 {
-	if (obs_frontend_streaming_active() ||
-	    obs_frontend_recording_active() ||
-	    obs_frontend_replay_buffer_active()) {
+	if (obs_frontend_streaming_active() || obs_frontend_recording_active() || obs_frontend_replay_buffer_active()) {
 		return {false, false,
 			"Stop streaming, recording and Replay Buffer before changing the OBS encoder profile."};
 	}
 	const auto options = replayEncoderOptions();
 	if (std::none_of(options.begin(), options.end(),
-			 [&encoderId](const auto &option) {
-				 return option.id == encoderId;
-			 })) {
-		return {false, false,
-			"The selected H.264 encoder is no longer available in OBS."};
+			 [&encoderId](const auto &option) { return option.id == encoderId; })) {
+		return {false, false, "The selected H.264 encoder is no longer available in OBS."};
 	}
 	config_t *config = obs_frontend_get_profile_config();
 	if (config == nullptr)
 		return {false, false, "OBS did not provide the active profile configuration."};
 	const auto mode = profileOutputMode(config);
 	if (mode == "Advanced") {
-		config_set_string(config, "AdvOut", "RecEncoder",
-				  encoderId.c_str());
+		config_set_string(config, "AdvOut", "RecEncoder", encoderId.c_str());
 		config_set_bool(config, "AdvOut", "RecRB", enabled);
 	} else {
-		const bool sharedWithStream =
-			safeConfigString(config, "SimpleOutput", "RecQuality") ==
-			"Stream";
-		config_set_string(config, "SimpleOutput",
-				  sharedWithStream ? "StreamEncoder" : "RecEncoder",
+		const bool sharedWithStream = safeConfigString(config, "SimpleOutput", "RecQuality") == "Stream";
+		config_set_string(config, "SimpleOutput", sharedWithStream ? "StreamEncoder" : "RecEncoder",
 				  encoderId.c_str());
 		config_set_bool(config, "SimpleOutput", "RecRB", enabled);
 	}
 	if (config_save_safe(config, "tmp", "bak") != CONFIG_SUCCESS)
-		return {false, false,
-			"OBS could not save the active profile. Check profile folder permissions."};
-	blog(LOG_INFO,
-	     "[ClipXtudio] OBS replay profile saved: mode=%s encoder=%s enabled=%s; restart required",
+		return {false, false, "OBS could not save the active profile. Check profile folder permissions."};
+	blog(LOG_INFO, "[ClipXtudio] OBS replay profile saved: mode=%s encoder=%s enabled=%s; restart required",
 	     mode.c_str(), encoderId.c_str(), enabled ? "true" : "false");
 	return {true, true, "OBS replay profile saved."};
 }
 
 bool restartObs(std::string *error)
 {
-	if (obs_frontend_streaming_active() ||
-	    obs_frontend_recording_active() ||
-	    obs_frontend_replay_buffer_active()) {
+	if (obs_frontend_streaming_active() || obs_frontend_recording_active() || obs_frontend_replay_buffer_active()) {
 		if (error != nullptr) {
-			*error =
-				"Stop streaming, recording and Replay Buffer before restarting OBS.";
+			*error = "Stop streaming, recording and Replay Buffer before restarting OBS.";
 		}
 		return false;
 	}
 	auto *application = QCoreApplication::instance();
-	auto *mainWindow =
-		static_cast<QWidget *>(obs_frontend_get_main_window());
+	auto *mainWindow = static_cast<QWidget *>(obs_frontend_get_main_window());
 	auto executable = QCoreApplication::applicationFilePath();
 #ifdef _WIN32
 	// cmd.exe truncates Win32 extended paths such as \\?\C:\... to "\\"
@@ -433,18 +364,15 @@ bool restartObs(std::string *error)
 	// helper and a normal drive path instead.
 	if (executable.startsWith(QStringLiteral("\\\\?\\")))
 		executable.remove(0, 4);
-	const auto restartHelper =
-		QStandardPaths::findExecutable(QStringLiteral("powershell.exe"));
+	const auto restartHelper = QStandardPaths::findExecutable(QStringLiteral("powershell.exe"));
 #endif
-	if (application == nullptr || mainWindow == nullptr ||
-	    executable.isEmpty() || !QFileInfo::exists(executable)
+	if (application == nullptr || mainWindow == nullptr || executable.isEmpty() || !QFileInfo::exists(executable)
 #ifdef _WIN32
 	    || restartHelper.isEmpty()
 #endif
 	) {
 		if (error != nullptr)
-			*error =
-				"OBS could not locate a valid executable or restart helper. Restart OBS manually.";
+			*error = "OBS could not locate a valid executable or restart helper. Restart OBS manually.";
 		return false;
 	}
 
@@ -458,39 +386,28 @@ bool restartObs(std::string *error)
 		 connection] {
 #ifdef _WIN32
 			QProcess helper;
-			auto environment =
-				QProcessEnvironment::systemEnvironment();
-			environment.insert(
-				QStringLiteral("CLIPXTUDIO_OBS_EXECUTABLE"),
-				executable);
-			environment.insert(
-				QStringLiteral("CLIPXTUDIO_OBS_WORKDIR"),
-				QFileInfo(executable).absolutePath());
+			auto environment = QProcessEnvironment::systemEnvironment();
+			environment.insert(QStringLiteral("CLIPXTUDIO_OBS_EXECUTABLE"), executable);
+			environment.insert(QStringLiteral("CLIPXTUDIO_OBS_WORKDIR"),
+					   QFileInfo(executable).absolutePath());
 			helper.setProcessEnvironment(environment);
 			helper.setProgram(restartHelper);
-			helper.setArguments(
-				{QStringLiteral("-NoLogo"),
-				 QStringLiteral("-NoProfile"),
-				 QStringLiteral("-NonInteractive"),
-				 QStringLiteral("-WindowStyle"),
-				 QStringLiteral("Hidden"),
-				 QStringLiteral("-Command"),
-				 QStringLiteral(
-					 "Start-Sleep -Milliseconds 1500; "
-					 "Start-Process -FilePath "
-					 "$env:CLIPXTUDIO_OBS_EXECUTABLE "
-					 "-WorkingDirectory "
-					 "$env:CLIPXTUDIO_OBS_WORKDIR")});
+			helper.setArguments({QStringLiteral("-NoLogo"), QStringLiteral("-NoProfile"),
+					     QStringLiteral("-NonInteractive"), QStringLiteral("-WindowStyle"),
+					     QStringLiteral("Hidden"), QStringLiteral("-Command"),
+					     QStringLiteral("Start-Sleep -Milliseconds 1500; "
+							    "Start-Process -FilePath "
+							    "$env:CLIPXTUDIO_OBS_EXECUTABLE "
+							    "-WorkingDirectory "
+							    "$env:CLIPXTUDIO_OBS_WORKDIR")});
 			const bool started = helper.startDetached();
 #else
-			const bool started = QProcess::startDetached(
-				QStringLiteral("/bin/sh"),
-				{QStringLiteral("-c"),
-				 QStringLiteral("sleep 2; exec \"$1\""),
-				 QStringLiteral("clipxtudio-restart"), executable});
+			const bool started =
+				QProcess::startDetached(QStringLiteral("/bin/sh"),
+							{QStringLiteral("-c"), QStringLiteral("sleep 2; exec \"$1\""),
+							 QStringLiteral("clipxtudio-restart"), executable});
 #endif
-			blog(started ? LOG_INFO : LOG_ERROR,
-			     "[ClipXtudio] OBS restart helper %s",
+			blog(started ? LOG_INFO : LOG_ERROR, "[ClipXtudio] OBS restart helper %s",
 			     started ? "started" : "could not start");
 			QObject::disconnect(*connection);
 		},
@@ -501,15 +418,12 @@ bool restartObs(std::string *error)
 		return false;
 	}
 
-	blog(LOG_INFO,
-	     "[ClipXtudio] Closing OBS for encoder profile restart; executable validated");
-	QTimer::singleShot(0, mainWindow,
-			   [mainWindow] { mainWindow->close(); });
+	blog(LOG_INFO, "[ClipXtudio] Closing OBS for encoder profile restart; executable validated");
+	QTimer::singleShot(0, mainWindow, [mainWindow] { mainWindow->close(); });
 	QTimer::singleShot(1500, mainWindow, [mainWindow, connection] {
 		if (mainWindow->isVisible()) {
 			QObject::disconnect(*connection);
-			blog(LOG_INFO,
-			     "[ClipXtudio] OBS restart canceled because the main window remained open");
+			blog(LOG_INFO, "[ClipXtudio] OBS restart canceled because the main window remained open");
 		}
 	});
 	return true;
@@ -523,23 +437,18 @@ bool installUpdate(const std::string &installerPath, std::string *error)
 		*error = "Automatic update installation is currently available on Windows.";
 	return false;
 #else
-	if (obs_frontend_streaming_active() ||
-	    obs_frontend_recording_active() ||
-	    obs_frontend_replay_buffer_active()) {
+	if (obs_frontend_streaming_active() || obs_frontend_recording_active() || obs_frontend_replay_buffer_active()) {
 		if (error != nullptr) {
-			*error =
-				"Stop streaming, recording and Replay Buffer before installing the update.";
+			*error = "Stop streaming, recording and Replay Buffer before installing the update.";
 		}
 		return false;
 	}
 
-	const auto installer =
-		QFileInfo(QString::fromStdString(installerPath)).absoluteFilePath();
+	const auto installer = QFileInfo(QString::fromStdString(installerPath)).absoluteFilePath();
 #if !defined(CLIPX_ALLOW_INSECURE_LOCAL_API)
 	WINTRUST_FILE_INFO fileInfo{};
 	fileInfo.cbStruct = sizeof(fileInfo);
-	fileInfo.pcwszFilePath =
-		reinterpret_cast<LPCWSTR>(installer.utf16());
+	fileInfo.pcwszFilePath = reinterpret_cast<LPCWSTR>(installer.utf16());
 	WINTRUST_DATA trustData{};
 	trustData.cbStruct = sizeof(trustData);
 	trustData.dwUIChoice = WTD_UI_NONE;
@@ -547,17 +456,14 @@ bool installUpdate(const std::string &installerPath, std::string *error)
 	trustData.dwUnionChoice = WTD_CHOICE_FILE;
 	trustData.pFile = &fileInfo;
 	trustData.dwStateAction = WTD_STATEACTION_VERIFY;
-	trustData.dwProvFlags =
-		WTD_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT | WTD_SAFER_FLAG;
+	trustData.dwProvFlags = WTD_REVOCATION_CHECK_CHAIN_EXCLUDE_ROOT | WTD_SAFER_FLAG;
 	GUID policy = WINTRUST_ACTION_GENERIC_VERIFY_V2;
-	const auto signatureStatus =
-		WinVerifyTrust(nullptr, &policy, &trustData);
+	const auto signatureStatus = WinVerifyTrust(nullptr, &policy, &trustData);
 	trustData.dwStateAction = WTD_STATEACTION_CLOSE;
 	(void)WinVerifyTrust(nullptr, &policy, &trustData);
 	if (signatureStatus != ERROR_SUCCESS) {
 		if (error != nullptr)
-			*error =
-				"The update installer is unsigned, untrusted or revoked.";
+			*error = "The update installer is unsigned, untrusted or revoked.";
 		return false;
 	}
 #endif
@@ -565,14 +471,11 @@ bool installUpdate(const std::string &installerPath, std::string *error)
 	if (executable.startsWith(QStringLiteral("\\\\?\\")))
 		executable.remove(0, 4);
 	auto *application = QCoreApplication::instance();
-	auto *mainWindow =
-		static_cast<QWidget *>(obs_frontend_get_main_window());
-	const auto helper =
-		QStandardPaths::findExecutable(QStringLiteral("powershell.exe"));
-	if (application == nullptr || mainWindow == nullptr ||
-	    helper.isEmpty() || !QFileInfo::exists(installer) ||
-	    !installer.endsWith(QStringLiteral(".exe"), Qt::CaseInsensitive) ||
-	    executable.isEmpty() || !QFileInfo::exists(executable)) {
+	auto *mainWindow = static_cast<QWidget *>(obs_frontend_get_main_window());
+	const auto helper = QStandardPaths::findExecutable(QStringLiteral("powershell.exe"));
+	if (application == nullptr || mainWindow == nullptr || helper.isEmpty() || !QFileInfo::exists(installer) ||
+	    !installer.endsWith(QStringLiteral(".exe"), Qt::CaseInsensitive) || executable.isEmpty() ||
+	    !QFileInfo::exists(executable)) {
 		if (error != nullptr)
 			*error = "The verified installer or OBS executable could not be located.";
 		return false;
@@ -584,38 +487,31 @@ bool installUpdate(const std::string &installerPath, std::string *error)
 		[installer, executable, helper, connection] {
 			QProcess updater;
 			auto environment = QProcessEnvironment::systemEnvironment();
-			environment.insert(QStringLiteral("CLIPXTUDIO_UPDATE_INSTALLER"),
-					   installer);
-			environment.insert(QStringLiteral("CLIPXTUDIO_OBS_EXECUTABLE"),
-					   executable);
+			environment.insert(QStringLiteral("CLIPXTUDIO_UPDATE_INSTALLER"), installer);
+			environment.insert(QStringLiteral("CLIPXTUDIO_OBS_EXECUTABLE"), executable);
 			environment.insert(QStringLiteral("CLIPXTUDIO_OBS_WORKDIR"),
 					   QFileInfo(executable).absolutePath());
 			updater.setProcessEnvironment(environment);
 			updater.setProgram(helper);
 			updater.setArguments(
-				{QStringLiteral("-NoLogo"),
-				 QStringLiteral("-NoProfile"),
-				 QStringLiteral("-NonInteractive"),
-				 QStringLiteral("-WindowStyle"),
-				 QStringLiteral("Hidden"),
-				 QStringLiteral("-Command"),
-				 QStringLiteral(
-					 "Start-Sleep -Milliseconds 1800; "
-					 "try { "
-					 "$p = Start-Process -FilePath "
-					 "$env:CLIPXTUDIO_UPDATE_INSTALLER "
-					 "-ArgumentList "
-					 "'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/CLOSEAPPLICATIONS' "
-					 "-Verb RunAs -Wait -PassThru; "
-					 "} finally { "
-					 "Start-Process -FilePath "
-					 "$env:CLIPXTUDIO_OBS_EXECUTABLE "
-					 "-WorkingDirectory "
-					 "$env:CLIPXTUDIO_OBS_WORKDIR "
-					 "}")});
+				{QStringLiteral("-NoLogo"), QStringLiteral("-NoProfile"),
+				 QStringLiteral("-NonInteractive"), QStringLiteral("-WindowStyle"),
+				 QStringLiteral("Hidden"), QStringLiteral("-Command"),
+				 QStringLiteral("Start-Sleep -Milliseconds 1800; "
+						"try { "
+						"$p = Start-Process -FilePath "
+						"$env:CLIPXTUDIO_UPDATE_INSTALLER "
+						"-ArgumentList "
+						"'/VERYSILENT','/SUPPRESSMSGBOXES','/NORESTART','/CLOSEAPPLICATIONS' "
+						"-Verb RunAs -Wait -PassThru; "
+						"} finally { "
+						"Start-Process -FilePath "
+						"$env:CLIPXTUDIO_OBS_EXECUTABLE "
+						"-WorkingDirectory "
+						"$env:CLIPXTUDIO_OBS_WORKDIR "
+						"}")});
 			const bool started = updater.startDetached();
-			blog(started ? LOG_INFO : LOG_ERROR,
-			     "[ClipXtudio] Verified update installer helper %s",
+			blog(started ? LOG_INFO : LOG_ERROR, "[ClipXtudio] Verified update installer helper %s",
 			     started ? "started" : "could not start");
 			QObject::disconnect(*connection);
 		},
@@ -626,14 +522,12 @@ bool installUpdate(const std::string &installerPath, std::string *error)
 		return false;
 	}
 
-	blog(LOG_INFO,
-	     "[ClipXtudio] Closing OBS to install a verified ClipXtudio update");
+	blog(LOG_INFO, "[ClipXtudio] Closing OBS to install a verified ClipXtudio update");
 	QTimer::singleShot(0, mainWindow, [mainWindow] { mainWindow->close(); });
 	QTimer::singleShot(1500, mainWindow, [mainWindow, connection] {
 		if (mainWindow->isVisible()) {
 			QObject::disconnect(*connection);
-			blog(LOG_INFO,
-			     "[ClipXtudio] Update canceled because OBS remained open");
+			blog(LOG_INFO, "[ClipXtudio] Update canceled because OBS remained open");
 		}
 	});
 	return true;
@@ -752,11 +646,10 @@ protected:
 		}
 		const auto delta = event->position() - dragOrigin_;
 		const auto nextX = std::clamp(
-			dragPanX_ - static_cast<int>(std::lround(delta.x() * 200.0 / std::max(1, width()))),
-			-100, 100);
-		const auto nextY = std::clamp(
-			dragPanY_ - static_cast<int>(std::lround(delta.y() * 200.0 / std::max(1, height()))),
-			-100, 100);
+			dragPanX_ - static_cast<int>(std::lround(delta.x() * 200.0 / std::max(1, width()))), -100, 100);
+		const auto nextY =
+			std::clamp(dragPanY_ - static_cast<int>(std::lround(delta.y() * 200.0 / std::max(1, height()))),
+				   -100, 100);
 		int zoom = 100;
 		{
 			std::lock_guard<std::mutex> lock(sourceMutex_);
@@ -823,11 +716,11 @@ private:
 		const bool active = interactionGate_.isActive();
 		setProperty("previewInteractionActive", active);
 		setCursor(active ? Qt::OpenHandCursor : Qt::ArrowCursor);
-		setToolTip(active
-				   ? QStringLiteral(
-					     "Edición activa: arrastra para mover y usa la rueda para acercar o alejar. Al salir de la vista, el zoom se desactiva.")
-				   : QStringLiteral(
-					     "Haz clic para activar la edición. Mientras está inactiva, la rueda desplaza la pantalla sin cambiar el zoom."));
+		setToolTip(
+			active ? QStringLiteral(
+					 "Edición activa: arrastra para mover y usa la rueda para acercar o alejar. Al salir de la vista, el zoom se desactiva.")
+			       : QStringLiteral(
+					 "Haz clic para activar la edición. Mientras está inactiva, la rueda desplaza la pantalla sin cambiar el zoom."));
 	}
 
 	void createDisplay()
@@ -895,10 +788,8 @@ private:
 			return;
 		}
 
-		const float targetAspect = static_cast<float>(canvasWidth) /
-					   static_cast<float>(canvasHeight);
-		const float sourceAspect = static_cast<float>(sourceWidth) /
-					   static_cast<float>(sourceHeight);
+		const float targetAspect = static_cast<float>(canvasWidth) / static_cast<float>(canvasHeight);
+		const float sourceAspect = static_cast<float>(sourceWidth) / static_cast<float>(sourceHeight);
 		float left = 0.0F;
 		float top = 0.0F;
 		float viewWidth = static_cast<float>(sourceWidth);
@@ -908,16 +799,13 @@ private:
 		} else {
 			viewHeight = viewWidth / targetAspect;
 		}
-		const float zoom = std::clamp(static_cast<float>(zoomPercent) / 100.0F,
-					      1.0F, 3.0F);
+		const float zoom = std::clamp(static_cast<float>(zoomPercent) / 100.0F, 1.0F, 3.0F);
 		viewWidth /= zoom;
 		viewHeight /= zoom;
 		left = (static_cast<float>(sourceWidth) - viewWidth) *
-		       (static_cast<float>(std::clamp(panXPercent, -100, 100)) + 100.0F) /
-		       200.0F;
+		       (static_cast<float>(std::clamp(panXPercent, -100, 100)) + 100.0F) / 200.0F;
 		top = (static_cast<float>(sourceHeight) - viewHeight) *
-		      (static_cast<float>(std::clamp(panYPercent, -100, 100)) + 100.0F) /
-		      200.0F;
+		      (static_cast<float>(std::clamp(panYPercent, -100, 100)) + 100.0F) / 200.0F;
 
 		const float displayAspect = static_cast<float>(width) / static_cast<float>(height);
 		uint32_t viewportWidth = width;
@@ -925,12 +813,10 @@ private:
 		int viewportX = 0;
 		int viewportY = 0;
 		if (displayAspect > targetAspect) {
-			viewportWidth = static_cast<uint32_t>(
-				std::lround(static_cast<float>(height) * targetAspect));
+			viewportWidth = static_cast<uint32_t>(std::lround(static_cast<float>(height) * targetAspect));
 			viewportX = static_cast<int>((width - viewportWidth) / 2);
 		} else {
-			viewportHeight = static_cast<uint32_t>(
-				std::lround(static_cast<float>(width) / targetAspect));
+			viewportHeight = static_cast<uint32_t>(std::lround(static_cast<float>(width) / targetAspect));
 			viewportY = static_cast<int>((height - viewportHeight) / 2);
 		}
 
@@ -1111,21 +997,21 @@ ui::VerticalObsBridge makeObsVerticalBridge()
 	bridge.scenes = sceneNames;
 	bridge.activeScene = activeSceneName;
 	bridge.sourcesForScene = sourceNames;
-	bridge.createPreview = [](QWidget *parent) { return new ObsVerticalPreview(parent); };
-	bridge.updatePreview = [](QWidget *widget, const std::string &source,
-				  const VerticalCanvasSettings &settings) {
+	bridge.createPreview = [](QWidget *parent) {
+		return new ObsVerticalPreview(parent);
+	};
+	bridge.updatePreview = [](QWidget *widget, const std::string &source, const VerticalCanvasSettings &settings) {
 		auto *preview = dynamic_cast<ObsVerticalPreview *>(widget);
 		if (preview == nullptr)
 			return;
 		preview->setSource(source);
 		preview->setCanvasSettings(settings);
 	};
-	bridge.bindPreviewInteraction =
-		[](QWidget *widget, ui::VerticalObsBridge::FramingChanged callback) {
-			auto *preview = dynamic_cast<ObsVerticalPreview *>(widget);
-			if (preview != nullptr)
-				preview->setFramingChanged(std::move(callback));
-		};
+	bridge.bindPreviewInteraction = [](QWidget *widget, ui::VerticalObsBridge::FramingChanged callback) {
+		auto *preview = dynamic_cast<ObsVerticalPreview *>(widget);
+		if (preview != nullptr)
+			preview->setFramingChanged(std::move(callback));
+	};
 	bridge.createVerticalScene = createVerticalScene;
 	bridge.replayEncoders = replayEncoderOptions;
 	bridge.replayProfile = replayProfileSettings;

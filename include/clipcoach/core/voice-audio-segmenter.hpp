@@ -20,8 +20,7 @@ class VoiceAudioSegmenter final {
 public:
 	explicit VoiceAudioSegmenter(VoiceAudioSegmenterConfig config = {});
 
-	[[nodiscard]] std::vector<AudioSegment> push(const std::int16_t *samples,
-						     std::size_t count);
+	[[nodiscard]] std::vector<AudioSegment> push(const std::int16_t *samples, std::size_t count);
 	void reset() noexcept;
 	void setSpeechThreshold(int threshold) noexcept;
 

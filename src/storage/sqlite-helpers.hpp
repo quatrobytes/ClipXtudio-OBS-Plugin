@@ -43,16 +43,14 @@ inline StorageStatus failure(sqlite3 *database, const std::string &operation)
 	return StorageStatus::fail(operation + ": " + sqlite3_errmsg(database));
 }
 
-template<typename T>
-RepositoryResult<T> queryFailure(sqlite3 *database, const std::string &operation)
+template<typename T> RepositoryResult<T> queryFailure(sqlite3 *database, const std::string &operation)
 {
 	return RepositoryResult<T>::fail(operation + ": " + sqlite3_errmsg(database));
 }
 
 inline bool bindText(sqlite3_stmt *statement, int index, const std::string &value)
 {
-	return sqlite3_bind_text(statement, index, value.c_str(), -1, SQLITE_TRANSIENT) ==
-	       SQLITE_OK;
+	return sqlite3_bind_text(statement, index, value.c_str(), -1, SQLITE_TRANSIENT) == SQLITE_OK;
 }
 
 inline std::string columnText(sqlite3_stmt *statement, int index)
@@ -75,8 +73,7 @@ inline std::string formatTime(std::chrono::system_clock::time_point value)
 	return output.str();
 }
 
-inline std::optional<std::chrono::system_clock::time_point>
-parseTime(const std::string &value)
+inline std::optional<std::chrono::system_clock::time_point> parseTime(const std::string &value)
 {
 	std::tm utc{};
 	std::istringstream input(value);

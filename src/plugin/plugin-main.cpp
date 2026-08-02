@@ -131,63 +131,49 @@ void restartReplayBufferWhenReady(int attempts = 0)
 	if (obs_frontend_replay_buffer_active()) {
 		if (attempts >= 40) {
 			replayCapacityRestartPending = false;
-			blog(LOG_ERROR, "%s Replay Buffer did not stop after its duration was updated",
-			     kLogPrefix);
+			blog(LOG_ERROR, "%s Replay Buffer did not stop after its duration was updated", kLogPrefix);
 			return;
 		}
-		QTimer::singleShot(250, [attempts] {
-			restartReplayBufferWhenReady(attempts + 1);
-		});
+		QTimer::singleShot(250, [attempts] { restartReplayBufferWhenReady(attempts + 1); });
 		return;
 	}
-	blog(LOG_INFO, "%s Restarting Replay Buffer with the updated clip window",
-	     kLogPrefix);
+	blog(LOG_INFO, "%s Restarting Replay Buffer with the updated clip window", kLogPrefix);
 	replayCapacityRestartPending = false;
 	obs_frontend_replay_buffer_start();
 }
 
 void ensureObsReplayCapacity(int requiredSeconds)
 {
-	const auto target = std::clamp(
-		requiredSeconds,
-		clipcoach::settings_constraints::kMinClipDurationSeconds,
-		clipcoach::settings_constraints::kMaxClipDurationSeconds);
+	const auto target = std::clamp(requiredSeconds, clipcoach::settings_constraints::kMinClipDurationSeconds,
+				       clipcoach::settings_constraints::kMaxClipDurationSeconds);
 	config_t *config = obs_frontend_get_profile_config();
 	if (config == nullptr) {
-		blog(LOG_WARNING, "%s OBS profile is unavailable; Replay Buffer duration was not updated",
-		     kLogPrefix);
+		blog(LOG_WARNING, "%s OBS profile is unavailable; Replay Buffer duration was not updated", kLogPrefix);
 		return;
 	}
 	const char *rawMode = config_get_string(config, "Output", "Mode");
-	const bool advanced = rawMode != nullptr &&
-			      std::string_view(rawMode) == "Advanced";
+	const bool advanced = rawMode != nullptr && std::string_view(rawMode) == "Advanced";
 	const char *section = advanced ? "AdvOut" : "SimpleOutput";
-	const auto current = static_cast<int>(
-		config_get_uint(config, section, "RecRBTime"));
-	const auto currentSizeLimit = config_get_uint(
-		config, section, "RecRBSize");
+	const auto current = static_cast<int>(config_get_uint(config, section, "RecRBTime"));
+	const auto currentSizeLimit = config_get_uint(config, section, "RecRBSize");
 	if (current >= target && currentSizeLimit == 0)
 		return;
 
-	config_set_uint(config, section, "RecRBTime",
-			static_cast<std::uint64_t>(std::max(current, target)));
+	config_set_uint(config, section, "RecRBTime", static_cast<std::uint64_t>(std::max(current, target)));
 	// OBS treats RecRBSize as a second, competing stop condition for
 	// quality-based encoders. A low MB cap can turn an 89-second request into
 	// a much shorter file, so the configured time is the single source of truth.
 	config_set_uint(config, section, "RecRBSize", 0);
 	if (config_save_safe(config, "tmp", "bak") != CONFIG_SUCCESS) {
-		blog(LOG_ERROR, "%s OBS could not save Replay Buffer duration %d s",
-		     kLogPrefix, target);
+		blog(LOG_ERROR, "%s OBS could not save Replay Buffer duration %d s", kLogPrefix, target);
 		return;
 	}
-	blog(LOG_INFO,
-	     "%s Replay Buffer capacity set to %d s with no competing size cap",
-	     kLogPrefix, std::max(current, target));
+	blog(LOG_INFO, "%s Replay Buffer capacity set to %d s with no competing size cap", kLogPrefix,
+	     std::max(current, target));
 	if (!obs_frontend_replay_buffer_active())
 		return;
 	if (clipManager != nullptr && clipManager->capturePending()) {
-		blog(LOG_WARNING,
-		     "%s Replay Buffer duration saved but restart deferred because a capture is pending",
+		blog(LOG_WARNING, "%s Replay Buffer duration saved but restart deferred because a capture is pending",
 		     kLogPrefix);
 		return;
 	}
@@ -601,20 +587,13 @@ bool isLicenseSigningFailure(const clipcoach::AiAssistantResult &result)
 bool isInvalidLicenseCode(const QString &code)
 {
 	static const QStringList invalidCodes{
-		QStringLiteral("LICENSE_KEY_INVALID"),
-		QStringLiteral("LICENSE_KEY_REVOKED"),
-		QStringLiteral("LICENSE_KEY_EXPIRED"),
-		QStringLiteral("LICENSE_REVOKED"),
-		QStringLiteral("LICENSE_NOT_FOUND"),
-		QStringLiteral("LICENSE_TOKEN_INVALID"),
-		QStringLiteral("LICENSE_TOKEN_EXPIRED"),
-		QStringLiteral("LICENSE_TOKEN_REVOKED"),
-		QStringLiteral("REFRESH_TOKEN_INVALID"),
-		QStringLiteral("REFRESH_TOKEN_REVOKED"),
-		QStringLiteral("SUBSCRIPTION_INACTIVE"),
-		QStringLiteral("TOKEN_DEVICE_MISMATCH"),
-		QStringLiteral("DEVICE_MISMATCH"),
-		QStringLiteral("DEVICE_BLOCKED"),
+		QStringLiteral("LICENSE_KEY_INVALID"),   QStringLiteral("LICENSE_KEY_REVOKED"),
+		QStringLiteral("LICENSE_KEY_EXPIRED"),   QStringLiteral("LICENSE_REVOKED"),
+		QStringLiteral("LICENSE_NOT_FOUND"),     QStringLiteral("LICENSE_TOKEN_INVALID"),
+		QStringLiteral("LICENSE_TOKEN_EXPIRED"), QStringLiteral("LICENSE_TOKEN_REVOKED"),
+		QStringLiteral("REFRESH_TOKEN_INVALID"), QStringLiteral("REFRESH_TOKEN_REVOKED"),
+		QStringLiteral("SUBSCRIPTION_INACTIVE"), QStringLiteral("TOKEN_DEVICE_MISMATCH"),
+		QStringLiteral("DEVICE_MISMATCH"),       QStringLiteral("DEVICE_BLOCKED"),
 	};
 	return invalidCodes.contains(code);
 }
@@ -716,19 +695,17 @@ void analyzeClipWithAuthorization(clipcoach::ClipMetadata clip, std::string tran
 				result.message = aiProviderUnavailableMessage().toStdString();
 			else if (result.code == "AI_INVALID_RESPONSE")
 				result.message = aiInvalidResponseMessage().toStdString();
-			else if (result.code == "AI_BACKEND_UNAVAILABLE" ||
-				 result.code == "AI_NETWORK_ERROR")
+			else if (result.code == "AI_BACKEND_UNAVAILABLE" || result.code == "AI_NETWORK_ERROR")
 				result.message = aiBackendUnavailableMessage().toStdString();
 			if (completion)
 				completion(std::move(result));
 		});
 }
 
-void generateCaptionFromValidatedLicense(
-	const clipcoach::ClipMetadata &clip,
-	clipcoach::AiAssistantConfiguration configuration,
-	clipcoach::ui::CaptionGenerationProgressCallback progress,
-	std::function<void(clipcoach::ui::CaptionGenerationResult)> complete)
+void generateCaptionFromValidatedLicense(const clipcoach::ClipMetadata &clip,
+					 clipcoach::AiAssistantConfiguration configuration,
+					 clipcoach::ui::CaptionGenerationProgressCallback progress,
+					 std::function<void(clipcoach::ui::CaptionGenerationResult)> complete)
 {
 	auto fail = [complete](QString message) mutable {
 		complete({false, {}, std::move(message)});
@@ -740,31 +717,33 @@ void generateCaptionFromValidatedLicense(
 		}
 		if (progress)
 			progress({82, uiText("Clips.Caption.GeneratingAi"), 30});
-		analyzeClipWithAuthorization(clip, std::move(transcript), configuration,
-					     [progress, complete](clipcoach::AiAssistantResult result) mutable {
-						     clipcoach::ui::CaptionGenerationResult output;
-						     if (result.success && result.response.has_value()) {
-							     const auto hashtags = responseHashtags(*result.response);
-							     output.caption = clipcoach::ui::formatSocialCaption(
-								     QString::fromStdString(result.response->caption), hashtags,
-								     QString::fromStdString(result.response->summary));
-							     const auto title = result.response->suggestedTitles.empty()
-								     ? QString::fromStdString(result.response->caption)
-								     : QString::fromStdString(result.response->suggestedTitles.front());
-							     output.youtubeShortsCaption =
-								     clipcoach::ui::formatYouTubeShortsCaption(title, output.caption);
-							     output.success = !output.caption.isEmpty();
-						     }
-						     if (!output.success) {
-							     output.error = QString::fromStdString(result.message);
-							     if (output.error.trimmed().isEmpty())
-								     output.error = QStringLiteral(
-									     "No se pudo generar el caption sugerido.");
-						     }
-						     if (progress)
-							     progress({100, uiText("Clips.Caption.Finalizing"), 0});
-						     complete(std::move(output));
-					     });
+		analyzeClipWithAuthorization(
+			clip, std::move(transcript), configuration,
+			[progress, complete](clipcoach::AiAssistantResult result) mutable {
+				clipcoach::ui::CaptionGenerationResult output;
+				if (result.success && result.response.has_value()) {
+					const auto hashtags = responseHashtags(*result.response);
+					output.caption = clipcoach::ui::formatSocialCaption(
+						QString::fromStdString(result.response->caption), hashtags,
+						QString::fromStdString(result.response->summary));
+					const auto title = result.response->suggestedTitles.empty()
+								   ? QString::fromStdString(result.response->caption)
+								   : QString::fromStdString(
+									     result.response->suggestedTitles.front());
+					output.youtubeShortsCaption =
+						clipcoach::ui::formatYouTubeShortsCaption(title, output.caption);
+					output.success = !output.caption.isEmpty();
+				}
+				if (!output.success) {
+					output.error = QString::fromStdString(result.message);
+					if (output.error.trimmed().isEmpty())
+						output.error =
+							QStringLiteral("No se pudo generar el caption sugerido.");
+				}
+				if (progress)
+					progress({100, uiText("Clips.Caption.Finalizing"), 0});
+				complete(std::move(output));
+			});
 	};
 
 	if (!clip.transcriptPath.empty() && std::filesystem::is_regular_file(clip.transcriptPath)) {
@@ -787,8 +766,8 @@ void generateCaptionFromValidatedLicense(
 				return;
 			const int percentage = 15 + ((std::clamp(localPercentage, 0, 100) * 60) / 100);
 			const int transcriptionEstimate = std::clamp(duration * 2, 15, 180);
-			const int remaining = 30 +
-				((100 - std::clamp(localPercentage, 0, 100)) * transcriptionEstimate / 100);
+			const int remaining =
+				30 + ((100 - std::clamp(localPercentage, 0, 100)) * transcriptionEstimate / 100);
 			progress({percentage, uiText("Clips.Caption.AnalyzingMedia"), remaining});
 		},
 		[analyze = std::move(analyze), fail](clipcoach::plugin::ClipTranscriptionResult result) mutable {
@@ -800,8 +779,7 @@ void generateCaptionFromValidatedLicense(
 		});
 }
 
-void generateCaption(const clipcoach::ClipMetadata &clip,
-		     clipcoach::ui::CaptionGenerationProgressCallback progress,
+void generateCaption(const clipcoach::ClipMetadata &clip, clipcoach::ui::CaptionGenerationProgressCallback progress,
 		     clipcoach::ui::CaptionGenerationCompletion completion)
 {
 	if (progress)
@@ -840,33 +818,31 @@ void generateCaption(const clipcoach::ClipMetadata &clip,
 	// Validate the license online before spending time extracting and transcribing
 	// audio. This also makes a revoked/replaced key fail promptly instead of leaving
 	// the card apparently stuck in local audio analysis.
-	licenseManager->refresh(
-		[clip, configuration, progress, complete, fail](const clipcoach::licensing::LicenseSnapshot &snapshot) mutable {
-			if (licenseManager == nullptr)
-				return fail(aiAuthorizationRequiredMessage());
-			if (!snapshot.lastErrorCode.empty() ||
-			    snapshot.state != clipcoach::licensing::LicenseState::ProActive ||
-			    licenseManager->authorizationToken().empty()) {
-				const auto code = QString::fromStdString(snapshot.lastErrorCode);
-				return fail(isInvalidLicenseCode(code)
-						 ? aiInvalidLicenseMessage()
-						 : code == QStringLiteral("LICENSE_SIGNING_UNAVAILABLE") ||
-							 code == QStringLiteral("SERVER_MISCONFIGURED")
-						 ? aiLicenseServiceUnavailableMessage()
-						 : aiSynchronizationRequiredMessage());
-			}
-			if (progress)
-				progress({12, uiText("Clips.Caption.AnalyzingMedia"),
-					  std::clamp(std::max(1, clip.durationSeconds) * 2 + 30, 45, 210)});
-			generateCaptionFromValidatedLicense(clip, std::move(configuration),
-						    std::move(progress), std::move(complete));
-		});
+	licenseManager->refresh([clip, configuration, progress, complete,
+				 fail](const clipcoach::licensing::LicenseSnapshot &snapshot) mutable {
+		if (licenseManager == nullptr)
+			return fail(aiAuthorizationRequiredMessage());
+		if (!snapshot.lastErrorCode.empty() ||
+		    snapshot.state != clipcoach::licensing::LicenseState::ProActive ||
+		    licenseManager->authorizationToken().empty()) {
+			const auto code = QString::fromStdString(snapshot.lastErrorCode);
+			return fail(isInvalidLicenseCode(code) ? aiInvalidLicenseMessage()
+				    : code == QStringLiteral("LICENSE_SIGNING_UNAVAILABLE") ||
+						    code == QStringLiteral("SERVER_MISCONFIGURED")
+					    ? aiLicenseServiceUnavailableMessage()
+					    : aiSynchronizationRequiredMessage());
+		}
+		if (progress)
+			progress({12, uiText("Clips.Caption.AnalyzingMedia"),
+				  std::clamp(std::max(1, clip.durationSeconds) * 2 + 30, 45, 210)});
+		generateCaptionFromValidatedLicense(clip, std::move(configuration), std::move(progress),
+						    std::move(complete));
+	});
 }
 
 void queueAiAnalysis(const clipcoach::ClipMetadata &clip)
 {
-	if (aiAssistant == nullptr || settingsManager == nullptr ||
-	    clip.filePath.empty() ||
+	if (aiAssistant == nullptr || settingsManager == nullptr || clip.filePath.empty() ||
 	    !std::filesystem::is_regular_file(clip.filePath))
 		return;
 	const auto configuration = aiConfiguration(clip);
@@ -878,8 +854,8 @@ void queueAiAnalysis(const clipcoach::ClipMetadata &clip)
 	auto finish = [clipId = clip.id](clipcoach::AiAssistantResult result) {
 		aiAnalysisInFlight.erase(clipId);
 		if (!result.success)
-			blog(LOG_WARNING, "%s AI scoring failed for %s: %s", kLogPrefix,
-			     clipId.c_str(), result.code.c_str());
+			blog(LOG_WARNING, "%s AI scoring failed for %s: %s", kLogPrefix, clipId.c_str(),
+			     result.code.c_str());
 	};
 	auto analyze = [clip, configuration, finish](std::string transcript) mutable {
 		if (transcript.empty() || transcript.size() > 100'000) {
@@ -887,12 +863,10 @@ void queueAiAnalysis(const clipcoach::ClipMetadata &clip)
 			blog(LOG_WARNING, "%s AI scoring skipped: transcript is empty or too large", kLogPrefix);
 			return;
 		}
-		analyzeClipWithAuthorization(clip, std::move(transcript), configuration,
-					     std::move(finish));
+		analyzeClipWithAuthorization(clip, std::move(transcript), configuration, std::move(finish));
 	};
 
-	if (!clip.transcriptPath.empty() &&
-	    std::filesystem::is_regular_file(clip.transcriptPath)) {
+	if (!clip.transcriptPath.empty() && std::filesystem::is_regular_file(clip.transcriptPath)) {
 		auto transcript = readFile(clip.transcriptPath);
 		analyze(std::move(transcript));
 		return;
@@ -903,15 +877,13 @@ void queueAiAnalysis(const clipcoach::ClipMetadata &clip)
 	}
 
 	captionTranscriber->transcribe(
-		clip.filePath,
-		clipcoach::AiAssistantService::languageCode(configuration.language),
-		[](int) {},
-		[analyze = std::move(analyze), clipId = clip.id](
-			clipcoach::plugin::ClipTranscriptionResult result) mutable {
+		clip.filePath, clipcoach::AiAssistantService::languageCode(configuration.language), [](int) {},
+		[analyze = std::move(analyze),
+		 clipId = clip.id](clipcoach::plugin::ClipTranscriptionResult result) mutable {
 			if (!result.success) {
 				aiAnalysisInFlight.erase(clipId);
-				blog(LOG_WARNING, "%s Local transcription failed for AI scoring: %s",
-				     kLogPrefix, result.error.c_str());
+				blog(LOG_WARNING, "%s Local transcription failed for AI scoring: %s", kLogPrefix,
+				     result.error.c_str());
 				return;
 			}
 			analyze(std::move(result.transcript));
@@ -1004,18 +976,19 @@ void initializeAiAssistant()
 		[](const clipcoach::AiPersistedClipResult &result, std::string *) {
 			if (libraryService == nullptr)
 				return false;
-			libraryService->storeAiResult(
-				result, [](clipcoach::storage::StorageStatus status) {
-					if (!status.success)
-						return;
-					QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
-					if (!dock.isNull())
-						QMetaObject::invokeMethod(
-							dock, [dock] {
-								if (!dock.isNull())
-									dock->refreshClipLibrary();
-							}, Qt::QueuedConnection);
-				});
+			libraryService->storeAiResult(result, [](clipcoach::storage::StorageStatus status) {
+				if (!status.success)
+					return;
+				QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
+				if (!dock.isNull())
+					QMetaObject::invokeMethod(
+						dock,
+						[dock] {
+							if (!dock.isNull())
+								dock->refreshClipLibrary();
+						},
+						Qt::QueuedConnection);
+			});
 			return true;
 		},
 		[](const std::string &sessionId, const std::string &summary, clipcoach::AiLanguage language,
@@ -1050,31 +1023,32 @@ void reportRemoteResult(clipcoach::remote::RemoteCommandResult result, int attem
 	}
 	if (remoteClipperClient == nullptr || licenseManager == nullptr || frontendShuttingDown)
 		return;
-	if (attempt == 0 && !remoteResultsInFlight.insert(result.commandUuid).second) return;
+	if (attempt == 0 && !remoteResultsInFlight.insert(result.commandUuid).second)
+		return;
 	const auto token = licenseManager->authorizationToken();
 	if (token.empty()) {
 		remoteResultsInFlight.erase(result.commandUuid);
 		return;
 	}
 	const auto retryCopy = result;
-	remoteClipperClient->reportResult(
-		result, token, [result = retryCopy, attempt](auto response) mutable {
-			if (response.succeeded()) {
-				if (remoteResultOutbox != nullptr) remoteResultOutbox->remove(result.commandUuid);
-				remoteResultsInFlight.erase(result.commandUuid);
-				return;
-			}
-			if (response.error.retryable && attempt < 5 && !frontendShuttingDown) {
-				const auto delayMs = std::min(30'000, 1000 * (1 << attempt));
-				QTimer::singleShot(delayMs, [result = std::move(result), attempt]() mutable {
-					reportRemoteResult(std::move(result), attempt + 1);
-				});
-				return;
-			}
+	remoteClipperClient->reportResult(result, token, [result = retryCopy, attempt](auto response) mutable {
+		if (response.succeeded()) {
+			if (remoteResultOutbox != nullptr)
+				remoteResultOutbox->remove(result.commandUuid);
 			remoteResultsInFlight.erase(result.commandUuid);
-			blog(LOG_WARNING, "%s Remote command result could not be synchronized (%s)",
-			     kLogPrefix, response.error.code.c_str());
-		});
+			return;
+		}
+		if (response.error.retryable && attempt < 5 && !frontendShuttingDown) {
+			const auto delayMs = std::min(30'000, 1000 * (1 << attempt));
+			QTimer::singleShot(delayMs, [result = std::move(result), attempt]() mutable {
+				reportRemoteResult(std::move(result), attempt + 1);
+			});
+			return;
+		}
+		remoteResultsInFlight.erase(result.commandUuid);
+		blog(LOG_WARNING, "%s Remote command result could not be synchronized (%s)", kLogPrefix,
+		     response.error.code.c_str());
+	});
 }
 
 void persistRemoteCommandUuid(const std::string &uuid)
@@ -1100,9 +1074,15 @@ clipcoach::remote::RemoteHeartbeatRequest remoteHeartbeat()
 	request.obsVersion = obs_get_version_string();
 	if (clipManager != nullptr) {
 		switch (clipManager->replayState()) {
-		case clipcoach::ReplayState::Active: request.replayBufferStatus = "active"; break;
-		case clipcoach::ReplayState::Inactive: request.replayBufferStatus = "inactive"; break;
-		default: request.replayBufferStatus = "unknown"; break;
+		case clipcoach::ReplayState::Active:
+			request.replayBufferStatus = "active";
+			break;
+		case clipcoach::ReplayState::Inactive:
+			request.replayBufferStatus = "inactive";
+			break;
+		default:
+			request.replayBufferStatus = "unknown";
+			break;
 		}
 	}
 	request.verticalCanvasStatus = verticalCanvasManager != nullptr ? "active" : "inactive";
@@ -1118,17 +1098,25 @@ bool initializeRemoteClipper()
 	char *rawStatePath = obs_module_config_path("remote-clipper-state.ini");
 	if (rawStatePath != nullptr) {
 		remoteCommandState = std::make_unique<QSettings>(QString::fromUtf8(rawStatePath), QSettings::IniFormat);
-		remoteResultOutbox = std::make_unique<clipcoach::remote::RemoteResultOutbox>(QString::fromUtf8(rawStatePath));
+		remoteResultOutbox =
+			std::make_unique<clipcoach::remote::RemoteResultOutbox>(QString::fromUtf8(rawStatePath));
 		bfree(rawStatePath);
 	}
-	remoteClipperClient = std::make_unique<clipcoach::network::RemoteClipperClient>(
-		QUrl(QStringLiteral(CLIPX_SERVICE_BASE_URL)));
+	remoteClipperClient =
+		std::make_unique<clipcoach::network::RemoteClipperClient>(QUrl(QStringLiteral(CLIPX_SERVICE_BASE_URL)));
 	remoteCaptureCoordinator = std::make_unique<clipcoach::plugin::RemoteCaptureCoordinator>(
 		*clipManager, *exportManager, *settingsManager, [](int) {});
 	remoteCommandExecutor = std::make_unique<clipcoach::remote::RemoteCommandExecutor>(
 		[](const clipcoach::remote::RemoteCapturePlan &plan, auto completion) {
 			if (remoteCaptureCoordinator == nullptr) {
-				completion({plan.commandUuid, false, {}, {}, 0, {}, {}, "CAPTURE_UNAVAILABLE",
+				completion({plan.commandUuid,
+					    false,
+					    {},
+					    {},
+					    0,
+					    {},
+					    {},
+					    "CAPTURE_UNAVAILABLE",
 					    "Remote capture service is unavailable"});
 				return;
 			}
@@ -1136,12 +1124,24 @@ bool initializeRemoteClipper()
 		},
 		[](const clipcoach::remote::RemoteCommand &command, auto completion) {
 			if (clipManager == nullptr) {
-				completion({command.uuid, false, {}, {}, 0, {}, {}, "MARK_MOMENT_UNAVAILABLE",
+				completion({command.uuid,
+					    false,
+					    {},
+					    {},
+					    0,
+					    {},
+					    {},
+					    "MARK_MOMENT_UNAVAILABLE",
 					    "Mark moment service is unavailable"});
 				return;
 			}
 			const auto marked = clipManager->markMoment("remote_clipper", command.delayCompensationSeconds);
-			completion({command.uuid, marked.accepted, {}, {}, 0, {},
+			completion({command.uuid,
+				    marked.accepted,
+				    {},
+				    {},
+				    0,
+				    {},
 				    marked.accepted ? "Moment marked locally" : std::string{},
 				    marked.accepted ? std::string{} : "MARK_MOMENT_FAILED",
 				    marked.accepted ? std::string{} : marked.message});
@@ -1149,25 +1149,31 @@ bool initializeRemoteClipper()
 		persistRemoteCommandUuid);
 	if (remoteCommandState != nullptr) {
 		std::set<std::string> processed;
-		for (const auto &value : remoteCommandState->value(QStringLiteral("processed_commands")).toStringList()) {
+		for (const auto &value :
+		     remoteCommandState->value(QStringLiteral("processed_commands")).toStringList()) {
 			const auto uuid = value.toStdString();
-			if (clipcoach::remote::isValidCommandUuid(uuid)) processed.insert(uuid);
+			if (clipcoach::remote::isValidCommandUuid(uuid))
+				processed.insert(uuid);
 		}
 		remoteCommandExecutor->preloadProcessed(std::move(processed));
 	}
 
 	clipcoach::network::RemoteCommandPoller::Providers providers;
-	providers.proActive = [] { return licenseManager != nullptr && licenseManager->snapshot().proEnabled(); };
+	providers.proActive = [] {
+		return licenseManager != nullptr && licenseManager->snapshot().proEnabled();
+	};
 	providers.localCommandsEnabled = [] {
 		return settingsManager != nullptr && settingsManager->settings().remoteCommandsEnabled;
 	};
-	providers.shuttingDown = [] { return frontendShuttingDown; };
+	providers.shuttingDown = [] {
+		return frontendShuttingDown;
+	};
 	providers.bearerToken = [] {
 		return licenseManager != nullptr ? licenseManager->authorizationToken() : std::string{};
 	};
 	providers.heartbeat = remoteHeartbeat;
-	remoteCommandPoller = std::make_unique<clipcoach::network::RemoteCommandPoller>(
-		*remoteClipperClient, std::move(providers));
+	remoteCommandPoller =
+		std::make_unique<clipcoach::network::RemoteCommandPoller>(*remoteClipperClient, std::move(providers));
 	remoteCommandPoller->setStatusCallback([](const clipcoach::remote::RemoteClipperStatus &status) {
 		if (status.remoteEnabled && !remoteReplayCapacityPrepared) {
 			remoteReplayCapacityPrepared = true;
@@ -1175,37 +1181,48 @@ bool initializeRemoteClipper()
 		}
 		QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
 		if (!dock.isNull()) {
-			QMetaObject::invokeMethod(dock, [dock, status] {
-				if (!dock.isNull()) dock->setRemoteClipperStatus(status);
-			}, Qt::QueuedConnection);
+			QMetaObject::invokeMethod(
+				dock,
+				[dock, status] {
+					if (!dock.isNull())
+						dock->setRemoteClipperStatus(status);
+				},
+				Qt::QueuedConnection);
 		}
 	});
 	remoteCommandPoller->setCommandsCallback([](std::vector<clipcoach::remote::RemoteCommand> commands) {
-		if (remoteCommandExecutor == nullptr || remoteClipperClient == nullptr || licenseManager == nullptr) return;
+		if (remoteCommandExecutor == nullptr || remoteClipperClient == nullptr || licenseManager == nullptr)
+			return;
 		for (auto &command : commands) {
 			auto pending = std::make_shared<clipcoach::remote::RemoteCommand>(std::move(command));
-			remoteClipperClient->markProcessing(pending->uuid, licenseManager->authorizationToken(), [pending](auto ack) {
-				if (!ack.succeeded() || remoteCommandExecutor == nullptr) {
-					blog(LOG_WARNING, "%s Remote command was not executed because processing acknowledgement failed", kLogPrefix);
-					return;
-				}
-				remoteCommandExecutor->submit(std::move(*pending), [](auto result) {
-					reportRemoteResult(std::move(result));
+			remoteClipperClient->markProcessing(
+				pending->uuid, licenseManager->authorizationToken(), [pending](auto ack) {
+					if (!ack.succeeded() || remoteCommandExecutor == nullptr) {
+						blog(LOG_WARNING,
+						     "%s Remote command was not executed because processing acknowledgement failed",
+						     kLogPrefix);
+						return;
+					}
+					remoteCommandExecutor->submit(std::move(*pending), [](auto result) {
+						reportRemoteResult(std::move(result));
+					});
 				});
-			});
 		}
 	});
 	remoteCommandPoller->start();
 	if (remoteResultOutbox != nullptr)
-		for (auto &result : remoteResultOutbox->pending()) reportRemoteResult(std::move(result));
+		for (auto &result : remoteResultOutbox->pending())
+			reportRemoteResult(std::move(result));
 	blog(LOG_INFO, "%s Remote Clipper polling initialized", kLogPrefix);
 	return true;
 }
 
 void shutdownRemoteClipper() noexcept
 {
-	if (remoteCommandPoller != nullptr) remoteCommandPoller->stop();
-	if (remoteCaptureCoordinator != nullptr) remoteCaptureCoordinator->cancel();
+	if (remoteCommandPoller != nullptr)
+		remoteCommandPoller->stop();
+	if (remoteCaptureCoordinator != nullptr)
+		remoteCaptureCoordinator->cancel();
 	remoteCommandPoller.reset();
 	remoteCommandExecutor.reset();
 	remoteCaptureCoordinator.reset();
@@ -1366,25 +1383,30 @@ void frontendEventCallback(enum obs_frontend_event event, void *)
 #endif
 		if (settingsManager != nullptr) {
 			const auto &settings = settingsManager->settings();
-			ensureObsReplayCapacity(settings.preRollSeconds +
-						settings.postRollSeconds);
+			ensureObsReplayCapacity(settings.preRollSeconds + settings.postRollSeconds);
 		}
 		QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
 		if (!dock.isNull())
-			QMetaObject::invokeMethod(dock, [dock] {
-				if (!dock.isNull()) {
-					dock->refreshVerticalObsScenes();
-					dock->showInitialSetupIfNeeded();
-				}
-			}, Qt::QueuedConnection);
+			QMetaObject::invokeMethod(
+				dock,
+				[dock] {
+					if (!dock.isNull()) {
+						dock->refreshVerticalObsScenes();
+						dock->showInitialSetupIfNeeded();
+					}
+				},
+				Qt::QueuedConnection);
 	} else if (event == OBS_FRONTEND_EVENT_SCENE_LIST_CHANGED ||
 		   event == OBS_FRONTEND_EVENT_SCENE_COLLECTION_CHANGED) {
 		QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
 		if (!dock.isNull())
-			QMetaObject::invokeMethod(dock, [dock] {
-				if (!dock.isNull())
-					dock->refreshVerticalObsScenes();
-			}, Qt::QueuedConnection);
+			QMetaObject::invokeMethod(
+				dock,
+				[dock] {
+					if (!dock.isNull())
+						dock->refreshVerticalObsScenes();
+				},
+				Qt::QueuedConnection);
 	} else if (event == OBS_FRONTEND_EVENT_SCENE_CHANGED && triggerEngine != nullptr) {
 		clipcoach::TriggerSignal signal;
 		signal.type = clipcoach::SmartTriggerType::Scene;
@@ -1521,8 +1543,7 @@ bool registerMainDock()
 		libraryService.get(), nullptr, currentSessionId, verticalCanvasManager.get(), exportManager.get(),
 		triggerEngine.get(), nullptr, licenseManager.get(), featureGateService.get(),
 		voiceTriggerController.get(), availableSceneNames, clipcoach::plugin::makeObsVerticalBridge(),
-		[](const clipcoach::ClipMetadata &clip,
-		   clipcoach::ui::CaptionGenerationProgressCallback progress,
+		[](const clipcoach::ClipMetadata &clip, clipcoach::ui::CaptionGenerationProgressCallback progress,
 		   clipcoach::ui::CaptionGenerationCompletion completion) {
 			generateCaption(clip, std::move(progress), std::move(completion));
 		});
@@ -1554,9 +1575,8 @@ bool registerMainDock()
 			blog(LOG_WARNING, "%s One or more Settings shortcuts could not be applied", kLogPrefix);
 		}
 	});
-	content->setReplayDurationChangedCallback([](int requiredSeconds) {
-		ensureObsReplayCapacity(requiredSeconds);
-	});
+	content->setReplayDurationChangedCallback(
+		[](int requiredSeconds) { ensureObsReplayCapacity(requiredSeconds); });
 	const auto dockTitle = uiText("Dock.Title").toUtf8();
 	if (!obs_frontend_add_dock_by_id(kDockId, dockTitle.constData(), content)) {
 		blog(LOG_ERROR, "%s Could not register the main dock; the dock id may already be in use", kLogPrefix);
@@ -1634,8 +1654,7 @@ void executeTriggerAction(const clipcoach::TriggerEvent &event)
 						   if (context.isNull())
 							   return;
 						   const auto result = context->requestTriggeredCapture(
-							   requestedDuration, type, label, score,
-							   output);
+							   requestedDuration, type, label, score, output);
 						   if (!result.accepted) {
 							   blog(LOG_WARNING, "%s Smart trigger save failed: %s",
 								kLogPrefix, result.message.c_str());
@@ -1656,23 +1675,20 @@ clipcoach::HotkeyActionResult captureFromHotkey(int seconds)
 		auto output = clipcoach::ExportOrientation::Horizontal;
 		if (verticalCanvasManager != nullptr) {
 			const auto mode = verticalCanvasManager->settings().outputMode;
-			output = mode == clipcoach::CaptureOutputMode::Vertical
-					 ? clipcoach::ExportOrientation::Vertical
+			output = mode == clipcoach::CaptureOutputMode::Vertical ? clipcoach::ExportOrientation::Vertical
 				 : mode == clipcoach::CaptureOutputMode::Both
 					 ? clipcoach::ExportOrientation::Both
 					 : clipcoach::ExportOrientation::Horizontal;
 		}
 		const auto invoke = [&] {
 			if (!dock.isNull())
-				result = dock->requestTriggeredCapture(
-					seconds, clipcoach::TriggerType::Manual,
-					"manual", 0, output);
+				result = dock->requestTriggeredCapture(seconds, clipcoach::TriggerType::Manual,
+								       "manual", 0, output);
 		};
 		if (QThread::currentThread() == dock->thread())
 			invoke();
 		else
-			QMetaObject::invokeMethod(dock, invoke,
-						  Qt::BlockingQueuedConnection);
+			QMetaObject::invokeMethod(dock, invoke, Qt::BlockingQueuedConnection);
 	} else {
 		result = clipManager->captureManual(seconds);
 	}
@@ -1697,9 +1713,8 @@ clipcoach::HotkeyActionResult captureVerticalFromHotkey()
 	clipcoach::CaptureResult capture;
 	const auto invoke = [&] {
 		if (!dock.isNull())
-			capture = dock->requestTriggeredCapture(
-				seconds, clipcoach::TriggerType::Manual, "manual", 0,
-				clipcoach::ExportOrientation::Vertical);
+			capture = dock->requestTriggeredCapture(seconds, clipcoach::TriggerType::Manual, "manual", 0,
+								clipcoach::ExportOrientation::Vertical);
 	};
 	if (QThread::currentThread() == dock->thread())
 		invoke();
@@ -1732,10 +1747,13 @@ clipcoach::HotkeyActionResult cycleOutputMode()
 	}
 	QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
 	if (!dock.isNull())
-		QMetaObject::invokeMethod(dock, [dock] {
-			if (!dock.isNull())
-				dock->refreshCaptureOutputMode();
-		}, Qt::QueuedConnection);
+		QMetaObject::invokeMethod(
+			dock,
+			[dock] {
+				if (!dock.isNull())
+					dock->refreshCaptureOutputMode();
+			},
+			Qt::QueuedConnection);
 	blog(LOG_INFO, "%s Output mode changed from native hotkey", kLogPrefix);
 	return clipcoach::HotkeyActionResult::ok();
 }
@@ -1904,10 +1922,12 @@ MODULE_EXPORT bool obs_module_load(void)
 							QPointer<clipcoach::ui::MainDock> dock = mainDockContent;
 							if (!dock.isNull())
 								QMetaObject::invokeMethod(
-									dock, [dock] {
+									dock,
+									[dock] {
 										if (!dock.isNull())
 											dock->refreshClipLibrary();
-									}, Qt::QueuedConnection);
+									},
+									Qt::QueuedConnection);
 						});
 				}
 			},
@@ -1928,8 +1948,7 @@ MODULE_EXPORT bool obs_module_load(void)
 			blog(LOG_WARNING, "%s Remote Clipper integration is unavailable", kLogPrefix);
 		if (settingsManager != nullptr) {
 			const auto &settings = settingsManager->settings();
-			ensureObsReplayCapacity(settings.preRollSeconds +
-						settings.postRollSeconds);
+			ensureObsReplayCapacity(settings.preRollSeconds + settings.postRollSeconds);
 		}
 		obs_frontend_add_event_callback(frontendEventCallback, nullptr);
 		lifecycleCallbackRegistered = true;

@@ -114,8 +114,7 @@ int main(int argc, char **argv)
 				"Activate button must call LicenseManager with the key");
 	clipcoach::test::expect(manager.snapshot().proEnabled() && !activate->isVisible(),
 				"successful activation must show Pro and hide key entry");
-	clipcoach::test::expect(change->isVisible(),
-				"an active Pro account must expose the change-license action");
+	clipcoach::test::expect(change->isVisible(), "an active Pro account must expose the change-license action");
 	change->click();
 	application.processEvents();
 	clipcoach::test::expect(key->isVisible() && activate->isVisible(),
@@ -128,8 +127,8 @@ int main(int argc, char **argv)
 	key->setText(QStringLiteral("CCS1-11111-22222-33333-44444"));
 	activate->click();
 	application.processEvents();
-	clipcoach::test::expect(api.receivedKey == "CCS1-11111-22222-33333-44444" &&
-					manager.snapshot().proEnabled() && !activate->isVisible(),
+	clipcoach::test::expect(api.receivedKey == "CCS1-11111-22222-33333-44444" && manager.snapshot().proEnabled() &&
+					!activate->isVisible(),
 				"a valid replacement key must be verified by LicenseManager and close the form");
 	auto *expiration = tab.findChild<QLabel *>(QStringLiteral("licenseExpirationValue"));
 	auto *usage = tab.findChild<QLabel *>(QStringLiteral("monthlyUsageValue"));
@@ -138,13 +137,12 @@ int main(int argc, char **argv)
 	clipcoach::test::expect(usage != nullptr && usage->text() == QStringLiteral("Settings.Pro.UsageUnlimited"),
 				"founder license must ignore stale monthly counters and display unlimited usage");
 
-	const std::string expiredMessage =
-		"Your Pro subscription expired. ClipCoach has returned to Free.";
+	const std::string expiredMessage = "Your Pro subscription expired. ClipCoach has returned to Free.";
 	manager.forceFree("SUBSCRIPTION_INACTIVE", expiredMessage);
 	application.processEvents();
 	auto *message = tab.findChild<QLabel *>(QStringLiteral("licenseStatusMessage"));
 	clipcoach::test::expect(message != nullptr && message->isVisible() &&
-				       message->text().toStdString() == expiredMessage,
+					message->text().toStdString() == expiredMessage,
 				"expired subscription must show the backend downgrade message");
 	clipcoach::test::expect(!manager.snapshot().proEnabled() && activate->isVisible(),
 				"expired subscription must return the UI and core gates to Free");
@@ -158,9 +156,8 @@ int main(int argc, char **argv)
 	key->setText(QStringLiteral("CCS1-AAAAA-BBBBB-CCCCC-DDDDD"));
 	activate->click();
 	application.processEvents();
-	clipcoach::test::expect(
-		message->text() == QStringLiteral("Settings.Pro.LicenseActivationUnavailable"),
-		"signing configuration failures must show a safe localized availability message");
+	clipcoach::test::expect(message->text() == QStringLiteral("Settings.Pro.LicenseActivationUnavailable"),
+				"signing configuration failures must show a safe localized availability message");
 
 	return 0;
 }

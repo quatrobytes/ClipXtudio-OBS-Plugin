@@ -23,8 +23,8 @@ public:
 	explicit QtUpdateDownloader(QNetworkAccessManager *manager = nullptr);
 	~QtUpdateDownloader();
 
-	void download(const UpdateCheckResult &update, const QString &destinationPath,
-		      Progress progress, Completion completion);
+	void download(const UpdateCheckResult &update, const QString &destinationPath, Progress progress,
+		      Completion completion);
 
 private:
 	std::unique_ptr<QNetworkAccessManager> ownedManager_;
