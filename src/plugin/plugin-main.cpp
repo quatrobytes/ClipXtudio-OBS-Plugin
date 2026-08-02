@@ -943,7 +943,7 @@ void queueClipTelemetry(const clipcoach::ClipMetadata &clip)
 
 	const auto capturedAt = QDateTime::fromMSecsSinceEpoch(
 		std::chrono::duration_cast<std::chrono::milliseconds>(clip.createdAt.time_since_epoch()).count(),
-		QTimeZone::UTC);
+		QTimeZone::utc());
 	const QJsonObject payload{
 		{QStringLiteral("clip_id"), QString::fromStdString(clip.id)},
 		{QStringLiteral("session_id"), QString::fromStdString(clip.sessionId)},
@@ -1760,7 +1760,7 @@ clipcoach::HotkeyActionResult cycleOutputMode()
 
 clipcoach::HotkeyActionResult toggleDock()
 {
-	QPointer<QWidget> guard = mainDockContent;
+	QPointer<clipcoach::ui::MainDock> guard = mainDockContent;
 	if (guard.isNull()) {
 		return clipcoach::HotkeyActionResult::fail("dock is unavailable");
 	}

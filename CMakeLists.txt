@@ -370,6 +370,12 @@ if(BUILD_PLUGIN)
       if(NOT MSVC)
         target_compile_options(${_clipx_third_party_target} PRIVATE -Wno-error)
       endif()
+      if(APPLE)
+        target_compile_options(
+          ${_clipx_third_party_target}
+          PRIVATE -Wno-error=ambiguous-macro -Wno-error=shorten-64-to-32
+        )
+      endif()
     endif()
   endforeach()
   if(MSVC)
