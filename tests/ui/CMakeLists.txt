@@ -36,6 +36,9 @@ target_compile_definitions(
 )
 add_test(NAME ui.clips-library-tab COMMAND clips-library-tab-test)
 set_tests_properties(ui.clips-library-tab PROPERTIES ENVIRONMENT "QT_QPA_PLATFORM=${CLIPCOACH_QT_TEST_PLATFORM}")
+if(NOT FFMPEG_EXECUTABLE)
+  set_tests_properties(ui.clips-library-tab PROPERTIES DISABLED TRUE)
+endif()
 
 add_executable(clips-tab-smoke-test clips-tab-smoke-test.cpp)
 target_link_libraries(clips-tab-smoke-test PRIVATE clipcoach_ui Qt6::Core Qt6::Widgets)
@@ -84,8 +87,13 @@ add_executable(rs256-token-verifier-test rs256-token-verifier-test.cpp)
 target_link_libraries(rs256-token-verifier-test PRIVATE clipcoach_network Qt6::Core OpenSSL::Crypto)
 add_test(NAME ui.rs256-token-verifier COMMAND rs256-token-verifier-test)
 
-add_executable(qt-license-api-test qt-license-api-test.cpp)
-target_link_libraries(qt-license-api-test PRIVATE clipcoach_network Qt6::Core Qt6::Network)
+add_executable(qt-license-api-test qt-license-api-test.cpp ../../src/network/qt-license-api.cpp)
+target_include_directories(qt-license-api-test PRIVATE ../../include)
+target_compile_definitions(
+  qt-license-api-test
+  PRIVATE CLIPCOACH_VERSION="${PROJECT_VERSION}" CLIPX_ALLOW_INSECURE_LOCAL_API=1
+)
+target_link_libraries(qt-license-api-test PRIVATE clipcoach_licensing Qt6::Core Qt6::Network)
 add_test(NAME ui.qt-license-api COMMAND qt-license-api-test)
 
 add_executable(qt-ai-api-test qt-ai-api-test.cpp ../../src/network/qt-ai-api.cpp)

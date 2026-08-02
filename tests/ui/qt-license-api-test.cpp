@@ -8,6 +8,7 @@
 #include <QUrl>
 
 #include <cassert>
+#include <cstdio>
 
 namespace {
 
@@ -44,8 +45,14 @@ int main(int argc, char **argv)
 
 	QTcpServer missingLicenseServer;
 	QTcpServer activeLicenseServer;
-	assert(missingLicenseServer.listen(QHostAddress::LocalHost));
-	assert(activeLicenseServer.listen(QHostAddress::LocalHost));
+	const bool missingServerListening = missingLicenseServer.listen(QHostAddress::LocalHost);
+	const bool activeServerListening = activeLicenseServer.listen(QHostAddress::LocalHost);
+	assert(missingServerListening);
+	assert(activeServerListening);
+	if (!missingServerListening || !activeServerListening) {
+		std::fputs("Failed to start local HTTP test servers.\n", stderr);
+		return 1;
+	}
 
 	serveOnce(missingLicenseServer,
 		  R"({"error":{"code":"LICENSE_KEY_INVALID","message":"Not in this environment"}})", 422);
@@ -55,17 +62,22 @@ int main(int argc, char **argv)
 
 	clipcoach::network::QtLicenseApi api(
 		QList<QUrl>{serverUrl(missingLicenseServer), serverUrl(activeLicenseServer)});
-	assert(api.configured());
+	const bool apiConfigured = api.configured();
+	assert(apiConfigured);
+	if (!apiConfigured) {
+		std::fputs("QtLicenseApi rejected local HTTP test endpoints.\n", stderr);
+		return 1;
+	}
 
 	bool completed = false;
+	bool activationSucceeded = false;
 	clipcoach::licensing::ActivationRequest request;
 	request.licenseKey = "CC-PRO-TEST";
 	request.machineFingerprintHash = "fingerprint";
 	request.installId = "install";
 	request.requestNonce = "nonce";
-	api.activate(std::move(request), [&application, &completed](auto result) {
-		assert(result.succeeded());
-		assert(result.response->status == "active");
+	api.activate(std::move(request), [&application, &completed, &activationSucceeded](auto result) {
+		activationSucceeded = result.succeeded() && result.response->status == "active";
 		completed = true;
 		application.quit();
 	});
@@ -73,8 +85,18 @@ int main(int argc, char **argv)
 	QTimer::singleShot(3000, &application, &QCoreApplication::quit);
 	application.exec();
 	assert(completed);
+	assert(activationSucceeded);
+	if (!completed || !activationSucceeded) {
+		std::fputs(completed ? "License activation did not succeed.\n" : "License activation timed out.\n",
+			   stderr);
+		return 1;
+	}
 
 	clipcoach::network::QtLicenseApi unsafeRemote(QUrl(QStringLiteral("http://example.com")));
-	assert(!unsafeRemote.configured());
-	return 0;
+	const bool unsafeRemoteRejected = !unsafeRemote.configured();
+	assert(unsafeRemoteRejected);
+	if (!unsafeRemoteRejected) {
+		std::fputs("QtLicenseApi accepted an insecure remote endpoint.\n", stderr);
+	}
+	return unsafeRemoteRejected ? 0 : 1;
 }
