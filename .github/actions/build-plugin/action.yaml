@@ -82,11 +82,22 @@ runs:
           Set-PSDebug -Trace 1
         }
 
-        $OpenSslRoot = 'C:\Program Files\OpenSSL-Win64'
-        if ( -not (Test-Path "$OpenSslRoot\include\openssl\ssl.h") ) {
-          choco install openssl --no-progress -y
+        function Find-OpenSslRoot {
+          $Header = Get-ChildItem -Path 'C:\Program Files\OpenSSL*' -Filter ssl.h -Recurse -ErrorAction SilentlyContinue |
+            Where-Object { $_.FullName -match '[\\/]include[\\/]openssl[\\/]ssl\.h$' } |
+            Select-Object -First 1
+          if ( $Header ) {
+            return $Header.Directory.Parent.Parent.FullName
+          }
+          return $null
         }
-        if ( -not (Test-Path "$OpenSslRoot\include\openssl\ssl.h") ) {
+
+        $OpenSslRoot = Find-OpenSslRoot
+        if ( -not $OpenSslRoot ) {
+          choco install openssl --no-progress -y
+          $OpenSslRoot = Find-OpenSslRoot
+        }
+        if ( -not $OpenSslRoot ) {
           throw 'OpenSSL development files were not found after installation.'
         }
         $env:OPENSSL_ROOT_DIR = $OpenSslRoot

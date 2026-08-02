@@ -227,7 +227,7 @@ QString ProAccountTab::formatDate(const std::optional<licensing::LicenseTimePoin
 	if (!value)
 		return text(strings::kSettingsDateUnavailable);
 	const auto seconds = std::chrono::duration_cast<std::chrono::seconds>(value->time_since_epoch()).count();
-	return QLocale().toString(QDateTime::fromSecsSinceEpoch(seconds, QTimeZone::UTC).toLocalTime(),
+	return QLocale().toString(QDateTime::fromSecsSinceEpoch(seconds, QTimeZone::utc()).toLocalTime(),
 				  QLocale::ShortFormat);
 }
 

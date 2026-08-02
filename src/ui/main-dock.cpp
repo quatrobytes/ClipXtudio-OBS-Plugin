@@ -2496,7 +2496,7 @@ void MainDock::checkForUpdates(bool userInitiated)
 				      if (self.isNull())
 					      return;
 				      self->setUpdateChecking(false);
-				      self->updateDownloadUrl_ = {};
+				      self->updateDownloadUrl_.clear();
 				      self->updateSha256_.clear();
 				      self->updateVersion_.clear();
 				      self->updateSizeBytes_ = 0;

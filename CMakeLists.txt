@@ -353,7 +353,11 @@ if(BUILD_PLUGIN)
     GIT_TAG "f049fff95a089aa9969deb009cdd4892b3e74916"
     GIT_SHALLOW TRUE
   )
+  set(_clipx_warning_as_error "${CMAKE_COMPILE_WARNING_AS_ERROR}")
+  set(CMAKE_COMPILE_WARNING_AS_ERROR OFF)
   FetchContent_MakeAvailable(whisper_cpp)
+  set(CMAKE_COMPILE_WARNING_AS_ERROR "${_clipx_warning_as_error}")
+  unset(_clipx_warning_as_error)
   if(MSVC)
     # The project enables /WX for first-party code. Keep upstream conversion
     # warnings visible without treating third-party whisper.cpp as our errors.
