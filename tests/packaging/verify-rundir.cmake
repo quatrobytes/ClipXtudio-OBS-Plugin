@@ -1,0 +1,49 @@
+if(NOT EXISTS "${PLUGIN_FILE}")
+  message(FATAL_ERROR "Native plugin binary is missing: ${PLUGIN_FILE}")
+endif()
+
+foreach(locale IN ITEMS en-US.ini es-ES.ini)
+  if(NOT EXISTS "${RESOURCE_DIR}/locale/${locale}")
+    message(FATAL_ERROR "Required locale is missing: ${RESOURCE_DIR}/locale/${locale}")
+  endif()
+endforeach()
+
+set(voice_model "${RESOURCE_DIR}/models/ggml-tiny-q5_1.bin")
+if(NOT EXISTS "${voice_model}")
+  message(FATAL_ERROR "Bundled multilingual Voice Trigger model is missing: ${voice_model}")
+endif()
+file(SIZE "${voice_model}" voice_model_size)
+if(voice_model_size LESS 30000000)
+  message(FATAL_ERROR "Voice Trigger model is a placeholder or truncated (${voice_model_size} bytes)")
+endif()
+file(SHA256 "${voice_model}" voice_model_hash)
+if(NOT voice_model_hash STREQUAL "818710568da3ca15689e31a743197b520007872ff9576237bda97bd1b469c3d7")
+  message(FATAL_ERROR "Voice Trigger model checksum is invalid: ${voice_model_hash}")
+endif()
+
+if(WIN32)
+  set(tls_backend "${RESOURCE_DIR}/qt-plugins/tls/qschannelbackend.dll")
+  if(NOT EXISTS "${tls_backend}")
+    message(FATAL_ERROR "Bundled Qt Schannel TLS backend is missing: ${tls_backend}")
+  endif()
+  set(ffmpeg_binary "${RESOURCE_DIR}/tools/ffmpeg/ffmpeg.exe")
+  if(NOT EXISTS "${ffmpeg_binary}")
+    message(FATAL_ERROR "Bundled FFmpeg executable is missing: ${ffmpeg_binary}")
+  endif()
+  file(SIZE "${ffmpeg_binary}" ffmpeg_size)
+  if(ffmpeg_size LESS 50000000)
+    message(FATAL_ERROR "Bundled FFmpeg executable is a placeholder or truncated (${ffmpeg_size} bytes)")
+  endif()
+endif()
+
+file(
+  GLOB_RECURSE forbidden_user_data
+  "${RESOURCE_DIR}/*.db"
+  "${RESOURCE_DIR}/settings.json"
+  "${RESOURCE_DIR}/clips/*"
+)
+if(forbidden_user_data)
+  message(FATAL_ERROR "Package contains user data: ${forbidden_user_data}")
+endif()
+
+message(STATUS "Plugin rundir layout is valid and contains no user data")

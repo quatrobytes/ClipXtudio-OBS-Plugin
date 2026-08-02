@@ -1,0 +1,5 @@
+<RCC>
+  <qresource prefix="/clipx">
+    <file alias="icon.png">assets/branding/clipx-studio-icon.png</file>
+  </qresource>
+</RCC>

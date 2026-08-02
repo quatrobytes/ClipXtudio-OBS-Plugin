@@ -1,0 +1,37 @@
+# Build outputs
+/build*/
+/release/
+/artifacts/
+/.deps/
+/.tools/
+/.vs/
+/.vscode/
+/CMakeUserPresets.json
+/cmake/.CMakeBuildNumber
+
+# Runtime and local state
+*.db
+*.sqlite
+*.sqlite3
+*.log
+*.tmp
+*.bak
+*.user
+*.suo
+*.lock.json
+
+# Secrets and signing material
+.env
+.env.*
+!.env.example
+*.pfx
+*.p12
+*.key
+*.pem
+!data/license-public.pem
+!data/license-public.pem.example
+
+# OS files
+.DS_Store
+Thumbs.db
+Desktop.ini

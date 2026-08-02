@@ -1,0 +1,125 @@
+name: Quality Gates
+
+on:
+  push:
+    branches: [main, master, 'release/**']
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: quality-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  native-tests:
+    name: Native C++ (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2022, ubuntu-24.04]
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Configure core, storage, mocks and performance tests
+        run: >
+          cmake -S . -B build-core
+          -DBUILD_PLUGIN=OFF
+          -DBUILD_TESTS=ON
+          -DBUILD_UI_TESTS=OFF
+
+      - name: Build tests
+        run: cmake --build build-core --config Debug --parallel
+
+      - name: Run tests
+        run: >
+          ctest --test-dir build-core -C Debug
+          --output-on-failure
+          --output-junit native-results.xml
+
+      - name: Validate release metadata and installer policy
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          tests/packaging/Test-ReleaseMetadata.ps1
+          if ( -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe") ) {
+            choco install innosetup --no-progress -y
+          }
+          tests/packaging/Test-InnoSource.ps1
+
+      - name: Publish native test report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-results-${{ matrix.os }}
+          path: build-core/native-results.xml
+          if-no-files-found: error
+
+  native-coverage:
+    name: Native coverage
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install coverage dependencies
+        run: sudo apt-get update && sudo apt-get install -y gcovr libssl-dev libsqlite3-dev
+
+      - name: Configure coverage build
+        run: >
+          cmake -S . -B build-coverage
+          -DCMAKE_BUILD_TYPE=Debug
+          -DBUILD_PLUGIN=OFF
+          -DBUILD_TESTS=ON
+          -DBUILD_UI_TESTS=OFF
+          -DENABLE_COVERAGE=ON
+
+      - name: Build and test
+        run: |
+          cmake --build build-coverage --parallel
+          ctest --test-dir build-coverage --output-on-failure
+
+      - name: Enforce 65% native line coverage
+        run: >
+          gcovr
+          --root .
+          --filter 'src/core/'
+          --filter 'src/storage/'
+          --filter 'src/security/'
+          --exclude 'tests/'
+          --fail-under-line 65
+          --xml-pretty coverage-native.xml
+          --html-details coverage-native.html
+
+      - name: Publish native coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: native-coverage
+          path: |
+            coverage-native.xml
+            coverage-native.html
+            coverage-native.*.html
+          if-no-files-found: warn
+
+  secret-policy:
+    name: No provider secrets in native plugin
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Reject embedded provider credentials
+        shell: bash
+        run: |
+          if grep -RInE \
+            --include='*.cpp' --include='*.hpp' --include='*.h' \
+            '(sk-[A-Za-z0-9_-]{20,}|OPENAI_API_KEY|ANTHROPIC_API_KEY|STRIPE_SECRET)' \
+            src include tests; then
+            echo 'Provider credential pattern found in native sources.'
+            exit 1
+          fi
